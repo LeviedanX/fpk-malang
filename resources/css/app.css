@@ -1,0 +1,282 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+/* Dark mode berbasis class (.dark pada <html>). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../views/**/*.blade.php';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-display: 'Playfair Display', 'Lora', ui-serif, Georgia, 'Times New Roman', serif;
+
+    /* Brand — Maroon (identitas FPK). */
+    --color-maroon-50: #fbf3f3;
+    --color-maroon-100: #f6e4e4;
+    --color-maroon-200: #ecc9c9;
+    --color-maroon-300: #dda2a2;
+    --color-maroon-400: #c86e6e;
+    --color-maroon-500: #b04a4a;
+    --color-maroon-600: #98383a;
+    --color-maroon-700: #7c2b2f;
+    --color-maroon-800: #6a2529;
+    --color-maroon-900: #4f1c20;
+    --color-maroon-950: #2e0f12;
+
+    /* Cream / off-white. */
+    --color-cream-50: #fdfbf6;
+    --color-cream-100: #faf5ea;
+    --color-cream-200: #f3e9cf;
+    --color-cream-300: #e9d9b4;
+
+    /* Aksen emas. */
+    --color-gold-300: #e6c478;
+    --color-gold-400: #d9a441;
+    --color-gold-500: #c8912f;
+    --color-gold-600: #a9761f;
+
+    /* Ink / neutral. */
+    --color-ink-50: #f6f6f7;
+    --color-ink-100: #ececee;
+    --color-ink-200: #d7d8db;
+    --color-ink-300: #b4b6bc;
+    --color-ink-400: #8b8e96;
+    --color-ink-500: #6c6f78;
+    --color-ink-600: #565962;
+    --color-ink-700: #3f424a;
+    --color-ink-800: #2a2c32;
+    --color-ink-900: #1a1b20;
+    --color-ink-950: #101116;
+}
+
+@layer base {
+    [x-cloak] {
+        display: none !important;
+    }
+
+    html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 5.5rem;
+        overflow-x: clip;
+    }
+
+    body {
+        @apply bg-cream-50 text-ink-800 antialiased;
+        overflow-x: hidden;
+        transition: background-color 0.35s ease, color 0.3s ease;
+    }
+
+    .dark body {
+        @apply bg-ink-950 text-ink-100;
+    }
+
+    h1, h2, h3, h4 {
+        font-family: var(--font-display);
+        text-wrap: balance;
+    }
+
+    img, video, svg, iframe {
+        max-width: 100%;
+    }
+
+    :where(p, li, dd, a, button, label) {
+        overflow-wrap: break-word;
+    }
+
+    a:focus-visible,
+    button:focus-visible,
+    [tabindex]:focus-visible,
+    summary:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+        outline: 2px solid var(--color-maroon-600);
+        outline-offset: 2px;
+        border-radius: 0.375rem;
+    }
+
+    ::selection {
+        background: color-mix(in srgb, var(--color-maroon-600) 28%, transparent);
+    }
+}
+
+/* ---------------- Utilities ---------------- */
+
+@utility container-x {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
+}
+
+@utility section {
+    @apply py-16 sm:py-20 lg:py-24;
+}
+
+@utility eyebrow {
+    @apply inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-maroon-600;
+}
+
+@utility btn {
+    @apply relative inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-semibold transition duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-[0.98];
+}
+
+@utility btn-primary {
+    @apply btn bg-maroon-700 text-cream-50 shadow-sm hover:bg-maroon-800 focus-visible:ring-maroon-600;
+}
+
+@utility btn-gold {
+    @apply btn bg-gold-500 text-maroon-950 shadow-sm hover:bg-gold-400 focus-visible:ring-gold-500;
+}
+
+@utility btn-outline {
+    @apply btn border border-maroon-200 bg-white/70 text-maroon-700 hover:border-maroon-400 hover:bg-white focus-visible:ring-maroon-600 dark:border-ink-700 dark:bg-ink-900 dark:text-cream-100;
+}
+
+@utility btn-ghost-light {
+    @apply btn border border-cream-100/40 bg-white/10 text-cream-50 backdrop-blur hover:bg-white/20 focus-visible:ring-cream-100;
+}
+
+@utility surface {
+    @apply rounded-xl border border-maroon-100 bg-white shadow-sm dark:border-ink-800 dark:bg-ink-900;
+}
+
+@utility card-lift {
+    @apply transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-maroon-900/10;
+}
+
+@utility section-title {
+    @apply font-display text-2xl font-bold text-maroon-800 sm:text-3xl lg:text-[2.1rem] dark:text-cream-100;
+}
+
+/* Garis emas kecil di bawah judul section. */
+@utility title-rule {
+    @apply mt-3 block h-1 w-16 rounded-full bg-gold-500;
+}
+
+/* ---------------- Reveal on scroll ---------------- */
+
+/* Progressive enhancement: hidden state only applies when JS is available, so
+   content stays visible for no-JS visitors and crawlers. */
+.js .reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+    will-change: opacity, transform;
+}
+
+.js .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+}
+
+/* ---------------- Hero decoration ---------------- */
+
+/* Motif kebhinnekaan: pola titik halus + gradien maroon berlapis. */
+.hero-motif {
+    background-image:
+        radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.10) 1px, transparent 0);
+    background-size: 22px 22px;
+}
+
+.hero-glow {
+    background: radial-gradient(60% 55% at 78% 30%, rgba(216, 164, 65, 0.20), transparent 70%);
+    animation: hero-glow-float 14s ease-in-out infinite;
+}
+
+.text-gradient-gold {
+    background: linear-gradient(100deg, var(--color-gold-300), var(--color-gold-500));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+@keyframes hero-glow-float {
+    0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.9; }
+    50% { transform: translate3d(-3%, 4%, 0); opacity: 1; }
+}
+
+/* Naik-turun halus untuk elemen dekoratif. */
+.float-slow {
+    animation: float-slow 7s ease-in-out infinite;
+}
+
+@keyframes float-slow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+/* ---------------- Rich text (prose Trix/artikel) ---------------- */
+
+.prose-content :where(h2, h3) {
+    font-family: var(--font-display);
+}
+
+/* ---------------- Trix editor (admin) ---------------- */
+
+trix-toolbar .trix-button-group--file-tools {
+    display: none !important; /* lampiran berkas dinonaktifkan */
+}
+
+trix-toolbar .trix-button-group {
+    border-color: var(--color-ink-200);
+}
+
+trix-editor {
+    padding: 0.9rem 1rem;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--color-ink-800);
+}
+
+trix-editor:empty::before,
+trix-editor:not(.trix-content--focused) {
+    color: var(--color-ink-800);
+}
+
+trix-editor h1 {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 0.75rem 0 0.5rem;
+}
+
+trix-editor ul,
+trix-editor ol {
+    margin-left: 1.25rem;
+}
+
+trix-editor ul { list-style: disc; }
+trix-editor ol { list-style: decimal; }
+
+trix-editor blockquote {
+    border-left: 3px solid var(--color-gold-400);
+    padding-left: 0.75rem;
+    color: var(--color-ink-600);
+}
+
+trix-editor a {
+    color: var(--color-maroon-700);
+    text-decoration: underline;
+}
+
+/* ---------------- Reduced motion ---------------- */
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+    }
+
+    .js .reveal {
+        opacity: 1;
+        transform: none;
+    }
+}

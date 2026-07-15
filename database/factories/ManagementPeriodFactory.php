@@ -1,0 +1,29 @@
+<?php
+
+namespace Database\Factories;
+
+use App\Models\ManagementPeriod;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends Factory<ManagementPeriod>
+ */
+class ManagementPeriodFactory extends Factory
+{
+    public function definition(): array
+    {
+        $startYear = fake()->numberBetween(2018, 2025);
+
+        return [
+            'name' => "Periode {$startYear}-".($startYear + 2),
+            'start_year' => $startYear,
+            'end_year' => $startYear + 2,
+            'is_active' => false,
+        ];
+    }
+
+    public function active(): static
+    {
+        return $this->state(fn () => ['is_active' => true]);
+    }
+}
