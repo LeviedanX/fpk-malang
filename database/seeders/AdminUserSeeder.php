@@ -16,7 +16,8 @@ class AdminUserSeeder extends Seeder
     public function run(): void
     {
         $email = env('ADMIN_EMAIL', 'admin@fpkmalang.test');
-
+//ayam1234
+//lanjutan aja
         User::query()->firstOrCreate(
             ['email' => $email],
             [
