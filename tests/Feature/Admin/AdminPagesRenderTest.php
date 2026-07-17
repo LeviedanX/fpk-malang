@@ -57,4 +57,30 @@ class AdminPagesRenderTest extends TestCase
         $this->get(route('admin.articles.index'))->assertRedirect(route('login'));
         $this->get(route('admin.settings.edit'))->assertRedirect(route('login'));
     }
+
+    public function test_member_list_displays_sequential_numbers_instead_of_internal_order_weights(): void
+    {
+        $user = $this->admin();
+        $period = ManagementPeriod::factory()->create();
+
+        ManagementMember::factory()->for($period, 'period')->create([
+            'name' => 'Anggota Pertama',
+            'display_order' => 10,
+        ]);
+
+        ManagementMember::factory()->for($period, 'period')->create([
+            'name' => 'Anggota Kedua',
+            'display_order' => 20,
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('admin.members.index', ['period' => $period]))
+            ->assertOk()
+            ->assertSeeInOrder([
+                'data-label="No." class="px-4 py-3 text-slate-500">1</td>',
+                'Anggota Pertama',
+                'data-label="No." class="px-4 py-3 text-slate-500">2</td>',
+                'Anggota Kedua',
+            ], false);
+    }
 }

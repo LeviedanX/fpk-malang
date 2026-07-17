@@ -5,11 +5,45 @@ namespace Tests\Feature\Admin;
 use App\Models\ManagementPeriod;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class ManagementPeriodTest extends TestCase
 {
     use RefreshDatabase;
+
+    private function pngUpload(string $name = 'pengurus.png'): UploadedFile
+    {
+        $bytes = base64_decode(
+            'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk'
+            .'+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
+        );
+
+        $path = tempnam(sys_get_temp_dir(), 'png');
+        file_put_contents($path, $bytes);
+
+        return new UploadedFile($path, $name, 'image/png', null, true);
+    }
+
+    public function test_admin_can_create_period_with_group_photo(): void
+    {
+        Storage::fake('public');
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->post(route('admin.periods.store'), [
+            'name' => 'Periode 2027-2029',
+            'start_year' => 2027,
+            'end_year' => 2029,
+            'group_photo' => $this->pngUpload(),
+            'is_active' => '1',
+        ])->assertRedirect(route('admin.periods.index'));
+
+        $period = ManagementPeriod::firstWhere('name', 'Periode 2027-2029');
+
+        $this->assertNotNull($period?->group_photo_path);
+        Storage::disk('public')->assertExists($period->group_photo_path);
+    }
 
     public function test_activating_a_period_deactivates_others(): void
     {

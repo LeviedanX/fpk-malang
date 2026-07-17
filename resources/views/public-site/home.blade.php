@@ -4,38 +4,38 @@
 
 {{-- ============================ HERO ============================ --}}
 <section id="beranda" class="relative isolate overflow-hidden bg-maroon-950 text-cream-50">
-    <div class="hero-motif pointer-events-none absolute inset-0 -z-10" aria-hidden="true"></div>
-    <div class="hero-glow pointer-events-none absolute inset-0 -z-10" aria-hidden="true"></div>
+    <div class="hero-motif parallax-layer pointer-events-none absolute inset-0 -z-10" data-parallax="0.012" aria-hidden="true"></div>
+    <div class="hero-glow parallax-layer pointer-events-none absolute inset-0 -z-10" data-parallax="0.032" aria-hidden="true"></div>
     <div class="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-40 bg-linear-to-t from-maroon-950 to-transparent" aria-hidden="true"></div>
 
     <div class="container-x relative flex min-h-[88vh] flex-col justify-center pb-20 pt-36 sm:pt-40">
         <div class="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
             {{-- Left: message --}}
             <div>
-                <p class="reveal eyebrow text-gold-400!" style="--reveal-delay: 0ms">
+                <p class="reveal reveal-left eyebrow text-gold-400!" style="--reveal-delay: 0ms">
                     <span class="h-1.5 w-1.5 rounded-full bg-gold-400"></span>
                     Forum Pembauran Kebangsaan &middot; Kota Malang
                 </p>
 
-                <h1 class="reveal mt-6 font-display text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl" style="--reveal-delay: 90ms">
+                <h1 class="reveal reveal-left mt-6 font-display text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl" style="--reveal-delay: 90ms">
                     {{ $profile->hero_title }}
                 </h1>
 
                 @if ($profile->hero_subtitle)
-                    <p class="reveal mt-6 max-w-xl text-base leading-relaxed text-cream-100/85 sm:text-lg" style="--reveal-delay: 170ms">
+                    <p class="reveal reveal-left mt-6 max-w-xl text-base leading-relaxed text-cream-100/85 sm:text-lg" style="--reveal-delay: 170ms">
                         {{ $profile->hero_subtitle }}
                     </p>
                 @endif
 
-                <div class="reveal mt-9 flex flex-wrap gap-3" style="--reveal-delay: 250ms">
+                <div class="reveal reveal-left mt-9 flex flex-wrap gap-3" style="--reveal-delay: 250ms">
                     <a href="#tentang" class="btn-gold">Tentang FPK</a>
                     <a href="#agenda" class="btn-ghost-light">Lihat Agenda</a>
                 </div>
             </div>
 
             {{-- Right: featured visual, with a composed fallback when no image is set --}}
-            <div class="reveal relative" style="--reveal-delay: 200ms">
-                <div class="relative aspect-4/5 overflow-hidden rounded-2xl border border-cream-100/15 bg-maroon-900/40 shadow-2xl shadow-black/30 sm:aspect-square lg:aspect-4/5">
+            <div class="reveal reveal-right reveal-scale relative" style="--reveal-delay: 200ms">
+                <div class="hero-visual parallax-layer relative aspect-4/5 overflow-hidden rounded-2xl border border-cream-100/15 bg-maroon-900/40 shadow-2xl shadow-black/30 sm:aspect-square lg:aspect-4/5" data-parallax="0.025">
                     @if ($profile->hero_image_path)
                         <img src="{{ \Illuminate\Support\Facades\Storage::url($profile->hero_image_path) }}"
                              alt="Kegiatan Forum Pembauran Kebangsaan Kota Malang"
@@ -43,13 +43,18 @@
                              class="h-full w-full object-cover">
                         <div class="pointer-events-none absolute inset-0 bg-linear-to-t from-maroon-950/70 via-transparent to-transparent" aria-hidden="true"></div>
                     @else
-                        <div class="hero-motif absolute inset-0 opacity-50" aria-hidden="true"></div>
-                        <div class="absolute inset-0 grid place-items-center p-8 text-center">
-                            <div>
-                                <span class="mx-auto grid h-24 w-24 place-items-center rounded-full border border-gold-400/40 bg-cream-50/95 font-display text-4xl font-bold text-maroon-800" aria-hidden="true">F</span>
-                                <p class="mt-5 font-display text-lg font-semibold text-cream-50">FPK Kota Malang</p>
-                                <p class="mt-1 text-sm text-cream-100/70">Merawat kebhinnekaan, memperkuat persatuan.</p>
-                            </div>
+                        <img src="{{ asset('assets/images/branding/hero-card-bg.webp') }}"
+                             alt=""
+                             class="absolute inset-0 h-full w-full object-cover"
+                             aria-hidden="true">
+                        <div class="absolute inset-0 bg-black/10" aria-hidden="true"></div>
+                        <div class="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center sm:px-8">
+                            <img src="{{ asset('assets/images/branding/logo-fpk.png') }}"
+                                 alt="Logo FPK Kota Malang"
+                                 width="144" height="144"
+                                 class="float-slow h-24 w-24 rounded-full bg-white p-3 shadow-2xl ring-1 ring-gold-400/35 sm:h-28 sm:w-28 md:h-36 md:w-36 md:p-4">
+                            <p class="mt-6 font-display text-xl font-bold text-cream-50 sm:text-2xl">FPK Kota Malang</p>
+                            <p class="mt-2 max-w-sm text-sm leading-relaxed text-cream-100/75">Merawat kebhinnekaan, memperkuat persatuan.</p>
                         </div>
                     @endif
                 </div>
@@ -57,7 +62,7 @@
         </div>
 
         {{-- Dasar hukum sebagai penanda kredibilitas (faktual dari SK). --}}
-        <dl class="reveal mt-14 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-cream-100/15 bg-cream-100/5 sm:grid-cols-3" style="--reveal-delay: 320ms">
+        <dl class="reveal reveal-scale mt-14 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-cream-100/15 bg-cream-100/5 sm:grid-cols-3" style="--reveal-delay: 320ms">
             @foreach ([
                 ['Dasar Hukum', 'Pergub Jatim No. 41/2009'],
                 ['Landasan', 'SK Wali Kota Malang'],
@@ -75,19 +80,55 @@
 {{-- ============================ TENTANG ============================ --}}
 <section id="tentang" class="section scroll-mt-24 bg-cream-50 dark:bg-ink-950">
     <div class="container-x">
-        <div class="reveal mx-auto max-w-2xl text-center">
+        <div class="reveal reveal-scale mx-auto max-w-2xl text-center">
             <span class="eyebrow">Profil Organisasi</span>
             <h2 class="section-title mt-3">Tentang FPK Kota Malang</h2>
             <span class="title-rule mx-auto"></span>
         </div>
 
-        @if ($profile->definition)
-            <div class="reveal mx-auto mt-8 max-w-3xl text-center text-lg leading-relaxed text-ink-600 dark:text-ink-300">
-                <x-public-site.rich-text :text="$profile->definition" />
-            </div>
-        @endif
+        <div class="mt-12 grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+            <div class="reveal reveal-left surface p-6 sm:p-8">
+                <div class="text-base leading-relaxed text-ink-600 dark:text-ink-300 sm:text-lg">
+                    @if ($profile->definition)
+                        <x-public-site.rich-text :text="$profile->definition" />
+                    @else
+                        <p>
+                            Forum Pembauran Kebangsaan Kota Malang merupakan wadah informasi, komunikasi,
+                            konsultasi, dan kerja sama antarwarga masyarakat. FPK diarahkan untuk menumbuhkan,
+                            memantapkan, memelihara, dan mengembangkan pembauran kebangsaan di tengah
+                            kemajemukan masyarakat Kota Malang.
+                        </p>
+                    @endif
+                </div>
 
-        <div class="mt-12 grid gap-6 md:grid-cols-2">
+                <ul class="mt-6 space-y-3">
+                    @foreach ([
+                        'Menumbuhkan toleransi dan saling menghormati.',
+                        'Meningkatkan integrasi dan persatuan masyarakat.',
+                        'Mencegah konflik sosial dan disintegrasi.',
+                        'Membangun solidaritas dalam bingkai NKRI.',
+                    ] as $point)
+                        <li class="flex gap-3 text-sm leading-relaxed text-ink-600 dark:text-ink-300">
+                            <span class="mt-0.5 grid h-6 w-6 flex-none place-items-center rounded-full bg-maroon-50 text-maroon-700 ring-1 ring-maroon-100 dark:bg-ink-800 dark:text-gold-400 dark:ring-white/10" aria-hidden="true">
+                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </span>
+                            <span>{{ $point }}</span>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+
+            <figure class="reveal reveal-right reveal-scale overflow-hidden rounded-2xl border border-cream-200 bg-white shadow-xl shadow-maroon-950/10 dark:border-white/10 dark:bg-ink-900 dark:shadow-black/20" style="--reveal-delay: 100ms">
+                <img src="{{ asset('assets/images/about/about-fpk-vector.webp') }}"
+                     alt="Ilustrasi Tugu Malang dan Balai Kota Malang sebagai identitas FPK Kota Malang"
+                     width="1400" height="1050"
+                     class="aspect-4/3 h-full w-full object-cover transition duration-700 hover:scale-[1.025]">
+            </figure>
+        </div>
+
+        <div class="mt-10 grid gap-6 md:grid-cols-2">
             @php($aboutBlocks = [
                 ['background', 'Latar Belakang', 'M12 3v18m9-9H3', false],
                 ['objectives', 'Tujuan', 'M5 13l4 4L19 7', true],
@@ -96,7 +137,7 @@
             ])
             @foreach ($aboutBlocks as [$field, $label, $icon, $asList])
                 @if ($profile->{$field})
-                    <article class="reveal surface card-lift p-6">
+                    <article class="reveal {{ $loop->odd ? 'reveal-left' : 'reveal-right' }} surface card-lift p-6" style="--reveal-delay: {{ ($loop->index % 2) * 70 }}ms">
                         <div class="flex items-center gap-3">
                             <span class="grid h-10 w-10 flex-none place-items-center rounded-lg bg-maroon-50 text-maroon-700 dark:bg-ink-800 dark:text-gold-400">
                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $icon }}"/></svg>
@@ -120,7 +161,7 @@
 {{-- ============================ ARTIKEL ============================ --}}
 <section id="artikel" class="section scroll-mt-24 bg-white dark:bg-ink-900">
     <div class="container-x">
-        <div class="reveal flex flex-wrap items-end justify-between gap-4">
+        <div class="reveal reveal-left flex flex-wrap items-end justify-between gap-4">
             <div>
                 <span class="eyebrow">Kabar Terbaru</span>
                 <h2 class="section-title mt-3">Artikel Terbaru</h2>
@@ -132,7 +173,7 @@
         @if ($featuredArticle)
             <div class="mt-10 grid gap-6 lg:grid-cols-2 lg:items-stretch">
                 {{-- Featured article: dominant editorial card. --}}
-                <article class="reveal group surface card-lift flex flex-col overflow-hidden">
+                <article class="reveal reveal-left group surface card-lift flex flex-col overflow-hidden">
                     <a href="{{ route('articles.show', $featuredArticle) }}" class="relative block aspect-16/10 overflow-hidden bg-cream-100 dark:bg-ink-800">
                         @if ($featuredArticle->thumbnail_path)
                             <img src="{{ \Illuminate\Support\Facades\Storage::url($featuredArticle->thumbnail_path) }}" alt="{{ $featuredArticle->title }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
@@ -166,7 +207,7 @@
                 @if ($latestArticles->isNotEmpty())
                     <div class="flex flex-col divide-y divide-cream-200 dark:divide-ink-800">
                         @foreach ($latestArticles as $article)
-                            <article class="reveal group flex gap-4 py-4 first:pt-0 last:pb-0" style="--reveal-delay: {{ $loop->index * 80 }}ms">
+                            <article class="reveal reveal-right group flex gap-4 py-4 first:pt-0 last:pb-0" style="--reveal-delay: {{ $loop->index * 80 }}ms">
                                 <a href="{{ route('articles.show', $article) }}" class="block aspect-square w-24 flex-none overflow-hidden rounded-lg bg-cream-100 dark:bg-ink-800 sm:w-28">
                                     @if ($article->thumbnail_path)
                                         <img src="{{ \Illuminate\Support\Facades\Storage::url($article->thumbnail_path) }}" alt="{{ $article->title }}" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
@@ -201,7 +242,7 @@
 {{-- ============================ AGENDA ============================ --}}
 <section id="agenda" class="section scroll-mt-24 bg-cream-50 dark:bg-ink-950">
     <div class="container-x max-w-4xl!">
-        <div class="reveal text-center">
+        <div class="reveal reveal-scale text-center">
             <span class="eyebrow">Jadwal Kegiatan</span>
             <h2 class="section-title mt-3">Agenda Mendatang</h2>
             <span class="title-rule mx-auto"></span>
@@ -227,7 +268,7 @@
 {{-- ============================ PENGURUS ============================ --}}
 <section id="pengurus" class="section scroll-mt-24 bg-white dark:bg-ink-900">
     <div class="container-x">
-        <div class="reveal text-center">
+        <div class="reveal reveal-scale text-center">
             <span class="eyebrow">Struktur Organisasi</span>
             <h2 class="section-title mt-3">Susunan Pengurus</h2>
             <span class="title-rule mx-auto"></span>
@@ -236,92 +277,58 @@
             @endif
         </div>
 
-        @if ($activePeriod && $activePeriod->activeMembers->isNotEmpty())
-            @php($members = $activePeriod->activeMembers)
-            @php($core = $members->where('division', 'Pengurus Inti')->values())
-            @php($divisions = $members->reject(fn ($m) => $m->division === 'Pengurus Inti')->groupBy(fn ($m) => $m->division ?: 'Lainnya'))
-            @php($leader = $core->first())
-            @php($coreRest = $core->slice(1)->values())
-            @php($divisionKeys = $divisions->keys())
-
-            {{-- Pengurus inti: ketua dominan + jajaran inti lain --}}
-            @if ($leader)
-                <div class="reveal mt-12">
-                    <div class="mx-auto max-w-xs">
-                        <x-public-site.member-card :member="$leader" featured />
+        @if ($activePeriod && ($activePeriod->group_photo_path || $activePeriod->activeMembers->isNotEmpty()))
+            @if ($activePeriod->group_photo_path)
+                <figure class="reveal reveal-scale group relative mt-12 overflow-hidden rounded-2xl border border-maroon-100 bg-maroon-950 shadow-xl shadow-maroon-950/15 dark:border-white/10 dark:shadow-black/30">
+                    <div class="aspect-16/7 min-h-64 sm:min-h-80">
+                        <img src="{{ \Illuminate\Support\Facades\Storage::url($activePeriod->group_photo_path) }}"
+                             alt="Foto bersama pengurus FPK Kota Malang masa bakti {{ $activePeriod->label() }}"
+                             width="1400" height="613"
+                             class="h-full w-full object-cover transition duration-1000 group-hover:scale-[1.015]">
                     </div>
-                    @if ($coreRest->isNotEmpty())
-                        <div class="mx-auto mt-6 grid max-w-3xl gap-6 sm:grid-cols-3">
-                            @foreach ($coreRest as $member)
-                                <x-public-site.member-card :member="$member" />
-                            @endforeach
-                        </div>
-                    @endif
-                </div>
+                    <figcaption class="absolute inset-x-0 bottom-0 bg-linear-to-t from-maroon-950/90 via-maroon-950/55 to-transparent px-5 pb-5 pt-16 text-cream-50 sm:px-7 sm:pb-7">
+                        <p class="font-display text-xl font-bold sm:text-2xl">Kebersamaan Pengurus FPK Kota Malang</p>
+                        <p class="mt-1 text-sm text-cream-100/75">Masa Bakti {{ $activePeriod->label() }}</p>
+                    </figcaption>
+                </figure>
             @endif
 
-            {{-- Pengurus bidang: tab di desktop, accordion di mobile --}}
-            @if ($divisions->isNotEmpty())
-                @php($tabCount = $divisionKeys->count())
+            @if ($activePeriod->activeMembers->isNotEmpty())
+                <div x-data="memberCarousel" data-member-carousel
+                     class="reveal reveal-scale mt-10"
+                     x-on:resize.window.debounce.150ms="sync()"
+                     x-on:keydown.arrow-left.prevent="move(-1)"
+                     x-on:keydown.arrow-right.prevent="move(1)">
+                    <div class="mb-5 flex items-end justify-between gap-4">
+                        <div>
+                            <p class="eyebrow">Profil Pengurus</p>
+                            <h3 class="mt-2 font-display text-2xl font-bold text-maroon-800 dark:text-cream-100">Kenali Pengurus Kami</h3>
+                            <p class="mt-1 text-sm text-ink-500 dark:text-ink-400">Geser kartu ke samping untuk melihat seluruh pengurus.</p>
+                        </div>
 
-                {{-- Desktop: tabs --}}
-                <div x-data="{ tab: 0 }" class="reveal mt-14 hidden lg:block">
-                    <div role="tablist" aria-label="Bidang kepengurusan"
-                         class="flex flex-wrap gap-1 border-b border-cream-200 dark:border-ink-800"
-                         x-on:keydown.arrow-right.prevent="tab = (tab + 1) % {{ $tabCount }}; $refs['t' + tab].focus()"
-                         x-on:keydown.arrow-left.prevent="tab = (tab - 1 + {{ $tabCount }}) % {{ $tabCount }}; $refs['t' + tab].focus()">
-                        @foreach ($divisionKeys as $i => $key)
-                            <button type="button" role="tab" x-ref="t{{ $i }}"
-                                    id="pengurus-tab-{{ $i }}" aria-controls="pengurus-panel-{{ $i }}"
-                                    :aria-selected="tab === {{ $i }} ? 'true' : 'false'"
-                                    :tabindex="tab === {{ $i }} ? 0 : -1"
-                                    x-on:click="tab = {{ $i }}"
-                                    class="-mb-px rounded-t-lg border-b-2 px-4 py-2.5 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-gold-400 dark:focus-visible:ring-offset-ink-900"
-                                    :class="tab === {{ $i }} ? 'border-maroon-700 text-maroon-800 dark:border-gold-400 dark:text-gold-400' : 'border-transparent text-ink-500 hover:text-maroon-700 dark:text-ink-400 dark:hover:text-cream-100'">
-                                {{ $key }}
+                        <div class="hidden gap-2 sm:flex" aria-label="Kontrol carousel pengurus">
+                            <button type="button" x-on:click="move(-1)" :disabled="!canPrevious"
+                                    class="icon-button grid h-11 w-11 place-items-center rounded-full border border-maroon-200 bg-white text-maroon-700 shadow-sm disabled:cursor-not-allowed disabled:opacity-35 dark:border-ink-700 dark:bg-ink-900 dark:text-gold-400"
+                                    aria-label="Pengurus sebelumnya">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
                             </button>
-                        @endforeach
+                            <button type="button" x-on:click="move(1)" :disabled="!canNext"
+                                    class="icon-button grid h-11 w-11 place-items-center rounded-full border border-maroon-200 bg-white text-maroon-700 shadow-sm disabled:cursor-not-allowed disabled:opacity-35 dark:border-ink-700 dark:bg-ink-900 dark:text-gold-400"
+                                    aria-label="Pengurus berikutnya">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                            </button>
+                        </div>
                     </div>
 
-                    @foreach ($divisions as $key => $bidangMembers)
-                        @php($i = $divisionKeys->search($key))
-                        <div role="tabpanel" id="pengurus-panel-{{ $i }}" aria-labelledby="pengurus-tab-{{ $i }}"
-                             x-show="tab === {{ $i }}" x-cloak class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                            @foreach ($bidangMembers as $member)
-                                <x-public-site.member-card :member="$member" />
-                            @endforeach
-                        </div>
-                    @endforeach
-                </div>
-
-                {{-- Mobile: accordion --}}
-                <div x-data="{ open: 0 }" class="reveal mt-10 space-y-3 lg:hidden">
-                    @foreach ($divisions as $key => $bidangMembers)
-                        @php($i = $divisionKeys->search($key))
-                        <div class="surface overflow-hidden">
-                            <h3>
-                                <button type="button"
-                                        x-on:click="open = (open === {{ $i }} ? null : {{ $i }})"
-                                        :aria-expanded="open === {{ $i }} ? 'true' : 'false'"
-                                        aria-controls="pengurus-acc-{{ $i }}"
-                                        class="flex w-full items-center justify-between gap-3 px-5 py-4 text-left font-display text-base font-bold text-maroon-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-maroon-600 dark:text-cream-100 dark:focus-visible:ring-gold-400">
-                                    <span>{{ $key }}</span>
-                                    <svg class="h-5 w-5 flex-none text-maroon-500 transition-transform dark:text-gold-400"
-                                         :class="open === {{ $i }} && 'rotate-180'"
-                                         fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                                    </svg>
-                                </button>
-                            </h3>
-                            <div id="pengurus-acc-{{ $i }}" x-show="open === {{ $i }}" x-collapse x-cloak>
-                                <div class="grid gap-5 px-5 pb-5 sm:grid-cols-2">
-                                    @foreach ($bidangMembers as $member)
-                                        <x-public-site.member-card :member="$member" />
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
+                    <div x-ref="track" x-on:scroll.debounce.80ms="sync()" tabindex="0"
+                         class="member-carousel-track -mx-4 flex gap-5 overflow-x-auto px-4 pb-5 sm:-mx-6 sm:gap-6 sm:px-6 lg:-mx-8 lg:px-8"
+                         aria-label="Daftar kartu pengurus">
+                        @foreach ($activePeriod->activeMembers as $member)
+                            <x-public-site.member-card :member="$member"
+                                data-member-card
+                                class="w-[78vw] max-w-70 flex-none snap-start sm:w-64 lg:w-68" />
+                        @endforeach
+                    </div>
                 </div>
             @endif
         @else
@@ -332,9 +339,9 @@
 
 {{-- ============================ KONTAK ============================ --}}
 <section id="kontak" class="section relative isolate scroll-mt-24 overflow-hidden bg-maroon-950 text-cream-50">
-    <div class="hero-motif pointer-events-none absolute inset-0 -z-10 opacity-40" aria-hidden="true"></div>
+    <div class="hero-motif parallax-layer pointer-events-none absolute inset-0 -z-10 opacity-40" data-parallax="0.018" aria-hidden="true"></div>
     <div class="container-x">
-        <div class="reveal text-center">
+        <div class="reveal reveal-scale text-center">
             <span class="eyebrow text-gold-400!">Hubungi Kami</span>
             <h2 class="section-title mt-3 text-cream-100!">Kontak &amp; Media Sosial</h2>
             <span class="title-rule mx-auto"></span>
@@ -342,7 +349,7 @@
 
         @if ($contact->hasAnyContact() || $contact->map_embed_url)
             <div class="mt-12 grid gap-8 md:grid-cols-2">
-                <div class="reveal space-y-6 text-sm">
+                <div class="reveal reveal-left space-y-6 text-sm">
                     @if ($contact->address)
                         <div><p class="font-semibold text-gold-400">Alamat</p><p class="mt-1 text-cream-100/85">{{ $contact->address }}</p></div>
                     @endif
@@ -365,7 +372,7 @@
                 </div>
 
                 @if ($contact->map_embed_url)
-                    <div class="reveal overflow-hidden rounded-xl border border-cream-100/15">
+                    <div class="reveal reveal-right overflow-hidden rounded-xl border border-cream-100/15">
                         <iframe src="{{ $contact->map_embed_url }}" title="Peta lokasi FPK Kota Malang" class="h-72 w-full md:h-full" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
                     </div>
                 @endif

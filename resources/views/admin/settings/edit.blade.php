@@ -21,7 +21,7 @@
         </x-admin.card>
 
         <x-admin.card title="Branding">
-            <div class="grid gap-6 sm:grid-cols-3">
+            <div class="grid gap-6 md:grid-cols-3">
                 <x-form.image-field name="logo" label="Logo" :current="$settings->logo_path" />
                 <x-form.image-field name="favicon" label="Favicon" :current="$settings->favicon_path" hint="Format PNG atau ICO. Maksimal 512 KB." />
                 <x-form.image-field name="default_og_image" label="Gambar OG Default" :current="$settings->default_og_image_path" />
@@ -35,8 +35,8 @@
             </div>
         </x-admin.card>
 
-        <div class="flex justify-end">
-            <button type="submit" class="rounded-md bg-maroon-700 px-6 py-2.5 font-medium text-cream-50 hover:bg-maroon-800">Simpan Perubahan</button>
+        <div class="flex justify-stretch sm:justify-end">
+            <button type="submit" class="admin-button admin-button-primary w-full sm:w-auto">Simpan Perubahan</button>
         </div>
     </form>
 @endsection

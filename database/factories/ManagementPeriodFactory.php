@@ -18,6 +18,7 @@ class ManagementPeriodFactory extends Factory
             'name' => "Periode {$startYear}-".($startYear + 2),
             'start_year' => $startYear,
             'end_year' => $startYear + 2,
+            'group_photo_path' => null,
             'is_active' => false,
         ];
     }

@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Http\Requests\Concerns\HandlesImageRules;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ManagementPeriodRequest extends FormRequest
 {
+    use HandlesImageRules;
+
     public function authorize(): bool
     {
         return true;
@@ -27,6 +30,7 @@ class ManagementPeriodRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'start_year' => ['required', 'integer', 'min:1945', 'max:2100'],
             'end_year' => ['nullable', 'integer', 'min:1945', 'max:2100', 'gte:start_year'],
+            'group_photo' => $this->imageRules(),
             'is_active' => ['boolean'],
         ];
     }
@@ -40,6 +44,7 @@ class ManagementPeriodRequest extends FormRequest
             'name' => 'nama periode',
             'start_year' => 'tahun mulai',
             'end_year' => 'tahun berakhir',
+            'group_photo' => 'foto bersama pengurus',
             'is_active' => 'status aktif',
         ];
     }

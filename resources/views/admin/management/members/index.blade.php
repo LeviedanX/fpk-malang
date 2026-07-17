@@ -4,17 +4,17 @@
 @section('heading', 'Susunan Pengurus - Anggota')
 
 @section('content')
-    <div class="flex flex-wrap items-center justify-between gap-3">
+    <div class="admin-toolbar">
         <div class="flex flex-wrap gap-2">
-            <a href="{{ route('admin.periods.index') }}" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">Periode</a>
-            <a href="{{ route('admin.members.index') }}" class="rounded-md bg-maroon-700 px-4 py-2 text-sm font-medium text-cream-50">Anggota</a>
+            <a href="{{ route('admin.periods.index') }}" class="admin-button admin-button-secondary">Periode</a>
+            <a href="{{ route('admin.members.index') }}" class="admin-button admin-button-primary">Anggota</a>
         </div>
-        <a href="{{ route('admin.members.create', ['period' => $periodId]) }}" class="rounded-md bg-maroon-700 px-4 py-2 text-sm font-medium text-cream-50 hover:bg-maroon-800">+ Tambah Anggota</a>
+        <a href="{{ route('admin.members.create', ['period' => $periodId]) }}" class="admin-button admin-button-primary">+ Tambah Anggota</a>
     </div>
 
-    <form method="GET" action="{{ route('admin.members.index') }}" class="flex gap-2">
+    <form method="GET" action="{{ route('admin.members.index') }}" class="admin-filter">
         <label for="period" class="sr-only">Filter periode</label>
-        <select name="period" id="period" onchange="this.form.submit()" class="rounded-md border-slate-300 text-sm shadow-sm focus:border-maroon-600 focus:ring-maroon-600">
+        <select name="period" id="period" onchange="this.form.submit()" class="form-control text-sm sm:w-auto sm:min-w-64">
             <option value="">Semua periode</option>
             @foreach ($periods as $period)
                 <option value="{{ $period->id }}" @selected((string) $periodId === (string) $period->id)>{{ $period->name }}</option>
@@ -22,11 +22,11 @@
         </select>
     </form>
 
-    <div class="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
-        <table class="min-w-full divide-y divide-slate-200 text-sm">
+    <div class="admin-table-wrap">
+        <table class="admin-table divide-y divide-slate-200">
             <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr>
-                    <th class="px-4 py-3">Urutan</th>
+                    <th class="px-4 py-3">No.</th>
                     <th class="px-4 py-3">Nama</th>
                     <th class="px-4 py-3">Jabatan</th>
                     <th class="px-4 py-3">Bidang</th>
@@ -37,20 +37,20 @@
             <tbody class="divide-y divide-slate-100">
                 @forelse ($members as $member)
                     <tr>
-                        <td class="px-4 py-3 text-slate-500">{{ $member->display_order }}</td>
-                        <td class="px-4 py-3 font-medium text-slate-800">{{ $member->name }}</td>
-                        <td class="px-4 py-3 text-slate-600">{{ $member->position }}</td>
-                        <td class="px-4 py-3 text-slate-600">{{ $member->division ?: '—' }}</td>
-                        <td class="px-4 py-3">
+                        <td data-label="No." class="px-4 py-3 text-slate-500">{{ $members->firstItem() + $loop->index }}</td>
+                        <td data-label="Nama" class="px-4 py-3 font-medium text-slate-800">{{ $member->name }}</td>
+                        <td data-label="Jabatan" class="px-4 py-3 text-slate-600">{{ $member->position }}</td>
+                        <td data-label="Bidang" class="px-4 py-3 text-slate-600">{{ $member->division ?: '—' }}</td>
+                        <td data-label="Status" class="px-4 py-3">
                             <span class="rounded-full px-2 py-0.5 text-xs {{ $member->is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600' }}">{{ $member->is_active ? 'Aktif' : 'Nonaktif' }}</span>
                         </td>
-                        <td class="px-4 py-3">
-                            <div class="flex justify-end gap-2">
-                                <a href="{{ route('admin.members.edit', $member) }}" class="rounded border border-slate-300 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50">Ubah</a>
+                        <td data-label="Aksi" class="px-4 py-3">
+                            <div class="admin-actions">
+                                <a href="{{ route('admin.members.edit', $member) }}" class="admin-action">Ubah</a>
                                 <form method="POST" action="{{ route('admin.members.destroy', $member) }}" onsubmit="return confirm('Hapus anggota ini?');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="rounded border border-rose-300 px-3 py-1 text-xs font-medium text-rose-700 hover:bg-rose-50">Hapus</button>
+                                    <button type="submit" class="admin-action admin-action-danger">Hapus</button>
                                 </form>
                             </div>
                         </td>

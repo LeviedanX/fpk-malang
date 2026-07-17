@@ -4,6 +4,8 @@ namespace Tests\Feature\PublicSite;
 
 use App\Models\Agenda;
 use App\Models\Article;
+use App\Models\ManagementMember;
+use App\Models\ManagementPeriod;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -14,6 +16,26 @@ class PublicPagesTest extends TestCase
     public function test_home_page_renders(): void
     {
         $this->get('/')->assertOk()->assertSee('Tentang FPK');
+    }
+
+    public function test_home_renders_group_photo_and_swipeable_member_cards(): void
+    {
+        $period = ManagementPeriod::factory()->active()->create([
+            'group_photo_path' => 'management/foto-bersama.webp',
+        ]);
+
+        ManagementMember::factory()->for($period, 'period')->create([
+            'name' => 'Ketua Pengurus Uji',
+            'position' => 'Ketua',
+            'portrait_path' => 'management/ketua.webp',
+        ]);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('Foto bersama pengurus FPK Kota Malang', false)
+            ->assertSee('data-member-carousel', false)
+            ->assertSee('Ketua Pengurus Uji')
+            ->assertSee('management/ketua.webp', false);
     }
 
     public function test_article_index_renders(): void

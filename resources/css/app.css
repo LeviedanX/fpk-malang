@@ -66,7 +66,7 @@
     body {
         @apply bg-cream-50 text-ink-800 antialiased;
         overflow-x: hidden;
-        transition: background-color 0.35s ease, color 0.3s ease;
+        transition: background-color 0.45s ease, color 0.4s ease;
     }
 
     .dark body {
@@ -118,7 +118,9 @@
 }
 
 @utility btn {
-    @apply relative inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-semibold transition duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-[0.98];
+    @apply relative isolate inline-flex items-center justify-center gap-2 overflow-hidden rounded-lg px-6 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-[0.98];
+    transition-duration: 320ms;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @utility btn-primary {
@@ -142,11 +144,24 @@
 }
 
 @utility card-lift {
-    @apply transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-maroon-900/10;
+    @apply transition hover:-translate-y-1.5 hover:shadow-xl hover:shadow-maroon-900/15;
+    transition-duration: 450ms;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @utility section-title {
     @apply font-display text-2xl font-bold text-maroon-800 sm:text-3xl lg:text-[2.1rem] dark:text-cream-100;
+}
+
+.member-carousel-track {
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 0.25rem;
+    scrollbar-width: none;
+    overscroll-behavior-inline: contain;
+}
+
+.member-carousel-track::-webkit-scrollbar {
+    display: none;
 }
 
 /* Garis emas kecil di bawah judul section. */
@@ -154,22 +169,534 @@
     @apply mt-3 block h-1 w-16 rounded-full bg-gold-500;
 }
 
-/* ---------------- Reveal on scroll ---------------- */
+/* ---------------- Motion primitives ---------------- */
+
+.scroll-progress {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 60;
+    height: 3px;
+    pointer-events: none;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.motion-ready .scroll-progress {
+    opacity: 1;
+}
+
+.scroll-progress > span {
+    display: block;
+    width: 100%;
+    height: 100%;
+    transform: scaleX(0);
+    transform-origin: left center;
+    background: linear-gradient(90deg, var(--color-gold-400), var(--color-gold-500), var(--color-maroon-500));
+    box-shadow: 0 0 14px color-mix(in srgb, var(--color-gold-400) 70%, transparent);
+    will-change: transform;
+}
 
 /* Progressive enhancement: hidden state only applies when JS is available, so
    content stays visible for no-JS visitors and crawlers. */
 .js .reveal {
+    --reveal-x: 0px;
+    --reveal-y: 30px;
+    --reveal-scale: 0.985;
     opacity: 0;
-    transform: translateY(22px);
-    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-        transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translate3d(var(--reveal-x), var(--reveal-y), 0) scale(var(--reveal-scale));
+    transition:
+        opacity 0.72s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.82s cubic-bezier(0.16, 1, 0.3, 1);
     transition-delay: var(--reveal-delay, 0ms);
     will-change: opacity, transform;
+}
+
+.js .reveal[data-reveal-origin="top"] {
+    --reveal-y: -30px;
+}
+
+.js .reveal-left {
+    --reveal-x: -34px;
+}
+
+.js .reveal-right {
+    --reveal-x: 34px;
+}
+
+.js .reveal-scale {
+    --reveal-scale: 0.94;
 }
 
 .js .reveal.is-visible {
     opacity: 1;
     transform: none;
+    will-change: auto;
+}
+
+.js #konten {
+    animation: page-enter 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes page-enter {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.parallax-layer {
+    transform: translate3d(0, var(--parallax-shift, 0px), 0);
+    will-change: transform;
+}
+
+.hero-visual {
+    transition: transform 0.25s linear, box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-visual:hover {
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.36);
+}
+
+:where(.btn, .btn-primary, .btn-gold, .btn-outline, .btn-ghost-light)::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(110deg, transparent 22%, rgba(255, 255, 255, 0.28) 48%, transparent 74%);
+    transform: translateX(-125%);
+    transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:where(.btn, .btn-primary, .btn-gold, .btn-outline, .btn-ghost-light):hover::before {
+    transform: translateX(125%);
+}
+
+:where(.btn, .btn-primary, .btn-gold, .btn-outline, .btn-ghost-light):hover {
+    transform: translateY(-2px);
+}
+
+.icon-button {
+    transition:
+        color 0.3s ease,
+        background-color 0.3s ease,
+        transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.icon-button:hover {
+    transform: translateY(-2px) rotate(4deg);
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    inset: auto 0.75rem 0.22rem;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-link:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+/* ---------------- Auth & admin interface ---------------- */
+
+.form-control {
+    min-height: 2.75rem;
+    min-width: 0;
+    border: 1px solid rgb(203 213 225);
+    border-radius: 0.75rem;
+    background-color: #fff;
+    padding: 0.65rem 0.8rem;
+    color: rgb(30 41 59);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    transition:
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        background-color 0.25s ease,
+        transform 0.25s ease;
+}
+
+.form-control:hover {
+    border-color: rgb(148 163 184);
+}
+
+.form-control:focus {
+    border-color: var(--color-maroon-600);
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-maroon-500) 14%, transparent);
+}
+
+.form-control::placeholder {
+    color: rgb(148 163 184);
+}
+
+.admin-button {
+    position: relative;
+    display: inline-flex;
+    min-height: 2.6rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    padding: 0.65rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition:
+        color 0.3s ease,
+        background-color 0.3s ease,
+        border-color 0.3s ease,
+        box-shadow 0.3s ease,
+        transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.admin-button:hover {
+    transform: translateY(-2px);
+}
+
+.admin-button:active {
+    transform: scale(0.98);
+}
+
+.admin-button-primary {
+    border: 1px solid var(--color-maroon-700);
+    background: linear-gradient(135deg, var(--color-maroon-700), var(--color-maroon-900));
+    color: var(--color-cream-50);
+    box-shadow: 0 8px 20px color-mix(in srgb, var(--color-maroon-900) 20%, transparent);
+}
+
+.admin-button-primary:hover {
+    background: linear-gradient(135deg, var(--color-maroon-600), var(--color-maroon-800));
+    box-shadow: 0 12px 26px color-mix(in srgb, var(--color-maroon-900) 28%, transparent);
+}
+
+.admin-button-secondary {
+    border: 1px solid rgb(203 213 225);
+    background: rgb(248 250 252);
+    color: rgb(51 65 85);
+}
+
+.admin-button-secondary:hover {
+    border-color: rgb(148 163 184);
+    background: #fff;
+}
+
+.admin-button-dark {
+    border: 1px solid rgb(30 41 59);
+    background: rgb(30 41 59);
+    color: #fff;
+}
+
+.admin-button-dark:hover {
+    background: rgb(51 65 85);
+}
+
+.admin-button-danger {
+    border: 1px solid rgb(253 164 175);
+    background: #fff;
+    color: rgb(190 18 60);
+}
+
+.admin-button-danger:hover {
+    border-color: rgb(251 113 133);
+    background: rgb(255 241 242);
+}
+
+.admin-icon-button {
+    width: 2.5rem;
+    height: 2.5rem;
+    flex: none;
+    border-radius: 0.75rem;
+    transition:
+        color 0.3s ease,
+        background-color 0.3s ease,
+        transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.admin-icon-button:hover {
+    transform: translateY(-2px) rotate(3deg);
+}
+
+.admin-shell {
+    background:
+        radial-gradient(circle at 85% 5%, rgba(217, 164, 65, 0.08), transparent 28rem),
+        rgb(248 250 252);
+}
+
+.admin-sidebar {
+    isolation: isolate;
+}
+
+.admin-sidebar::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 20% 15%, rgba(217, 164, 65, 0.14), transparent 16rem),
+        radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.055) 1px, transparent 0);
+    background-size: auto, 22px 22px;
+}
+
+.admin-nav-link {
+    transition:
+        color 0.3s ease,
+        background-color 0.3s ease,
+        transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.admin-nav-link:hover {
+    transform: translateX(4px);
+}
+
+.admin-card {
+    transition:
+        border-color 0.35s ease,
+        box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.admin-card:hover {
+    border-color: color-mix(in srgb, var(--color-gold-400) 32%, rgb(226 232 240));
+    box-shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
+}
+
+.admin-shell :where(a, button) {
+    -webkit-tap-highlight-color: transparent;
+}
+
+.admin-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.admin-filter {
+    display: flex;
+    min-width: 0;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.admin-table-wrap {
+    overflow: hidden;
+    border: 1px solid rgb(226 232 240);
+    border-radius: 1rem;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+}
+
+.admin-table {
+    width: 100%;
+    font-size: 0.875rem;
+}
+
+.admin-table tbody tr {
+    transition:
+        background-color 0.25s ease,
+        transform 0.25s ease;
+}
+
+.admin-table tbody tr:hover {
+    background: color-mix(in srgb, var(--color-maroon-50) 62%, white);
+}
+
+.admin-table td,
+.admin-table th {
+    vertical-align: middle;
+}
+
+.admin-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.admin-action {
+    display: inline-flex;
+    min-height: 2rem;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgb(203 213 225);
+    border-radius: 0.5rem;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: rgb(51 65 85);
+    transition:
+        color 0.25s ease,
+        background-color 0.25s ease,
+        border-color 0.25s ease,
+        transform 0.25s ease;
+}
+
+.admin-action:hover {
+    border-color: rgb(148 163 184);
+    background: rgb(248 250 252);
+    transform: translateY(-1px);
+}
+
+.admin-action-danger {
+    border-color: rgb(253 164 175);
+    color: rgb(190 18 60);
+}
+
+.admin-action-danger:hover {
+    border-color: rgb(251 113 133);
+    background: rgb(255 241 242);
+}
+
+.auth-card {
+    animation: auth-card-enter 0.85s 0.08s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes auth-card-enter {
+    from {
+        opacity: 0;
+        transform: translate3d(30px, 16px, 0) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@media (max-width: 767px) {
+    .admin-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-filter,
+    .admin-filter > :where(input, select, button) {
+        width: 100%;
+    }
+
+    .admin-table-wrap {
+        overflow: visible;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .admin-table,
+    .admin-table tbody,
+    .admin-table tr,
+    .admin-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .admin-table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+
+    .admin-table tbody {
+        display: grid;
+        gap: 0.75rem;
+    }
+
+    .admin-table tbody tr {
+        overflow: hidden;
+        border: 1px solid rgb(226 232 240);
+        border-radius: 1rem;
+        background: #fff;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+    }
+
+    .admin-table tbody tr:hover {
+        transform: translateY(-2px);
+    }
+
+    .admin-table td {
+        display: grid;
+        grid-template-columns: minmax(5.5rem, 0.42fr) minmax(0, 1fr);
+        align-items: center;
+        gap: 0.75rem;
+        border-bottom: 1px solid rgb(241 245 249);
+        padding: 0.75rem 1rem;
+        text-align: right;
+    }
+
+    .admin-table td::before {
+        content: attr(data-label);
+        text-align: left;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        color: rgb(100 116 139);
+    }
+
+    .admin-table td:last-child {
+        border-bottom: 0;
+    }
+
+    .admin-table td[colspan] {
+        display: block;
+        padding: 2rem 1rem;
+        text-align: center;
+    }
+
+    .admin-table td[colspan]::before {
+        content: none;
+    }
+
+    .admin-actions {
+        flex-wrap: wrap;
+    }
+
+    .admin-table td .admin-actions {
+        justify-content: flex-end;
+    }
+
+    .admin-action {
+        min-height: 2.25rem;
+    }
+
+    .auth-card {
+        animation-name: auth-card-enter-mobile;
+    }
+
+    @keyframes auth-card-enter-mobile {
+        from {
+            opacity: 0;
+            transform: translateY(20px) scale(0.98);
+        }
+        to {
+            opacity: 1;
+            transform: none;
+        }
+    }
+}
+
+@media (hover: hover) {
+    .card-lift {
+        position: relative;
+    }
+
+    .card-lift:hover {
+        border-color: color-mix(in srgb, var(--color-gold-400) 44%, transparent);
+    }
+
+    .group img {
+        transition-duration: 700ms;
+        transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    }
 }
 
 /* ---------------- Hero decoration ---------------- */
@@ -222,6 +749,17 @@ trix-toolbar .trix-button-group--file-tools {
 
 trix-toolbar .trix-button-group {
     border-color: var(--color-ink-200);
+}
+
+trix-toolbar {
+    max-width: 100%;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+    scrollbar-width: thin;
+}
+
+trix-toolbar .trix-button-row {
+    min-width: max-content;
 }
 
 trix-editor {
@@ -278,5 +816,21 @@ trix-editor a {
     .js .reveal {
         opacity: 1;
         transform: none;
+    }
+
+    .js #konten {
+        animation: none;
+    }
+
+    .parallax-layer {
+        transform: none !important;
+    }
+
+    .scroll-progress {
+        display: none;
+    }
+
+    .auth-card {
+        animation: none;
     }
 }

@@ -36,9 +36,13 @@
     @endif
     <meta name="twitter:card" content="summary_large_image">
 
-    @if ($site->favicon_path)
-        <link rel="icon" href="{{ \Illuminate\Support\Facades\Storage::url($site->favicon_path) }}">
-    @endif
+    @php($faviconUrl = $site->favicon_path
+        ? \Illuminate\Support\Facades\Storage::url($site->favicon_path)
+        : ($site->logo_path
+            ? \Illuminate\Support\Facades\Storage::url($site->logo_path)
+            : asset('assets/images/branding/logo-fpk.png')))
+    <link rel="icon" href="{{ $faviconUrl }}">
+    <link rel="apple-touch-icon" href="{{ $faviconUrl }}">
 
     @include('public-site.partials.seo-jsonld')
 
@@ -46,7 +50,11 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen font-sans">
+<body class="page-shell min-h-screen font-sans">
+    <div class="scroll-progress" aria-hidden="true">
+        <span data-scroll-progress></span>
+    </div>
+
     <a href="#konten" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-maroon-700 focus:px-4 focus:py-2 focus:text-white">
         Lewati ke konten utama
     </a>

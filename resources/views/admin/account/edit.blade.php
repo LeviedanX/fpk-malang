@@ -12,8 +12,8 @@
             @method('PUT')
             <x-form.input name="name" label="Nama" :value="$user->name" required />
             <x-form.input name="email" label="Email" type="email" :value="$user->email" required />
-            <div class="flex justify-end">
-                <button type="submit" class="rounded-md bg-maroon-700 px-6 py-2.5 font-medium text-cream-50 hover:bg-maroon-800">Simpan Profil</button>
+            <div class="flex justify-stretch sm:justify-end">
+                <button type="submit" class="admin-button admin-button-primary w-full sm:w-auto">Simpan Profil</button>
             </div>
         </form>
     </x-admin.card>
@@ -25,8 +25,8 @@
             <x-form.input name="current_password" label="Password Saat Ini" type="password" required autocomplete="current-password" />
             <x-form.input name="password" label="Password Baru" type="password" required autocomplete="new-password" />
             <x-form.input name="password_confirmation" label="Konfirmasi Password Baru" type="password" required autocomplete="new-password" />
-            <div class="flex justify-end">
-                <button type="submit" class="rounded-md bg-maroon-700 px-6 py-2.5 font-medium text-cream-50 hover:bg-maroon-800">Perbarui Password</button>
+            <div class="flex justify-stretch sm:justify-end">
+                <button type="submit" class="admin-button admin-button-primary w-full sm:w-auto">Perbarui Password</button>
             </div>
         </form>
     </x-admin.card>

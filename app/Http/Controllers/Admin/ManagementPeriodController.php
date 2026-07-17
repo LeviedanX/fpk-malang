@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ManagementPeriodRequest;
 use App\Models\ManagementPeriod;
+use App\Support\ImageStorage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -30,7 +31,13 @@ class ManagementPeriodController extends Controller
 
     public function store(ManagementPeriodRequest $request): RedirectResponse
     {
-        $this->persist(new ManagementPeriod, $request->validated());
+        $data = $request->safe()->except('group_photo');
+
+        if ($request->hasFile('group_photo')) {
+            $data['group_photo_path'] = ImageStorage::store($request->file('group_photo'), 'management');
+        }
+
+        $this->persist(new ManagementPeriod, $data);
 
         return redirect()
             ->route('admin.periods.index')
@@ -46,7 +53,17 @@ class ManagementPeriodController extends Controller
 
     public function update(ManagementPeriodRequest $request, ManagementPeriod $period): RedirectResponse
     {
-        $this->persist($period, $request->validated());
+        $data = $request->safe()->except('group_photo');
+
+        if ($request->hasFile('group_photo')) {
+            $data['group_photo_path'] = ImageStorage::replace(
+                $request->file('group_photo'),
+                $period->group_photo_path,
+                'management'
+            );
+        }
+
+        $this->persist($period, $data);
 
         return redirect()
             ->route('admin.periods.index')
@@ -55,8 +72,14 @@ class ManagementPeriodController extends Controller
 
     public function destroy(ManagementPeriod $period): RedirectResponse
     {
-        // Members are removed via the cascading foreign key.
+        $portraitPaths = $period->members()
+            ->whereNotNull('portrait_path')
+            ->pluck('portrait_path');
+
         $period->delete();
+
+        ImageStorage::delete($period->group_photo_path);
+        $portraitPaths->each(fn (string $path) => ImageStorage::delete($path));
 
         return redirect()
             ->route('admin.periods.index')

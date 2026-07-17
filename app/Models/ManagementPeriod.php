@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'start_year', 'end_year', 'is_active'])]
+#[Fillable(['name', 'start_year', 'end_year', 'group_photo_path', 'is_active'])]
 class ManagementPeriod extends Model
 {
     /** @use HasFactory<ManagementPeriodFactory> */

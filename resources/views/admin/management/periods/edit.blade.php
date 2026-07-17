@@ -4,7 +4,7 @@
 @section('heading', 'Ubah Periode Pengurus')
 
 @section('content')
-    <form method="POST" action="{{ route('admin.periods.update', $period) }}">
+    <form method="POST" action="{{ route('admin.periods.update', $period) }}" enctype="multipart/form-data">
         @csrf
         @method('PUT')
         @include('admin.management.periods._form', ['submitLabel' => 'Perbarui Periode'])

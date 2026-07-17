@@ -11,7 +11,7 @@
 
 <section class="section bg-cream-50 dark:bg-ink-950">
     <div class="container-x">
-        <form method="GET" action="{{ route('articles.index') }}" class="mx-auto mb-10 flex max-w-xl gap-2">
+        <form method="GET" action="{{ route('articles.index') }}" class="reveal reveal-scale mx-auto mb-10 flex max-w-xl gap-2">
             <label for="q" class="sr-only">Cari artikel</label>
             <input type="search" name="q" id="q" value="{{ $search }}" placeholder="Cari artikel..."
                 class="block w-full rounded-lg border-ink-200 bg-white shadow-sm focus:border-maroon-600 focus:ring-maroon-600 dark:border-ink-700 dark:bg-ink-900">
@@ -59,7 +59,7 @@
                 @endforeach
             </div>
 
-            <div class="mt-10">{{ $articles->links() }}</div>
+            <div class="reveal mt-10">{{ $articles->links() }}</div>
         @elseif (! $featured)
             <x-public-site.empty-state>
                 @if ($search !== '')

@@ -25,9 +25,9 @@
             <x-form.image-field name="portrait" label="Foto Pengurus" :current="$member->portrait_path" />
         </x-admin.card>
 
-        <div class="flex flex-col gap-2">
-            <button type="submit" class="rounded-md bg-maroon-700 px-4 py-2.5 font-medium text-cream-50 hover:bg-maroon-800">{{ $submitLabel }}</button>
-            <a href="{{ route('admin.members.index') }}" class="rounded-md border border-slate-300 px-4 py-2.5 text-center font-medium text-slate-600 hover:bg-slate-50">Batal</a>
+        <div class="reveal flex flex-col gap-2">
+            <button type="submit" class="admin-button admin-button-primary">{{ $submitLabel }}</button>
+            <a href="{{ route('admin.members.index') }}" class="admin-button admin-button-secondary">Batal</a>
         </div>
     </div>
 </div>

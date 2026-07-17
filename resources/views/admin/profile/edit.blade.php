@@ -26,8 +26,8 @@
             </div>
         </x-admin.card>
 
-        <div class="flex justify-end">
-            <button type="submit" class="rounded-md bg-maroon-700 px-6 py-2.5 font-medium text-cream-50 hover:bg-maroon-800">Simpan Perubahan</button>
+        <div class="flex justify-stretch sm:justify-end">
+            <button type="submit" class="admin-button admin-button-primary w-full sm:w-auto">Simpan Perubahan</button>
         </div>
     </form>
 @endsection
