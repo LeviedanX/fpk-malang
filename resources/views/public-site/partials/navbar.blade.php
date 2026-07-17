@@ -19,7 +19,9 @@
             @if ($site->logo_path)
                 <img src="{{ \Illuminate\Support\Facades\Storage::url($site->logo_path) }}" alt="Logo {{ $site->organization_name }}" class="h-10 w-auto" width="40" height="40">
             @else
-                <span class="grid h-10 w-10 place-items-center rounded-full bg-maroon-700 font-display text-lg font-bold text-cream-50 ring-2 ring-gold-400/40" aria-hidden="true">F</span>
+                <span class="grid h-10 w-10 place-items-center overflow-hidden rounded-full bg-white p-1 shadow-sm ring-2 ring-gold-400/40" aria-hidden="true">
+                    <img src="{{ asset('assets/images/branding/logo-fpk.png') }}" alt="" class="h-full w-full object-contain">
+                </span>
             @endif
             <span class="leading-tight">
                 <span class="block font-display text-base font-bold text-maroon-800 dark:text-cream-100">{{ $site->abbreviation ?: 'FPK Kota Malang' }}</span>
