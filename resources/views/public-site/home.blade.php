@@ -43,13 +43,18 @@
                              class="h-full w-full object-cover">
                         <div class="pointer-events-none absolute inset-0 bg-linear-to-t from-maroon-950/70 via-transparent to-transparent" aria-hidden="true"></div>
                     @else
-                        <div class="hero-motif absolute inset-0 opacity-50" aria-hidden="true"></div>
-                        <div class="absolute inset-0 grid place-items-center p-8 text-center">
-                            <div>
-                                <span class="mx-auto grid h-24 w-24 place-items-center rounded-full border border-gold-400/40 bg-cream-50/95 font-display text-4xl font-bold text-maroon-800" aria-hidden="true">F</span>
-                                <p class="mt-5 font-display text-lg font-semibold text-cream-50">FPK Kota Malang</p>
-                                <p class="mt-1 text-sm text-cream-100/70">Merawat kebhinnekaan, memperkuat persatuan.</p>
-                            </div>
+                        <img src="{{ asset('assets/images/branding/hero-card-bg.webp') }}"
+                             alt=""
+                             class="absolute inset-0 h-full w-full object-cover"
+                             aria-hidden="true">
+                        <div class="absolute inset-0 bg-black/10" aria-hidden="true"></div>
+                        <div class="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center sm:px-8">
+                            <img src="{{ asset('assets/images/branding/logo-fpk.png') }}"
+                                 alt="Logo FPK Kota Malang"
+                                 width="144" height="144"
+                                 class="h-24 w-24 rounded-full bg-white p-3 shadow-2xl ring-1 ring-gold-400/35 sm:h-28 sm:w-28 md:h-36 md:w-36 md:p-4">
+                            <p class="mt-6 font-display text-xl font-bold text-cream-50 sm:text-2xl">FPK Kota Malang</p>
+                            <p class="mt-2 max-w-sm text-sm leading-relaxed text-cream-100/75">Merawat kebhinnekaan, memperkuat persatuan.</p>
                         </div>
                     @endif
                 </div>
@@ -81,13 +86,43 @@
             <span class="title-rule mx-auto"></span>
         </div>
 
-        @if ($profile->definition)
-            <div class="reveal mx-auto mt-8 max-w-3xl text-center text-lg leading-relaxed text-ink-600 dark:text-ink-300">
-                <x-public-site.rich-text :text="$profile->definition" />
-            </div>
-        @endif
+        <div class="mt-12 grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+            <div class="reveal surface p-6 sm:p-8">
+                <p class="text-base leading-relaxed text-ink-600 dark:text-ink-300 sm:text-lg">
+                    Forum Pembauran Kebangsaan Kota Malang merupakan wadah informasi, komunikasi,
+                    konsultasi, dan kerja sama antarwarga masyarakat. FPK diarahkan untuk menumbuhkan,
+                    memantapkan, memelihara, dan mengembangkan pembauran kebangsaan di tengah
+                    kemajemukan masyarakat Kota Malang.
+                </p>
 
-        <div class="mt-12 grid gap-6 md:grid-cols-2">
+                <ul class="mt-6 space-y-3">
+                    @foreach ([
+                        'Menumbuhkan toleransi dan saling menghormati.',
+                        'Meningkatkan integrasi dan persatuan masyarakat.',
+                        'Mencegah konflik sosial dan disintegrasi.',
+                        'Membangun solidaritas dalam bingkai NKRI.',
+                    ] as $point)
+                        <li class="flex gap-3 text-sm leading-relaxed text-ink-600 dark:text-ink-300">
+                            <span class="mt-0.5 grid h-6 w-6 flex-none place-items-center rounded-full bg-maroon-50 text-maroon-700 ring-1 ring-maroon-100 dark:bg-ink-800 dark:text-gold-400 dark:ring-white/10" aria-hidden="true">
+                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </span>
+                            <span>{{ $point }}</span>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+
+            <figure class="reveal overflow-hidden rounded-2xl border border-cream-200 bg-white shadow-xl shadow-maroon-950/10 dark:border-white/10 dark:bg-ink-900 dark:shadow-black/20" style="--reveal-delay: 100ms">
+                <img src="{{ asset('assets/images/about/about-fpk-vector.webp') }}"
+                     alt="Ilustrasi Tugu Malang dan Balai Kota Malang sebagai identitas FPK Kota Malang"
+                     width="1400" height="1050"
+                     class="aspect-4/3 h-full w-full object-cover">
+            </figure>
+        </div>
+
+        <div class="mt-10 grid gap-6 md:grid-cols-2">
             @php($aboutBlocks = [
                 ['background', 'Latar Belakang', 'M12 3v18m9-9H3', false],
                 ['objectives', 'Tujuan', 'M5 13l4 4L19 7', true],

@@ -8,7 +8,9 @@
                     @if ($site->logo_path)
                         <img src="{{ \Illuminate\Support\Facades\Storage::url($site->logo_path) }}" alt="Logo {{ $site->organization_name }}" class="h-11 w-auto" width="44" height="44">
                     @else
-                        <span class="grid h-11 w-11 place-items-center rounded-full bg-cream-50 font-display text-lg font-bold text-maroon-800" aria-hidden="true">F</span>
+                        <span class="grid h-11 w-11 place-items-center overflow-hidden rounded-full bg-cream-50 p-1 shadow-sm ring-1 ring-gold-400/35" aria-hidden="true">
+                            <img src="{{ asset('assets/images/branding/logo-fpk.png') }}" alt="" class="h-full w-full object-contain">
+                        </span>
                     @endif
                     <span class="font-display text-lg font-bold text-cream-50">{{ $site->abbreviation ?: 'FPK Kota Malang' }}</span>
                 </div>
