@@ -42,7 +42,7 @@ class AgendaController extends Controller
         return view('admin.agendas.create', [
             'agenda' => new Agenda([
                 'event_status' => AgendaStatus::Scheduled->value,
-                'publication_status' => PublicationStatus::Draft->value,
+                'publication_status' => PublicationStatus::Published->value,
             ]),
         ]);
     }

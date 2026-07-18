@@ -22,6 +22,34 @@
         </select>
     </form>
 
+    @if ($photoPeriod)
+        <x-admin.card
+            title="Foto Bersama Pengurus"
+            description="Tampil di bagian atas Susunan Pengurus pada halaman publik — {{ $photoPeriod->name }}."
+        >
+            <form method="POST" action="{{ route('admin.members.group_photo', $photoPeriod) }}" enctype="multipart/form-data" class="space-y-4">
+                @csrf
+                @method('PUT')
+                <x-form.image-field
+                    name="group_photo"
+                    label="Foto Bersama"
+                    :current="$photoPeriod->group_photo_path"
+                    hint="Gunakan foto landscape/lebar (rasio ~16:7). Format JPG, PNG, atau WEBP; maksimal 2 MB."
+                />
+                <button type="submit" class="admin-button admin-button-primary">Simpan Foto Bersama</button>
+            </form>
+
+            @if ($photoPeriod->group_photo_path)
+                <form method="POST" action="{{ route('admin.members.group_photo.destroy', $photoPeriod) }}"
+                    data-confirm="Foto bersama periode ini akan dihapus dari halaman publik." data-confirm-title="Hapus Foto Bersama?" data-confirm-action="Hapus Foto" class="mt-3">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="admin-action admin-action-danger">Hapus Foto Bersama</button>
+                </form>
+            @endif
+        </x-admin.card>
+    @endif
+
     <div class="admin-table-wrap">
         <table class="admin-table divide-y divide-slate-200">
             <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -47,7 +75,7 @@
                         <td data-label="Aksi" class="px-4 py-3">
                             <div class="admin-actions">
                                 <a href="{{ route('admin.members.edit', $member) }}" class="admin-action">Ubah</a>
-                                <form method="POST" action="{{ route('admin.members.destroy', $member) }}" onsubmit="return confirm('Hapus anggota ini?');">
+                                <form method="POST" action="{{ route('admin.members.destroy', $member) }}" data-confirm="Anggota &quot;{{ $member->name }}&quot; akan dihapus permanen dari susunan pengurus." data-confirm-title="Hapus Anggota?">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="admin-action admin-action-danger">Hapus</button>

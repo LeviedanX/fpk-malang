@@ -20,7 +20,7 @@
         <x-admin.card title="Status">
             <div class="space-y-4">
                 <x-form.select name="event_status" label="Status Acara" :options="\App\Enums\AgendaStatus::options()" :selected="$agenda->event_status?->value ?? 'scheduled'" required />
-                <x-form.select name="publication_status" label="Status Publikasi" :options="\App\Enums\PublicationStatus::options()" :selected="$agenda->publication_status?->value ?? 'draft'" required />
+                <x-form.select name="publication_status" label="Status Publikasi" :options="\App\Enums\PublicationStatus::options()" :selected="$agenda->publication_status?->value ?? 'published'" required hint="'Terbit' tampil di situs publik; 'Draf' disembunyikan." />
                 <x-form.input name="published_at" label="Waktu Terbit" type="datetime-local"
                     :value="old('published_at', optional($agenda->published_at)->format('Y-m-d\TH:i'))"
                     hint="Kosongkan untuk memakai waktu saat ini ketika diterbitkan." />

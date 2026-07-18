@@ -1,9 +1,6 @@
 @php
     $home = route('home');
     $isHome = request()->routeIs('home');
-    $hasHomeAgendaSection = $isHome
-        && isset($upcomingAgendas)
-        && $upcomingAgendas->isNotEmpty();
     $links = [
         ['beranda', 'Beranda', $home.'#beranda'],
         ['tentang', 'Tentang FPK', $home.'#tentang'],
@@ -14,7 +11,7 @@
     }
 
     if ($publicContentVisibility['agendas']) {
-        $links[] = ['agenda', 'Agenda', $hasHomeAgendaSection ? $home.'#agenda' : route('agendas.index')];
+        $links[] = ['agenda', 'Agenda', $home.'#agenda'];
     }
 
     if ($publicContentVisibility['management']) {

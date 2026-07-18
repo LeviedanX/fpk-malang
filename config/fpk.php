@@ -45,6 +45,6 @@ return [
     */
     'home' => [
         'latest_articles' => 3,
-        'upcoming_agendas' => 4,
+        'past_agendas' => 6,
     ],
 ];

@@ -45,6 +45,12 @@ Route::middleware([EnsureDesktopAdminAccess::class, 'auth'])
             ->names('members')
             ->except('show');
 
+        // Foto bersama periode (dikelola dari halaman Anggota)
+        Route::put('pengurus/foto-bersama/{period}', [ManagementPeriodController::class, 'updateGroupPhoto'])
+            ->name('members.group_photo');
+        Route::delete('pengurus/foto-bersama/{period}', [ManagementPeriodController::class, 'destroyGroupPhoto'])
+            ->name('members.group_photo.destroy');
+
         // Kontak & Media Sosial (singleton)
         Route::get('kontak', [ContactSettingController::class, 'edit'])->name('contact.edit');
         Route::put('kontak', [ContactSettingController::class, 'update'])->name('contact.update');

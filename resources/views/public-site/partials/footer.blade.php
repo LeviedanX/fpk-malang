@@ -27,7 +27,7 @@
                         <li><a href="{{ route('articles.index') }}" class="transition hover:text-white">Artikel</a></li>
                     @endif
                     @if ($publicContentVisibility['agendas'])
-                        <li><a href="{{ route('agendas.index') }}" class="transition hover:text-white">Agenda</a></li>
+                        <li><a href="{{ route('home') }}#agenda" class="transition hover:text-white">Agenda</a></li>
                     @endif
                     @if ($publicContentVisibility['management'])
                         <li><a href="{{ route('home') }}#pengurus" class="transition hover:text-white">Susunan Pengurus</a></li>

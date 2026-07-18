@@ -9,7 +9,7 @@
         <nav class="reveal reveal-left mb-6 text-sm text-ink-400" aria-label="Breadcrumb">
             <a href="{{ route('home') }}" class="hover:text-maroon-700 dark:hover:text-gold-400">Beranda</a>
             <span aria-hidden="true"> / </span>
-            <a href="{{ route('agendas.index') }}" class="hover:text-maroon-700 dark:hover:text-gold-400">Agenda</a>
+            <a href="{{ route('home') }}#agenda" class="hover:text-maroon-700 dark:hover:text-gold-400">Agenda</a>
         </nav>
 
         <span class="reveal inline-block rounded-full px-3 py-1 text-xs font-medium {{ $agenda->event_status->badgeClasses() }}">
@@ -48,7 +48,7 @@
         @endif
 
         <div class="reveal mt-12 border-t border-ink-100 pt-6 dark:border-ink-800">
-            <a href="{{ route('agendas.index') }}" class="inline-flex items-center gap-1 text-sm font-semibold text-maroon-700 hover:text-maroon-800 dark:text-gold-400">
+            <a href="{{ route('home') }}#agenda" class="inline-flex items-center gap-1 text-sm font-semibold text-maroon-700 hover:text-maroon-800 dark:text-gold-400">
                 <span aria-hidden="true">&larr;</span> Kembali ke agenda
             </a>
         </div>

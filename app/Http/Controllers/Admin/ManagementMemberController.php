@@ -25,10 +25,19 @@ class ManagementMemberController extends Controller
             ->paginate(30)
             ->withQueryString();
 
+        $periods = ManagementPeriod::query()->orderByDesc('start_year')->get();
+
+        // Foto bersama dikelola untuk periode terpilih; jika tidak ada filter,
+        // gunakan periode aktif, atau periode terbaru sebagai cadangan.
+        $photoPeriod = $periodId
+            ? $periods->firstWhere('id', (int) $periodId)
+            : ($periods->firstWhere('is_active', true) ?? $periods->first());
+
         return view('admin.management.members.index', [
             'members' => $members,
-            'periods' => ManagementPeriod::query()->orderByDesc('start_year')->get(),
+            'periods' => $periods,
             'periodId' => $periodId,
+            'photoPeriod' => $photoPeriod,
         ]);
     }
 

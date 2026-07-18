@@ -39,7 +39,7 @@
                         <td data-label="Aksi" class="px-4 py-3">
                             <div class="admin-actions">
                                 <a href="{{ route('admin.agendas.edit', $agenda) }}" class="admin-action">Ubah</a>
-                                <form method="POST" action="{{ route('admin.agendas.destroy', $agenda) }}" onsubmit="return confirm('Hapus agenda ini?');">
+                                <form method="POST" action="{{ route('admin.agendas.destroy', $agenda) }}" data-confirm="Agenda &quot;{{ $agenda->title }}&quot; akan dihapus." data-confirm-title="Hapus Agenda?">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="admin-action admin-action-danger">Hapus</button>

@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\ManagementPeriodRequest;
 use App\Models\ManagementPeriod;
 use App\Support\ImageStorage;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
@@ -68,6 +69,47 @@ class ManagementPeriodController extends Controller
         return redirect()
             ->route('admin.periods.index')
             ->with('status', 'Periode berhasil diperbarui.');
+    }
+
+    /**
+     * Upload/replace the group photo of a period (managed from the members page).
+     */
+    public function updateGroupPhoto(Request $request, ManagementPeriod $period): RedirectResponse
+    {
+        $request->validate([
+            'group_photo' => [
+                'required',
+                'image',
+                'mimes:'.implode(',', config('fpk.uploads.mimes')),
+                'max:'.(int) config('fpk.uploads.max_size'),
+                'dimensions:max_width='.(int) config('fpk.uploads.max_width').',max_height='.(int) config('fpk.uploads.max_height'),
+            ],
+        ], [], ['group_photo' => 'foto bersama']);
+
+        $period->update([
+            'group_photo_path' => ImageStorage::replace(
+                $request->file('group_photo'),
+                $period->group_photo_path,
+                'management'
+            ),
+        ]);
+
+        return redirect()
+            ->route('admin.members.index', ['period' => $period->id])
+            ->with('status', 'Foto bersama berhasil diperbarui.');
+    }
+
+    /**
+     * Remove the group photo of a period.
+     */
+    public function destroyGroupPhoto(ManagementPeriod $period): RedirectResponse
+    {
+        ImageStorage::delete($period->group_photo_path);
+        $period->update(['group_photo_path' => null]);
+
+        return redirect()
+            ->route('admin.members.index', ['period' => $period->id])
+            ->with('status', 'Foto bersama berhasil dihapus.');
     }
 
     public function destroy(ManagementPeriod $period): RedirectResponse

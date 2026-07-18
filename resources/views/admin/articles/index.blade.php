@@ -50,7 +50,7 @@
                         <td data-label="Aksi" class="px-4 py-3">
                             <div class="admin-actions">
                                 <a href="{{ route('admin.articles.edit', $article) }}" class="admin-action">Ubah</a>
-                                <form method="POST" action="{{ route('admin.articles.destroy', $article) }}" onsubmit="return confirm('Hapus artikel ini?');">
+                                <form method="POST" action="{{ route('admin.articles.destroy', $article) }}" data-confirm="Artikel &quot;{{ $article->title }}&quot; akan dihapus." data-confirm-title="Hapus Artikel?">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="admin-action admin-action-danger">Hapus</button>

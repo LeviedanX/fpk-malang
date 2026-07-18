@@ -20,7 +20,7 @@
     <div class="space-y-6">
         <x-admin.card title="Publikasi">
             <div class="space-y-4">
-                <x-form.select name="status" label="Status" :options="\App\Enums\PublicationStatus::options()" :selected="$article->status?->value ?? 'draft'" required />
+                <x-form.select name="status" label="Status" :options="\App\Enums\PublicationStatus::options()" :selected="$article->status?->value ?? 'published'" required hint="'Terbit' tampil di situs publik; 'Draf' disembunyikan." />
                 <x-form.input
                     name="published_at"
                     label="Waktu Terbit"

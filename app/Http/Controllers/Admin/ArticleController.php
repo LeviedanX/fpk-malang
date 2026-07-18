@@ -40,7 +40,7 @@ class ArticleController extends Controller
     public function create(): View
     {
         return view('admin.articles.create', [
-            'article' => new Article(['status' => PublicationStatus::Draft->value]),
+            'article' => new Article(['status' => PublicationStatus::Published->value]),
         ]);
     }
 

@@ -16,7 +16,8 @@ Route::get('/', HomeController::class)->name('home');
 Route::get('/artikel', [ArticleController::class, 'index'])->name('articles.index');
 Route::get('/artikel/{article:slug}', [ArticleController::class, 'show'])->name('articles.show');
 
-Route::get('/agenda', [AgendaController::class, 'index'])->name('agendas.index');
+// Daftar agenda kini tampil di beranda (#agenda); tautan lama dialihkan.
+Route::redirect('/agenda', '/#agenda')->name('agendas.index');
 Route::get('/agenda/{agenda:slug}', [AgendaController::class, 'show'])->name('agendas.show');
 
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');

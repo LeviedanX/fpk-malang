@@ -22,45 +22,46 @@
 </head>
 <body class="auth-shell relative min-h-dvh overflow-x-hidden bg-maroon-950 font-sans text-slate-800 antialiased">
     <x-admin.desktop-only-notice />
-    <div class="hero-motif parallax-layer pointer-events-none fixed inset-0 hidden opacity-50 lg:block" data-parallax="0.012" aria-hidden="true"></div>
-    <div class="hero-glow parallax-layer pointer-events-none fixed inset-0 hidden lg:block" data-parallax="0.025" aria-hidden="true"></div>
-    <div class="pointer-events-none fixed -left-24 top-1/4 hidden h-72 w-72 rounded-full bg-gold-400/10 blur-3xl lg:block" aria-hidden="true"></div>
 
-    <main class="admin-desktop-content relative mx-auto hidden min-h-dvh w-full max-w-6xl items-center gap-8 px-8 py-12 lg:grid lg:grid-cols-[1fr_0.82fr]" data-admin-desktop-content>
-        <section class="reveal reveal-left hidden max-w-xl text-cream-50 lg:block">
-            <span class="eyebrow text-gold-400!">Forum Pembauran Kebangsaan</span>
-            <h1 class="mt-5 font-display text-5xl font-extrabold leading-tight">Kelola informasi publik dengan rapi dan bertanggung jawab.</h1>
-            <p class="mt-5 max-w-lg text-base leading-relaxed text-cream-100/70">Panel terpadu untuk artikel, agenda, profil organisasi, kepengurusan, kontak, dan identitas website FPK Kota Malang.</p>
-            <div class="mt-8 flex items-center gap-3 text-sm text-cream-100/60">
-                <span class="h-px w-12 bg-gold-400/60"></span>
-                Akses khusus administrator
+    {{-- Latar dekoratif berlapis --}}
+    <div class="pointer-events-none fixed inset-0 hidden lg:block" aria-hidden="true">
+        <div class="hero-motif absolute inset-0 opacity-[0.14]"></div>
+        <div class="hero-glow absolute inset-0"></div>
+        <div class="float-slow absolute -left-44 top-[-14%] h-160 w-160 rounded-full bg-maroon-600/25 blur-3xl"></div>
+        <div class="absolute -right-40 bottom-[-20%] h-152 w-152 rounded-full bg-gold-500/12 blur-3xl"></div>
+        <div class="absolute left-1/2 top-1/2 h-208 w-208 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(217,164,65,0.10),transparent)]"></div>
+        <div class="absolute inset-0 bg-linear-to-b from-black/25 via-transparent to-black/50"></div>
+    </div>
+
+    <main class="admin-desktop-content relative mx-auto hidden min-h-dvh w-full items-center justify-center px-8 py-12 lg:flex" data-admin-desktop-content>
+
+        <section class="auth-card relative w-full max-w-sm overflow-hidden rounded-3xl border border-white/12 bg-white shadow-2xl shadow-black/40">
+            {{-- Aksen emas tipis di tepi atas kartu --}}
+            <span class="absolute inset-x-0 top-0 h-1 bg-linear-to-r from-maroon-700 via-gold-500 to-maroon-700" aria-hidden="true"></span>
+
+            <div class="px-8 pb-9 pt-10 sm:px-11">
+                {{-- Identitas ringkas: logo + sistem --}}
+                <div class="flex flex-col items-center text-center">
+                    <span class="auth-logo grid h-19 w-19 place-items-center rounded-full bg-white p-2 shadow-lg ring-1 ring-gold-400/45">
+                        <img src="{{ $faviconUrl }}" alt="Logo {{ $site->abbreviation ?: 'FPK Kota Malang' }}" class="h-full w-full object-contain">
+                    </span>
+                    <p class="mt-4 inline-flex items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-maroon-600">
+                        <span class="h-1.5 w-1.5 rounded-full bg-gold-500"></span>
+                        Sistem Administrasi
+                    </p>
+                </div>
+
+                @yield('content')
+
+                {{-- Tombol kembali ke beranda --}}
+                <div class="mt-8 border-t border-slate-100 pt-5 text-center">
+                    <a href="{{ route('home') }}" class="auth-back group inline-flex items-center gap-1.5 text-sm font-semibold text-maroon-600 transition-colors hover:text-maroon-800">
+                        <svg class="h-4 w-4 transition-transform duration-300 ease-out group-hover:-translate-x-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                        <span>Kembali ke Beranda</span>
+                    </a>
+                </div>
             </div>
         </section>
-
-        <div class="w-full max-w-md justify-self-center">
-            <div class="reveal reveal-scale mb-5 text-center lg:hidden">
-                <span class="mx-auto grid h-14 w-14 place-items-center rounded-full bg-cream-50 font-display text-2xl font-bold text-maroon-800 ring-4 ring-gold-400/20">F</span>
-                <h1 class="mt-3 font-display text-xl font-semibold text-cream-50">{{ $site->organization_name }}</h1>
-                <p class="text-sm text-cream-100/60">Panel Administrator</p>
-            </div>
-
-            <section class="auth-card rounded-2xl border border-white/15 bg-white/96 p-5 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-8">
-                <div class="mb-6 hidden items-center gap-3 lg:flex">
-                    <span class="grid h-11 w-11 place-items-center rounded-full bg-maroon-800 font-display text-lg font-bold text-cream-50 ring-2 ring-gold-400/30">F</span>
-                    <div class="min-w-0">
-                        <p class="truncate font-display font-semibold text-maroon-900">{{ $site->abbreviation ?: 'FPK Kota Malang' }}</p>
-                        <p class="text-xs uppercase tracking-wider text-slate-400">Panel Administrator</p>
-                    </div>
-                </div>
-                @yield('content')
-            </section>
-
-            <p class="reveal mt-5 text-center text-xs text-cream-100/60" style="--reveal-delay: 160ms">
-                <a href="{{ route('home') }}" class="inline-flex items-center gap-1.5 transition-all duration-300 hover:-translate-x-1 hover:text-cream-50">
-                    <span aria-hidden="true">&larr;</span> Kembali ke situs utama
-                </a>
-            </p>
-        </div>
     </main>
 </body>
 </html>

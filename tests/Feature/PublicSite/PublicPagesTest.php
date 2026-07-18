@@ -49,7 +49,7 @@ class PublicPagesTest extends TestCase
             ->assertDontSee('id="pengurus"', escape: false)
             ->assertDontSee('id="kontak"', escape: false)
             ->assertDontSee(route('articles.index'), escape: false)
-            ->assertDontSee(route('agendas.index'), escape: false)
+            ->assertDontSee(route('home').'#agenda', escape: false)
             ->assertDontSee(route('home').'#pengurus', escape: false)
             ->assertDontSee(route('home').'#kontak', escape: false)
             ->assertDontSee('Lihat Agenda');
@@ -75,7 +75,7 @@ class PublicPagesTest extends TestCase
             ->assertSee('id="pengurus"', escape: false)
             ->assertSee('id="kontak"', escape: false)
             ->assertSee(route('articles.index'), escape: false)
-            ->assertSee(route('agendas.index'), escape: false)
+            ->assertSee(route('home').'#agenda', escape: false)
             ->assertSee(route('home').'#pengurus', escape: false)
             ->assertSee(route('home').'#kontak', escape: false);
     }
@@ -95,6 +95,8 @@ class PublicPagesTest extends TestCase
 
     public function test_home_renders_group_photo_and_swipeable_member_cards(): void
     {
+        $this->removeOptionalPublicContent();
+
         $period = ManagementPeriod::factory()->active()->create([
             'group_photo_path' => 'management/foto-bersama.webp',
         ]);

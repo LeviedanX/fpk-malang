@@ -3,26 +3,25 @@
 @section('title', 'Masuk')
 
 @section('content')
-    <span class="inline-flex items-center gap-2 rounded-full bg-maroon-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-maroon-700">
-        <span class="h-1.5 w-1.5 rounded-full bg-gold-500"></span>
-        Autentikasi aman
-    </span>
-    <h2 class="mt-4 font-display text-2xl font-bold text-slate-900">Selamat datang kembali</h2>
-    <p class="mt-1.5 text-sm leading-relaxed text-slate-500">Masukkan kredensial administrator untuk melanjutkan ke panel.</p>
+    <div class="mt-3 text-center">
+        <h2 class="font-display text-[1.4rem] font-bold leading-tight text-maroon-800">Autentikasi Administrator</h2>
+        <span class="mx-auto mt-2.5 block h-1 w-10 rounded-full bg-gold-500"></span>
+    </div>
 
     @if ($errors->any())
-        <div class="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700" role="alert">
-            {{ $errors->first() }}
+        <div class="mt-6 flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700" role="alert">
+            <svg class="mt-0.5 h-4 w-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+            <span>{{ $errors->first() }}</span>
         </div>
     @endif
 
-    <form method="POST" action="{{ route('login.store') }}" class="mt-6 space-y-5">
+    <form method="POST" action="{{ route('login.store') }}" class="mt-6 space-y-4">
         @csrf
 
         <x-form.input name="email" label="Email" type="email" required autofocus autocomplete="username" />
 
         <div class="space-y-1.5" x-data="passwordField">
-            <label for="password" class="block text-sm font-medium text-slate-700">Password <span class="text-maroon-700">*</span></label>
+            <label for="password" class="block text-sm font-medium text-slate-700">Kata sandi <span class="text-maroon-700">*</span></label>
             <div class="relative">
                 <input :type="visible ? 'text' : 'password'" name="password" id="password" required autocomplete="current-password"
                     class="form-control block w-full pr-12">
@@ -34,14 +33,8 @@
             @error('password')<p class="text-xs text-rose-600">{{ $message }}</p>@enderror
         </div>
 
-        <label class="flex cursor-pointer items-center gap-2.5 text-sm text-slate-600">
-            <input type="checkbox" name="remember" value="1" class="h-4 w-4 rounded border-slate-300 text-maroon-700 focus:ring-maroon-600">
-            Ingat saya
-        </label>
-
-        <button type="submit" class="admin-button admin-button-primary group w-full">
-            <span>Masuk ke Panel</span>
-            <svg class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-5-5l5 5-5 5"/></svg>
+        <button type="submit" class="admin-button admin-button-primary mt-1 w-full">
+            <span>Masuk</span>
         </button>
     </form>
 @endsection

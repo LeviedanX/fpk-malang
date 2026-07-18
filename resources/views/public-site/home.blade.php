@@ -30,7 +30,7 @@
                 <div class="reveal reveal-left mt-9 flex flex-wrap gap-3" style="--reveal-delay: 250ms">
                     <a href="#tentang" class="btn-gold">Tentang FPK</a>
                     @if ($publicContentVisibility['agendas'])
-                        <a href="{{ $upcomingAgendas->isNotEmpty() ? '#agenda' : route('agendas.index') }}" class="btn-ghost-light">Lihat Agenda</a>
+                        <a href="#agenda" class="btn-ghost-light">Lihat Agenda</a>
                     @endif
                 </div>
             </div>
@@ -245,25 +245,42 @@
 @endif
 
 {{-- ============================ AGENDA ============================ --}}
-@if ($upcomingAgendas->isNotEmpty())
+@if ($upcomingAgendas->isNotEmpty() || $pastAgendas->isNotEmpty())
 <section id="agenda" class="section scroll-mt-24 bg-cream-50 dark:bg-ink-950">
     <div class="container-x max-w-4xl!">
         <div class="reveal reveal-scale text-center">
             <span class="eyebrow">Jadwal Kegiatan</span>
-            <h2 class="section-title mt-3">Agenda Mendatang</h2>
+            <h2 class="section-title mt-3">Agenda Kegiatan</h2>
             <span class="title-rule mx-auto"></span>
         </div>
 
-        <div class="mt-10 space-y-4">
-            @foreach ($upcomingAgendas as $agenda)
-                <div class="reveal" style="--reveal-delay: {{ $loop->index * 70 }}ms">
-                    <x-public-site.agenda-card :agenda="$agenda" />
-                </div>
-            @endforeach
-        </div>
-        <div class="reveal mt-8 text-center">
-            <a href="{{ route('agendas.index') }}" class="btn-outline">Lihat Semua Agenda</a>
-        </div>
+        @if ($upcomingAgendas->isNotEmpty())
+            <div class="reveal mt-12">
+                <h3 class="font-display text-xl font-bold text-maroon-800 dark:text-cream-100">Mendatang</h3>
+                <span class="title-rule"></span>
+            </div>
+            <div class="mt-6 space-y-4">
+                @foreach ($upcomingAgendas as $agenda)
+                    <div class="reveal" style="--reveal-delay: {{ $loop->index * 70 }}ms">
+                        <x-public-site.agenda-card :agenda="$agenda" />
+                    </div>
+                @endforeach
+            </div>
+        @endif
+
+        @if ($pastAgendas->isNotEmpty())
+            <div class="reveal {{ $upcomingAgendas->isNotEmpty() ? 'mt-14' : 'mt-12' }}">
+                <h3 class="font-display text-xl font-bold text-maroon-800 dark:text-cream-100">Terlaksana</h3>
+                <span class="title-rule"></span>
+            </div>
+            <div class="mt-6 space-y-4">
+                @foreach ($pastAgendas as $agenda)
+                    <div class="reveal" style="--reveal-delay: {{ ($loop->index % 4) * 70 }}ms">
+                        <x-public-site.agenda-card :agenda="$agenda" />
+                    </div>
+                @endforeach
+            </div>
+        @endif
     </div>
 </section>
 @endif

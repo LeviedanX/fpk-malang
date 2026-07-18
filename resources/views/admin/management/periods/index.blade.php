@@ -52,7 +52,7 @@
                             <div class="admin-actions">
                                 <a href="{{ route('admin.members.index', ['period' => $period->id]) }}" class="admin-action">Anggota</a>
                                 <a href="{{ route('admin.periods.edit', $period) }}" class="admin-action">Ubah</a>
-                                <form method="POST" action="{{ route('admin.periods.destroy', $period) }}" onsubmit="return confirm('Hapus periode ini beserta seluruh anggotanya?');">
+                                <form method="POST" action="{{ route('admin.periods.destroy', $period) }}" data-confirm="Menghapus periode ini juga akan menghapus seluruh anggota di dalamnya. Tindakan ini tidak dapat dibatalkan." data-confirm-title="Hapus Periode?">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="admin-action admin-action-danger">Hapus</button>

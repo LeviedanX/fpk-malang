@@ -26,13 +26,20 @@ class HomeController extends Controller
             ->limit(config('fpk.home.latest_articles'))
             ->get();
 
+        $agendaColumns = [
+            'id', 'title', 'slug', 'location', 'starts_at',
+            'event_status', 'publication_status', 'published_at',
+        ];
+
         $upcomingAgendas = Agenda::query()
-            ->select([
-                'id', 'title', 'slug', 'location', 'starts_at',
-                'event_status', 'publication_status', 'published_at',
-            ])
+            ->select($agendaColumns)
             ->upcoming()
-            ->limit(config('fpk.home.upcoming_agendas'))
+            ->get();
+
+        $pastAgendas = Agenda::query()
+            ->select($agendaColumns)
+            ->past()
+            ->limit(config('fpk.home.past_agendas'))
             ->get();
 
         $activePeriod = ManagementPeriod::query()
@@ -49,6 +56,7 @@ class HomeController extends Controller
             'featuredArticle' => $featuredArticle,
             'latestArticles' => $latestArticles,
             'upcomingAgendas' => $upcomingAgendas,
+            'pastAgendas' => $pastAgendas,
             'activePeriod' => $activePeriod,
         ]);
     }

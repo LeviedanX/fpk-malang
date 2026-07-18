@@ -1,9 +1,29 @@
+@php
+    // Pilihan tahun kalender (menurun), selalu menyertakan nilai yang tersimpan
+    // agar periode lama tetap terpilih walau di luar rentang bawaan.
+    $currentYear = (int) now()->year;
+    $years = range($currentYear + 5, 2000);
+
+    foreach ([$period->start_year, $period->end_year] as $existingYear) {
+        if ($existingYear && ! in_array((int) $existingYear, $years, true)) {
+            $years[] = (int) $existingYear;
+        }
+    }
+
+    rsort($years);
+    $yearOptions = array_combine($years, $years);
+@endphp
+
 <x-admin.card>
     <div class="space-y-4">
         <x-form.input name="name" label="Nama Periode" :value="$period->name" required hint="Contoh: Periode 2025-2027" />
         <div class="grid gap-4 sm:grid-cols-2">
-            <x-form.input name="start_year" label="Tahun Mulai" type="number" :value="$period->start_year" required />
-            <x-form.input name="end_year" label="Tahun Berakhir" type="number" :value="$period->end_year" />
+            <x-form.select name="start_year" label="Tahun Mulai" :options="$yearOptions"
+                :selected="$period->start_year ?? $currentYear" required
+                hint="Pilih tahun mulai masa bakti." />
+            <x-form.select name="end_year" label="Tahun Berakhir" :options="$yearOptions"
+                :selected="$period->end_year" placeholder="— Belum ditentukan (opsional)"
+                hint="Kosongkan bila masa bakti masih berjalan." />
         </div>
         <x-form.image-field
             name="group_photo"
