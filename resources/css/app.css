@@ -800,7 +800,24 @@ trix-editor a {
     text-decoration: underline;
 }
 
+/* Lewati layout dan paint section homepage yang masih jauh di bawah viewport. */
+@supports (content-visibility: auto) {
+    .page-shell #konten > section[id]:not(#beranda) {
+        content-visibility: auto;
+        contain-intrinsic-size: auto 720px;
+    }
+}
+
 /* ---------------- Reduced motion ---------------- */
+
+/* iPadOS dapat memakai user-agent desktop; tetap kunci panel pada perangkat sentuh tersebut. */
+html.admin-mobile-device [data-admin-desktop-content] {
+    display: none !important;
+}
+
+html.admin-mobile-device [data-admin-desktop-notice] {
+    display: grid !important;
+}
 
 @media (prefers-reduced-motion: reduce) {
     html {

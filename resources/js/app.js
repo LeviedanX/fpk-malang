@@ -1,7 +1,15 @@
 import Alpine from 'alpinejs';
 import collapse from '@alpinejs/collapse';
-import 'trix';
-import 'trix/dist/trix.css';
+
+/* Muat editor berat hanya pada form yang benar-benar memakainya. */
+if (document.querySelector('trix-editor')) {
+    Promise.all([
+        import('trix'),
+        import('trix/dist/trix.css'),
+    ]).catch((error) => {
+        console.error('Editor gagal dimuat.', error);
+    });
+}
 
 Alpine.plugin(collapse);
 window.Alpine = Alpine;
@@ -83,32 +91,6 @@ Alpine.data('siteNav', (sections = []) => ({
     },
     isActive(id) {
         return this.active === id;
-    },
-}));
-
-/* ---------------- Admin shell: drawer responsif ---------------- */
-Alpine.data('adminShell', () => ({
-    sidebar: false,
-    init() {
-        const syncBodyLock = () => {
-            document.body.classList.toggle('overflow-hidden', this.sidebar && window.innerWidth < 768);
-        };
-
-        this.$watch('sidebar', syncBodyLock);
-
-        const onResize = () => {
-            if (window.innerWidth >= 768) this.sidebar = false;
-            syncBodyLock();
-        };
-
-        window.addEventListener('resize', onResize, { passive: true });
-    },
-    openSidebar() {
-        this.sidebar = true;
-        this.$nextTick(() => this.$refs.sidebarClose?.focus());
-    },
-    closeSidebar() {
-        this.sidebar = false;
     },
 }));
 

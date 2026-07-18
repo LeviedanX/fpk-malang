@@ -6,13 +6,13 @@ use App\Models\Admin;
 use App\Models\BusinessApplication;
 use App\Models\BusinessCategory;
 use App\Models\ReportExport;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class OperasionalInternalTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected function setUp(): void
     {

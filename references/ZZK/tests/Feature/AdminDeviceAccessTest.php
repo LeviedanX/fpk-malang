@@ -3,12 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\Admin;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class AdminDeviceAccessTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     private const DESKTOP_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/150.0 Safari/537.36';
 

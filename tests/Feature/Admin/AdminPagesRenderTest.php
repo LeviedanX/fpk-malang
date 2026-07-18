@@ -7,12 +7,12 @@ use App\Models\Article;
 use App\Models\ManagementMember;
 use App\Models\ManagementPeriod;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class AdminPagesRenderTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     private function admin(): User
     {

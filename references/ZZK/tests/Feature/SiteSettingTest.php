@@ -7,13 +7,13 @@ use App\Models\Article;
 use App\Models\ArticleCategory;
 use App\Models\HeroSection;
 use App\Models\SiteSetting;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
 
 class SiteSettingTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     private function admin(bool $active = true): Admin
     {

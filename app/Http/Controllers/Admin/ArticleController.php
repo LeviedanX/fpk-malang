@@ -20,6 +20,7 @@ class ArticleController extends Controller
         $status = $request->query('status');
 
         $articles = Article::query()
+            ->select(['id', 'title', 'slug', 'is_featured', 'status', 'published_at', 'created_at'])
             ->when($search !== '', fn ($query) => $query->where('title', 'like', "%{$search}%"))
             ->when(
                 in_array($status, [PublicationStatus::Draft->value, PublicationStatus::Published->value], true),

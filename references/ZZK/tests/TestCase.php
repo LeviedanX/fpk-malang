@@ -3,18 +3,22 @@
 namespace Tests;
 
 use App\Providers\AppServiceProvider;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use ReflectionMethod;
+use RuntimeException;
 
 abstract class TestCase extends BaseTestCase
 {
-    public function createApplication()
+    public function createApplication(): Application
     {
         $app = parent::createApplication();
+        $connection = (string) $app['config']->get('database.default');
+        $database = (string) $app['config']->get("database.connections.{$connection}.database");
 
-        if (config('database.default') !== 'sqlite' || config('database.connections.sqlite.database') !== ':memory:') {
-            throw new \RuntimeException(
-                'Test dibatalkan: PHPUnit wajib memakai SQLite :memory:. Jalankan php artisan config:clear sebelum test.'
+        if ($connection !== 'mysql' || $database !== 'fpk_malang') {
+            throw new RuntimeException(
+                'Test dibatalkan: PHPUnit wajib memakai database MySQL fpk_malang.'
             );
         }
 

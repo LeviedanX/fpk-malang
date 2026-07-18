@@ -6,7 +6,7 @@ use App\Models\Admin;
 use App\Models\ReportExport;
 use App\Models\SiteSetting;
 use App\Models\WebVisit;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -14,7 +14,7 @@ use Tests\TestCase;
 
 class AdminSecurityAndOperationsTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     private function admin(): Admin
     {

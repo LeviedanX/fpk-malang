@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Admin;
 use App\Models\SiteSetting;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -16,7 +16,7 @@ use Tests\TestCase;
  */
 class ProfilIdentitasTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     private function admin(): Admin
     {

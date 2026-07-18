@@ -10,9 +10,15 @@ class AgendaController extends Controller
 {
     public function index(): View
     {
-        $upcoming = Agenda::query()->upcoming()->get();
+        $columns = [
+            'id', 'title', 'slug', 'location', 'starts_at',
+            'event_status', 'publication_status', 'published_at',
+        ];
+
+        $upcoming = Agenda::query()->select($columns)->upcoming()->get();
 
         $past = Agenda::query()
+            ->select($columns)
             ->past()
             ->paginate(9)
             ->withQueryString();

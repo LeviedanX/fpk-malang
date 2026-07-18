@@ -9,9 +9,10 @@ use App\Http\Controllers\Admin\FpkProfileController;
 use App\Http\Controllers\Admin\ManagementMemberController;
 use App\Http\Controllers\Admin\ManagementPeriodController;
 use App\Http\Controllers\Admin\SiteSettingController;
+use App\Http\Middleware\EnsureDesktopAdminAccess;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth')
+Route::middleware([EnsureDesktopAdminAccess::class, 'auth'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {

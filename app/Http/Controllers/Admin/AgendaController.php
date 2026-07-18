@@ -20,6 +20,7 @@ class AgendaController extends Controller
         $status = $request->query('status');
 
         $agendas = Agenda::query()
+            ->select(['id', 'title', 'slug', 'starts_at', 'event_status', 'publication_status'])
             ->when($search !== '', fn ($query) => $query->where('title', 'like', "%{$search}%"))
             ->when(
                 in_array($status, [PublicationStatus::Draft->value, PublicationStatus::Published->value], true),

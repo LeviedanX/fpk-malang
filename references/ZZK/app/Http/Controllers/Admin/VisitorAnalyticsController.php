@@ -114,10 +114,6 @@ class VisitorAnalyticsController extends Controller
             default => '%Y',
         };
 
-        return match (DB::connection()->getDriverName()) {
-            'sqlite' => "strftime('{$format}', visited_at)",
-            'pgsql' => "to_char(visited_at, '".strtr($format, ['%Y' => 'YYYY', '%m' => 'MM', '%d' => 'DD', '%H' => 'HH24'])."')",
-            default => "DATE_FORMAT(visited_at, '{$format}')",
-        };
+        return "DATE_FORMAT(visited_at, '{$format}')";
     }
 }

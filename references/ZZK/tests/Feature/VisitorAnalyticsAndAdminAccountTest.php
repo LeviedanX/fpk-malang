@@ -4,13 +4,13 @@ namespace Tests\Feature;
 
 use App\Models\Admin;
 use App\Models\WebVisit;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class VisitorAnalyticsAndAdminAccountTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     private function admin(): Admin
     {

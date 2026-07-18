@@ -1,9 +1,10 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Middleware\EnsureDesktopAdminAccess;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('guest')->group(function () {
+Route::middleware([EnsureDesktopAdminAccess::class, 'guest'])->group(function () {
     Route::get('/admin/login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 
@@ -12,5 +13,5 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::post('/admin/logout', [AuthenticatedSessionController::class, 'destroy'])
-    ->middleware('auth')
+    ->middleware([EnsureDesktopAdminAccess::class, 'auth'])
     ->name('logout');

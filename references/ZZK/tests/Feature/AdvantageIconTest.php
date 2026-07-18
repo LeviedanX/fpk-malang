@@ -4,12 +4,12 @@ namespace Tests\Feature;
 
 use App\Models\Admin;
 use App\Models\Advantage;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class AdvantageIconTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     private function admin(): Admin
     {

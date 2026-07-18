@@ -12,17 +12,21 @@
             : asset('assets/images/branding/logo-fpk.png')))
     <link rel="icon" href="{{ $faviconUrl }}">
     <link rel="apple-touch-icon" href="{{ $faviconUrl }}">
-    <script>document.documentElement.classList.add('js');</script>
+    <script>
+        document.documentElement.classList.add('js');
+        if (/Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1) {
+            document.documentElement.classList.add('admin-mobile-device');
+        }
+    </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="admin-shell min-h-screen bg-slate-100 font-sans text-slate-800 antialiased" x-data="adminShell" @keydown.escape.window="closeSidebar()">
-    <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
+<body class="admin-shell min-h-screen bg-slate-100 font-sans text-slate-800 antialiased">
+    <x-admin.desktop-only-notice />
 
-    <div class="flex min-h-screen">
+    <div class="admin-desktop-content hidden min-h-screen lg:flex" data-admin-desktop-content>
+        <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
         <aside
-            x-cloak
-            class="admin-sidebar fixed inset-y-0 left-0 z-40 flex w-[min(19rem,86vw)] -translate-x-full transform-gpu flex-col overflow-y-auto bg-maroon-950 text-cream-100 shadow-2xl transition-transform duration-500 ease-out md:sticky md:top-0 md:h-screen md:w-72 md:translate-x-0 md:shadow-none xl:w-80"
-            :class="sidebar ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
+            class="admin-sidebar sticky top-0 flex h-screen w-72 flex-none flex-col overflow-y-auto bg-maroon-950 text-cream-100 xl:w-80"
             aria-label="Panel navigasi admin"
         >
             <div class="flex items-center gap-3 border-b border-white/10 px-5 py-5">
@@ -33,9 +37,6 @@
                         <span class="block text-[10px] uppercase tracking-[0.2em] text-cream-100/50">Panel Administrator</span>
                     </span>
                 </a>
-                <button x-ref="sidebarClose" type="button" @click="closeSidebar()" class="admin-icon-button grid place-items-center text-cream-100/70 hover:bg-white/10 hover:text-white md:hidden" aria-label="Tutup menu">
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                </button>
             </div>
 
             <nav class="flex-1 px-3 py-5 text-sm" aria-label="Navigasi admin">
@@ -54,7 +55,6 @@
                         <li>
                             <a
                                 href="{{ route($route) }}"
-                                @click="closeSidebar()"
                                 @class([
                                     'admin-nav-link group flex items-center gap-3 rounded-xl px-3 py-2.5 font-medium',
                                     'bg-white/12 text-white shadow-sm ring-1 ring-white/10' => request()->routeIs(...$patterns),
@@ -70,22 +70,10 @@
                 </ul>
             </nav>
 
-            <div class="border-t border-white/10 p-4">
-                <a href="{{ route('home') }}" target="_blank" rel="noopener" class="admin-nav-link flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-cream-100/65 hover:bg-white/8 hover:text-white">
-                    <svg class="h-5 w-5 text-gold-400/80" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 3h7v7m0-7L10 14M5 5h5M5 5a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5"/></svg>
-                    <span>Lihat situs utama</span>
-                </a>
-            </div>
         </aside>
-
-        <div x-show="sidebar" x-cloak @click="closeSidebar()" x-transition.opacity.duration.300ms class="fixed inset-0 z-30 bg-maroon-950/60 backdrop-blur-sm md:hidden" aria-hidden="true"></div>
 
         <div class="flex min-w-0 flex-1 flex-col">
             <header class="admin-topbar sticky top-0 z-20 flex min-h-16 items-center justify-between gap-2 border-b border-slate-200/80 bg-white/90 px-3 py-3 shadow-sm backdrop-blur-xl sm:gap-4 sm:px-5 lg:px-8">
-                <button type="button" @click="openSidebar()" class="admin-icon-button grid flex-none place-items-center text-maroon-800 hover:bg-maroon-50 md:hidden" aria-label="Buka menu">
-                    <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
-                </button>
-
                 <div class="min-w-0 flex-1">
                     <p class="hidden text-[10px] font-semibold uppercase tracking-[0.18em] text-maroon-500 sm:block">Panel Administrator</p>
                     <h1 class="truncate font-display text-base font-semibold text-slate-800 sm:text-lg">@yield('heading', 'Panel Admin')</h1>

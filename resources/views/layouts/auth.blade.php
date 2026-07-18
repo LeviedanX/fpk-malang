@@ -12,15 +12,21 @@
             : asset('assets/images/branding/logo-fpk.png')))
     <link rel="icon" href="{{ $faviconUrl }}">
     <link rel="apple-touch-icon" href="{{ $faviconUrl }}">
-    <script>document.documentElement.classList.add('js');</script>
+    <script>
+        document.documentElement.classList.add('js');
+        if (/Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1) {
+            document.documentElement.classList.add('admin-mobile-device');
+        }
+    </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="auth-shell relative min-h-dvh overflow-x-hidden bg-maroon-950 font-sans text-slate-800 antialiased">
-    <div class="hero-motif parallax-layer pointer-events-none fixed inset-0 opacity-50" data-parallax="0.012" aria-hidden="true"></div>
-    <div class="hero-glow parallax-layer pointer-events-none fixed inset-0" data-parallax="0.025" aria-hidden="true"></div>
-    <div class="pointer-events-none fixed -left-24 top-1/4 h-72 w-72 rounded-full bg-gold-400/10 blur-3xl" aria-hidden="true"></div>
+    <x-admin.desktop-only-notice />
+    <div class="hero-motif parallax-layer pointer-events-none fixed inset-0 hidden opacity-50 lg:block" data-parallax="0.012" aria-hidden="true"></div>
+    <div class="hero-glow parallax-layer pointer-events-none fixed inset-0 hidden lg:block" data-parallax="0.025" aria-hidden="true"></div>
+    <div class="pointer-events-none fixed -left-24 top-1/4 hidden h-72 w-72 rounded-full bg-gold-400/10 blur-3xl lg:block" aria-hidden="true"></div>
 
-    <main class="relative mx-auto grid min-h-dvh w-full max-w-6xl items-center gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:grid-cols-[1fr_0.82fr] lg:px-8">
+    <main class="admin-desktop-content relative mx-auto hidden min-h-dvh w-full max-w-6xl items-center gap-8 px-8 py-12 lg:grid lg:grid-cols-[1fr_0.82fr]" data-admin-desktop-content>
         <section class="reveal reveal-left hidden max-w-xl text-cream-50 lg:block">
             <span class="eyebrow text-gold-400!">Forum Pembauran Kebangsaan</span>
             <h1 class="mt-5 font-display text-5xl font-extrabold leading-tight">Kelola informasi publik dengan rapi dan bertanggung jawab.</h1>

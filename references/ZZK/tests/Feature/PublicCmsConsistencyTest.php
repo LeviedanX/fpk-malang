@@ -6,13 +6,13 @@ use App\Models\Admin;
 use App\Models\Service;
 use App\Models\SiteSetting;
 use App\Providers\AppServiceProvider;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use ReflectionMethod;
 use Tests\TestCase;
 
 class PublicCmsConsistencyTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     private function admin(): Admin
     {

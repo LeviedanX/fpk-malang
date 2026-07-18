@@ -64,8 +64,13 @@ class Article extends Model
      */
     public static function featuredForHome(): ?self
     {
-        return static::query()->latestPublished()->where('is_featured', true)->first()
-            ?? static::query()->latestPublished()->first();
+        $columns = [
+            'id', 'title', 'slug', 'excerpt', 'thumbnail_path',
+            'is_featured', 'status', 'published_at',
+        ];
+
+        return static::query()->select($columns)->latestPublished()->where('is_featured', true)->first()
+            ?? static::query()->select($columns)->latestPublished()->first();
     }
 
     public function isPublished(): bool

@@ -10,14 +10,14 @@ use App\Models\BusinessCategory;
 use App\Models\Client;
 use App\Models\Statistic;
 use App\Models\Testimonial;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class IntegratedCmsFeaturesTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_new_admin_modules_have_registered_routes(): void
     {

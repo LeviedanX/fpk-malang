@@ -3,7 +3,7 @@
 <article class="group surface card-lift flex h-full flex-col overflow-hidden">
     <a href="{{ route('articles.show', $article) }}" class="block aspect-video overflow-hidden bg-cream-100 dark:bg-ink-800">
         @if ($article->thumbnail_path)
-            <img src="{{ \Illuminate\Support\Facades\Storage::url($article->thumbnail_path) }}" alt="{{ $article->title }}" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+            <img src="{{ \Illuminate\Support\Facades\Storage::url($article->thumbnail_path) }}" alt="{{ $article->title }}" loading="lazy" decoding="async" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
         @else
             <span class="flex h-full w-full items-center justify-center font-display text-3xl text-maroon-200 dark:text-ink-600" aria-hidden="true">FPK</span>
         @endif

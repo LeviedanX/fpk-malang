@@ -18,6 +18,10 @@ class ArticleController extends Controller
         $featured = $search === '' ? Article::featuredForHome() : null;
 
         $articles = Article::query()
+            ->select([
+                'id', 'title', 'slug', 'excerpt', 'thumbnail_path',
+                'is_featured', 'status', 'published_at',
+            ])
             ->latestPublished()
             ->when($featured, fn ($query) => $query->whereKeyNot($featured->getKey()))
             ->when($search !== '', function ($query) use ($search) {

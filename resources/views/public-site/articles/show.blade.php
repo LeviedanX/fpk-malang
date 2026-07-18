@@ -29,7 +29,7 @@
         </header>
 
         @if ($article->thumbnail_path)
-            <img src="{{ \Illuminate\Support\Facades\Storage::url($article->thumbnail_path) }}" alt="{{ $article->title }}" class="reveal reveal-scale mt-8 w-full rounded-xl object-cover shadow-sm">
+            <img src="{{ \Illuminate\Support\Facades\Storage::url($article->thumbnail_path) }}" alt="{{ $article->title }}" fetchpriority="high" decoding="async" class="reveal reveal-scale mt-8 w-full rounded-xl object-cover shadow-sm">
         @endif
 
         <div class="reveal prose prose-lg mt-8 max-w-none prose-headings:font-display prose-headings:text-ink-800 prose-a:text-maroon-700 hover:prose-a:text-maroon-800 dark:prose-invert dark:prose-a:text-gold-400">

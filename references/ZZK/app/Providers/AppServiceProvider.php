@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use RuntimeException;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,7 +28,13 @@ class AppServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        //
+        config(['database.connections' => [
+            'mysql' => config('database.connections.mysql'),
+        ]]);
+
+        if (config('database.default') !== 'mysql') {
+            throw new RuntimeException('Aplikasi wajib menggunakan koneksi database MySQL.');
+        }
     }
 
     /**

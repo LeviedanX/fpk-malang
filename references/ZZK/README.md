@@ -52,13 +52,13 @@ Model, migration, atau tabel legacy dapat tetap berada di source code untuk komp
 
 - Laravel 13 dan PHP 8.3+.
 - Blade, Vite 8, Tailwind CSS 4, dan Alpine.js.
-- MySQL untuk development/deployment; SQLite untuk testing dan skenario lokal tertentu.
+- MySQL `fpk_malang` untuk development, testing, dan deployment.
 - PHPUnit 12.
 - OpenSpout untuk export spreadsheet.
 
 ### Instalasi Lokal
 
-Prasyarat: PHP 8.3+ dengan extension database yang sesuai, Composer, Node.js, npm, dan MySQL atau SQLite.
+Prasyarat: PHP 8.3+ dengan extension `pdo_mysql`, Composer, Node.js, npm, dan MySQL.
 
 ```bash
 git clone https://github.com/LeviedanX/zamzamkhan.git
@@ -94,7 +94,7 @@ php artisan test
 npm run build
 ```
 
-Testing menggunakan SQLite in-memory sesuai `phpunit.xml`, sehingga tidak mengubah database development.
+Testing menggunakan database MySQL `fpk_malang`. Seluruh penulisan data test dibungkus transaksi dan di-rollback setelah setiap test, tanpa membuat database kedua atau mereset skema utama.
 
 ### Struktur Direktori
 
@@ -192,13 +192,13 @@ Legacy models, migrations, or tables may remain for compatibility and rollback, 
 
 - Laravel 13 and PHP 8.3+.
 - Blade, Vite 8, Tailwind CSS 4, and Alpine.js.
-- MySQL for development/deployment; SQLite for tests and selected local scenarios.
+- MySQL `fpk_malang` for development, testing, and deployment.
 - PHPUnit 12.
 - OpenSpout for spreadsheet exports.
 
 ### Local Installation
 
-Requirements: PHP 8.3+ with the required database extension, Composer, Node.js, npm, and MySQL or SQLite.
+Requirements: PHP 8.3+ with the `pdo_mysql` extension, Composer, Node.js, npm, and MySQL.
 
 ```bash
 git clone https://github.com/LeviedanX/zamzamkhan.git
@@ -234,7 +234,7 @@ php artisan test
 npm run build
 ```
 
-Tests use the SQLite in-memory database configured in `phpunit.xml`, so they do not modify the development database.
+Tests use the MySQL `fpk_malang` database. Every test write is wrapped in a transaction and rolled back after the test, without creating a second database or resetting the primary schema.
 
 ### Deployment
 

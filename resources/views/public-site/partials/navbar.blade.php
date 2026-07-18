@@ -1,14 +1,36 @@
-@php($home = route('home'))
-@php($isHome = request()->routeIs('home'))
-@php($links = [
-    ['beranda', 'Beranda', $home.'#beranda'],
-    ['tentang', 'Tentang FPK', $home.'#tentang'],
-    ['artikel', 'Artikel', $isHome ? $home.'#artikel' : route('articles.index')],
-    ['agenda', 'Agenda', $isHome ? $home.'#agenda' : route('agendas.index')],
-    ['pengurus', 'Pengurus', $home.'#pengurus'],
-])
+@php
+    $home = route('home');
+    $isHome = request()->routeIs('home');
+    $hasHomeAgendaSection = $isHome
+        && isset($upcomingAgendas)
+        && $upcomingAgendas->isNotEmpty();
+    $links = [
+        ['beranda', 'Beranda', $home.'#beranda'],
+        ['tentang', 'Tentang FPK', $home.'#tentang'],
+    ];
+
+    if ($publicContentVisibility['articles']) {
+        $links[] = ['artikel', 'Artikel', $isHome ? $home.'#artikel' : route('articles.index')];
+    }
+
+    if ($publicContentVisibility['agendas']) {
+        $links[] = ['agenda', 'Agenda', $hasHomeAgendaSection ? $home.'#agenda' : route('agendas.index')];
+    }
+
+    if ($publicContentVisibility['management']) {
+        $links[] = ['pengurus', 'Pengurus', $home.'#pengurus'];
+    }
+
+    $trackedSections = collect($links)->pluck(0);
+
+    if ($publicContentVisibility['contact']) {
+        $trackedSections->push('kontak');
+    }
+
+    $trackedSections = $trackedSections->values();
+@endphp
 <header
-    x-data="siteNav(['beranda','tentang','artikel','agenda','pengurus','kontak'])"
+    x-data="siteNav({{ \Illuminate\Support\Js::from($trackedSections) }})"
     class="fixed inset-x-0 top-0 z-40 transform-gpu transition-all duration-500 ease-out"
     :class="[
         scrolled || open
@@ -73,7 +95,9 @@
                 <svg x-show="$store.theme.dark" x-cloak class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.36 6.36l-1.42-1.42M7.06 7.06L5.64 5.64m12.72 0l-1.42 1.42M7.06 16.94l-1.42 1.42M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
             </button>
 
-            <a href="{{ $home }}#kontak" class="hidden btn-primary px-4! py-2! sm:inline-flex">Kontak</a>
+            @if ($publicContentVisibility['contact'])
+                <a href="{{ $home }}#kontak" class="hidden btn-primary px-4! py-2! sm:inline-flex">Kontak</a>
+            @endif
 
             <button type="button" @click="open = !open"
                 class="icon-button grid h-9 w-9 place-items-center rounded-md lg:hidden"
@@ -92,7 +116,9 @@
             @foreach ($links as [$id, $label, $href])
                 <li><a href="{{ $href }}" class="block rounded-md px-3 py-2.5 text-sm font-medium text-ink-700 transition-all duration-300 hover:translate-x-1 hover:bg-maroon-50 hover:text-maroon-700 dark:text-ink-200 dark:hover:bg-ink-800">{{ $label }}</a></li>
             @endforeach
-            <li><a href="{{ $home }}#kontak" class="mt-1 block rounded-md bg-maroon-700 px-3 py-2.5 text-center text-sm font-semibold text-cream-50">Kontak</a></li>
+            @if ($publicContentVisibility['contact'])
+                <li><a href="{{ $home }}#kontak" class="mt-1 block rounded-md bg-maroon-700 px-3 py-2.5 text-center text-sm font-semibold text-cream-50">Kontak</a></li>
+            @endif
         </ul>
     </div>
 </header>

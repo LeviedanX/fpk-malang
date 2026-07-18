@@ -5,12 +5,12 @@ namespace Tests\Feature;
 use App\Models\Admin;
 use App\Models\Article;
 use App\Models\ArticleCategory;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class ArticleTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     private function category(string $name = 'Sertifikasi Halal', string $slug = 'sertifikasi-halal'): ArticleCategory
     {

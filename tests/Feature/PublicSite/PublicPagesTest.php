@@ -4,18 +4,93 @@ namespace Tests\Feature\PublicSite;
 
 use App\Models\Agenda;
 use App\Models\Article;
+use App\Models\ContactSetting;
 use App\Models\ManagementMember;
 use App\Models\ManagementPeriod;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class PublicPagesTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_home_page_renders(): void
     {
         $this->get('/')->assertOk()->assertSee('Tentang FPK');
+    }
+
+    public function test_admin_login_shortcut_is_desktop_only(): void
+    {
+        $response = $this->get('/')
+            ->assertOk()
+            ->assertSee('aria-label="Login Admin"', escape: false);
+
+        $this->assertMatchesRegularExpression(
+            '/<a[^>]+href="[^"]*admin\/login"[^>]+aria-label="Login Admin"[^>]+class="[^"]*\bhidden\b[^"]*\blg:inline-flex\b[^"]*"/',
+            $response->getContent(),
+        );
+    }
+
+    public function test_empty_optional_content_is_removed_from_homepage_and_navigation(): void
+    {
+        $this->removeOptionalPublicContent();
+
+        Article::factory()->draft()->create();
+        Agenda::factory()->draft()->create();
+        ManagementPeriod::factory()->active()->create();
+
+        $inactivePeriod = ManagementPeriod::factory()->create();
+        ManagementMember::factory()->for($inactivePeriod, 'period')->create();
+
+        $this->get('/')
+            ->assertOk()
+            ->assertDontSee('id="artikel"', escape: false)
+            ->assertDontSee('id="agenda"', escape: false)
+            ->assertDontSee('id="pengurus"', escape: false)
+            ->assertDontSee('id="kontak"', escape: false)
+            ->assertDontSee(route('articles.index'), escape: false)
+            ->assertDontSee(route('agendas.index'), escape: false)
+            ->assertDontSee(route('home').'#pengurus', escape: false)
+            ->assertDontSee(route('home').'#kontak', escape: false)
+            ->assertDontSee('Lihat Agenda');
+    }
+
+    public function test_optional_content_and_navigation_appear_when_public_data_exists(): void
+    {
+        $this->removeOptionalPublicContent();
+
+        Article::factory()->create();
+        Agenda::factory()->create();
+
+        $period = ManagementPeriod::factory()->active()->create();
+        ManagementMember::factory()->for($period, 'period')->create();
+
+        $contact = ContactSetting::query()->first() ?? new ContactSetting;
+        $contact->fill(['email' => 'publik@fpk-malang.test'])->save();
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('id="artikel"', escape: false)
+            ->assertSee('id="agenda"', escape: false)
+            ->assertSee('id="pengurus"', escape: false)
+            ->assertSee('id="kontak"', escape: false)
+            ->assertSee(route('articles.index'), escape: false)
+            ->assertSee(route('agendas.index'), escape: false)
+            ->assertSee(route('home').'#pengurus', escape: false)
+            ->assertSee(route('home').'#kontak', escape: false);
+    }
+
+    public function test_contact_section_appears_when_only_map_is_available(): void
+    {
+        $this->removeOptionalPublicContent();
+
+        $contact = ContactSetting::query()->first() ?? new ContactSetting;
+        $contact->fill(['map_embed_url' => 'https://maps.google.com/maps?q=Malang&output=embed'])->save();
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('id="kontak"', escape: false)
+            ->assertSee('Peta lokasi FPK Kota Malang');
     }
 
     public function test_home_renders_group_photo_and_swipeable_member_cards(): void
@@ -153,5 +228,24 @@ class PublicPagesTest extends TestCase
     public function test_unknown_page_returns_404(): void
     {
         $this->get('/halaman-tidak-ada')->assertNotFound();
+    }
+
+    private function removeOptionalPublicContent(): void
+    {
+        Article::query()->delete();
+        Agenda::query()->delete();
+        ManagementPeriod::query()->update(['is_active' => false]);
+        ContactSetting::query()->update([
+            'address' => null,
+            'phone' => null,
+            'whatsapp' => null,
+            'email' => null,
+            'operational_hours' => null,
+            'map_embed_url' => null,
+            'instagram_url' => null,
+            'facebook_url' => null,
+            'youtube_url' => null,
+            'tiktok_url' => null,
+        ]);
     }
 }

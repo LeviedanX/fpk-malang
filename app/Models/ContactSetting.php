@@ -39,7 +39,8 @@ class ContactSetting extends Model
     public function hasAnyContact(): bool
     {
         return (bool) ($this->address || $this->phone || $this->whatsapp
-            || $this->email || $this->instagram_url || $this->facebook_url
+            || $this->email || $this->operational_hours
+            || $this->instagram_url || $this->facebook_url
             || $this->youtube_url || $this->tiktok_url);
     }
 

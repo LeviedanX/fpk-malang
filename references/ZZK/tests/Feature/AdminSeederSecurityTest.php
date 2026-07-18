@@ -4,13 +4,13 @@ namespace Tests\Feature;
 
 use App\Models\Admin;
 use Database\Seeders\AdminSeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class AdminSeederSecurityTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_seeder_gagal_bila_credential_tidak_disediakan(): void
     {

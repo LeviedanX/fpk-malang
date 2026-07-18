@@ -29,7 +29,9 @@
 
                 <div class="reveal reveal-left mt-9 flex flex-wrap gap-3" style="--reveal-delay: 250ms">
                     <a href="#tentang" class="btn-gold">Tentang FPK</a>
-                    <a href="#agenda" class="btn-ghost-light">Lihat Agenda</a>
+                    @if ($publicContentVisibility['agendas'])
+                        <a href="{{ $upcomingAgendas->isNotEmpty() ? '#agenda' : route('agendas.index') }}" class="btn-ghost-light">Lihat Agenda</a>
+                    @endif
                 </div>
             </div>
 
@@ -40,11 +42,14 @@
                         <img src="{{ \Illuminate\Support\Facades\Storage::url($profile->hero_image_path) }}"
                              alt="Kegiatan Forum Pembauran Kebangsaan Kota Malang"
                              width="640" height="800"
+                             fetchpriority="high" decoding="async"
                              class="h-full w-full object-cover">
                         <div class="pointer-events-none absolute inset-0 bg-linear-to-t from-maroon-950/70 via-transparent to-transparent" aria-hidden="true"></div>
                     @else
                         <img src="{{ asset('assets/images/branding/hero-card-bg.webp') }}"
                              alt=""
+                             width="960" height="1200"
+                             fetchpriority="high" decoding="async"
                              class="absolute inset-0 h-full w-full object-cover"
                              aria-hidden="true">
                         <div class="absolute inset-0 bg-black/10" aria-hidden="true"></div>
@@ -52,6 +57,7 @@
                             <img src="{{ asset('assets/images/branding/logo-fpk.png') }}"
                                  alt="Logo FPK Kota Malang"
                                  width="144" height="144"
+                                 decoding="async"
                                  class="float-slow h-24 w-24 rounded-full bg-white p-3 shadow-2xl ring-1 ring-gold-400/35 sm:h-28 sm:w-28 md:h-36 md:w-36 md:p-4">
                             <p class="mt-6 font-display text-xl font-bold text-cream-50 sm:text-2xl">FPK Kota Malang</p>
                             <p class="mt-2 max-w-sm text-sm leading-relaxed text-cream-100/75">Merawat kebhinnekaan, memperkuat persatuan.</p>
@@ -124,6 +130,7 @@
                 <img src="{{ asset('assets/images/about/about-fpk-vector.webp') }}"
                      alt="Ilustrasi Tugu Malang dan Balai Kota Malang sebagai identitas FPK Kota Malang"
                      width="1400" height="1050"
+                     loading="lazy" decoding="async"
                      class="aspect-4/3 h-full w-full object-cover transition duration-700 hover:scale-[1.025]">
             </figure>
         </div>
@@ -159,6 +166,7 @@
 </section>
 
 {{-- ============================ ARTIKEL ============================ --}}
+@if ($featuredArticle)
 <section id="artikel" class="section scroll-mt-24 bg-white dark:bg-ink-900">
     <div class="container-x">
         <div class="reveal reveal-left flex flex-wrap items-end justify-between gap-4">
@@ -170,13 +178,12 @@
             <a href="{{ route('articles.index') }}" class="text-sm font-semibold text-maroon-700 hover:text-maroon-800 dark:text-gold-400">Lihat semua artikel &rarr;</a>
         </div>
 
-        @if ($featuredArticle)
-            <div class="mt-10 grid gap-6 lg:grid-cols-2 lg:items-stretch">
+        <div class="mt-10 grid gap-6 lg:grid-cols-2 lg:items-stretch">
                 {{-- Featured article: dominant editorial card. --}}
                 <article class="reveal reveal-left group surface card-lift flex flex-col overflow-hidden">
                     <a href="{{ route('articles.show', $featuredArticle) }}" class="relative block aspect-16/10 overflow-hidden bg-cream-100 dark:bg-ink-800">
                         @if ($featuredArticle->thumbnail_path)
-                            <img src="{{ \Illuminate\Support\Facades\Storage::url($featuredArticle->thumbnail_path) }}" alt="{{ $featuredArticle->title }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                            <img src="{{ \Illuminate\Support\Facades\Storage::url($featuredArticle->thumbnail_path) }}" alt="{{ $featuredArticle->title }}" loading="lazy" decoding="async" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
                         @else
                             <span class="flex h-full w-full items-center justify-center font-display text-5xl text-maroon-200 dark:text-ink-600" aria-hidden="true">FPK</span>
                         @endif
@@ -210,7 +217,7 @@
                             <article class="reveal reveal-right group flex gap-4 py-4 first:pt-0 last:pb-0" style="--reveal-delay: {{ $loop->index * 80 }}ms">
                                 <a href="{{ route('articles.show', $article) }}" class="block aspect-square w-24 flex-none overflow-hidden rounded-lg bg-cream-100 dark:bg-ink-800 sm:w-28">
                                     @if ($article->thumbnail_path)
-                                        <img src="{{ \Illuminate\Support\Facades\Storage::url($article->thumbnail_path) }}" alt="{{ $article->title }}" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                                        <img src="{{ \Illuminate\Support\Facades\Storage::url($article->thumbnail_path) }}" alt="{{ $article->title }}" loading="lazy" decoding="async" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
                                     @else
                                         <span class="flex h-full w-full items-center justify-center font-display text-lg text-maroon-200 dark:text-ink-600" aria-hidden="true">FPK</span>
                                     @endif
@@ -232,14 +239,13 @@
                         @endforeach
                     </div>
                 @endif
-            </div>
-        @else
-            <x-public-site.empty-state class="reveal mt-10">Belum ada artikel yang dipublikasikan.</x-public-site.empty-state>
-        @endif
+        </div>
     </div>
 </section>
+@endif
 
 {{-- ============================ AGENDA ============================ --}}
+@if ($upcomingAgendas->isNotEmpty())
 <section id="agenda" class="section scroll-mt-24 bg-cream-50 dark:bg-ink-950">
     <div class="container-x max-w-4xl!">
         <div class="reveal reveal-scale text-center">
@@ -248,24 +254,22 @@
             <span class="title-rule mx-auto"></span>
         </div>
 
-        @if ($upcomingAgendas->isNotEmpty())
-            <div class="mt-10 space-y-4">
-                @foreach ($upcomingAgendas as $agenda)
-                    <div class="reveal" style="--reveal-delay: {{ $loop->index * 70 }}ms">
-                        <x-public-site.agenda-card :agenda="$agenda" />
-                    </div>
-                @endforeach
-            </div>
-            <div class="reveal mt-8 text-center">
-                <a href="{{ route('agendas.index') }}" class="btn-outline">Lihat Semua Agenda</a>
-            </div>
-        @else
-            <x-public-site.empty-state class="reveal mt-10">Belum ada agenda mendatang yang dijadwalkan.</x-public-site.empty-state>
-        @endif
+        <div class="mt-10 space-y-4">
+            @foreach ($upcomingAgendas as $agenda)
+                <div class="reveal" style="--reveal-delay: {{ $loop->index * 70 }}ms">
+                    <x-public-site.agenda-card :agenda="$agenda" />
+                </div>
+            @endforeach
+        </div>
+        <div class="reveal mt-8 text-center">
+            <a href="{{ route('agendas.index') }}" class="btn-outline">Lihat Semua Agenda</a>
+        </div>
     </div>
 </section>
+@endif
 
 {{-- ============================ PENGURUS ============================ --}}
+@if ($activePeriod && ($activePeriod->group_photo_path || $activePeriod->activeMembers->isNotEmpty()))
 <section id="pengurus" class="section scroll-mt-24 bg-white dark:bg-ink-900">
     <div class="container-x">
         <div class="reveal reveal-scale text-center">
@@ -277,13 +281,13 @@
             @endif
         </div>
 
-        @if ($activePeriod && ($activePeriod->group_photo_path || $activePeriod->activeMembers->isNotEmpty()))
-            @if ($activePeriod->group_photo_path)
+        @if ($activePeriod->group_photo_path)
                 <figure class="reveal reveal-scale group relative mt-12 overflow-hidden rounded-2xl border border-maroon-100 bg-maroon-950 shadow-xl shadow-maroon-950/15 dark:border-white/10 dark:shadow-black/30">
                     <div class="aspect-16/7 min-h-64 sm:min-h-80">
                         <img src="{{ \Illuminate\Support\Facades\Storage::url($activePeriod->group_photo_path) }}"
                              alt="Foto bersama pengurus FPK Kota Malang masa bakti {{ $activePeriod->label() }}"
                              width="1400" height="613"
+                             loading="lazy" decoding="async"
                              class="h-full w-full object-cover transition duration-1000 group-hover:scale-[1.015]">
                     </div>
                     <figcaption class="absolute inset-x-0 bottom-0 bg-linear-to-t from-maroon-950/90 via-maroon-950/55 to-transparent px-5 pb-5 pt-16 text-cream-50 sm:px-7 sm:pb-7">
@@ -291,9 +295,9 @@
                         <p class="mt-1 text-sm text-cream-100/75">Masa Bakti {{ $activePeriod->label() }}</p>
                     </figcaption>
                 </figure>
-            @endif
+        @endif
 
-            @if ($activePeriod->activeMembers->isNotEmpty())
+        @if ($activePeriod->activeMembers->isNotEmpty())
                 <div x-data="memberCarousel" data-member-carousel
                      class="reveal reveal-scale mt-10"
                      x-on:resize.window.debounce.150ms="sync()"
@@ -330,14 +334,13 @@
                         @endforeach
                     </div>
                 </div>
-            @endif
-        @else
-            <x-public-site.empty-state class="reveal mt-10">Susunan pengurus akan segera diperbarui.</x-public-site.empty-state>
         @endif
     </div>
 </section>
+@endif
 
 {{-- ============================ KONTAK ============================ --}}
+@if ($publicContentVisibility['contact'])
 <section id="kontak" class="section relative isolate scroll-mt-24 overflow-hidden bg-maroon-950 text-cream-50">
     <div class="hero-motif parallax-layer pointer-events-none absolute inset-0 -z-10 opacity-40" data-parallax="0.018" aria-hidden="true"></div>
     <div class="container-x">
@@ -347,8 +350,12 @@
             <span class="title-rule mx-auto"></span>
         </div>
 
-        @if ($contact->hasAnyContact() || $contact->map_embed_url)
-            <div class="mt-12 grid gap-8 md:grid-cols-2">
+        <div @class([
+            'mt-12 grid gap-8',
+            'md:grid-cols-2' => $contact->hasAnyContact() && $contact->map_embed_url,
+            'mx-auto max-w-3xl' => ! ($contact->hasAnyContact() && $contact->map_embed_url),
+        ])>
+            @if ($contact->hasAnyContact())
                 <div class="reveal reveal-left space-y-6 text-sm">
                     @if ($contact->address)
                         <div><p class="font-semibold text-gold-400">Alamat</p><p class="mt-1 text-cream-100/85">{{ $contact->address }}</p></div>
@@ -370,19 +377,16 @@
                         </div>
                     @endif
                 </div>
+            @endif
 
-                @if ($contact->map_embed_url)
-                    <div class="reveal reveal-right overflow-hidden rounded-xl border border-cream-100/15">
-                        <iframe src="{{ $contact->map_embed_url }}" title="Peta lokasi FPK Kota Malang" class="h-72 w-full md:h-full" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
-                    </div>
-                @endif
-            </div>
-        @else
-            <div class="reveal mx-auto mt-10 max-w-lg rounded-xl border border-dashed border-cream-100/25 px-6 py-12 text-center text-cream-100/70">
-                Informasi kontak resmi akan segera diperbarui.
-            </div>
-        @endif
+            @if ($contact->map_embed_url)
+                <div class="reveal reveal-right overflow-hidden rounded-xl border border-cream-100/15">
+                    <iframe src="{{ $contact->map_embed_url }}" title="Peta lokasi FPK Kota Malang" class="h-72 w-full md:h-full" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+                </div>
+            @endif
+        </div>
     </div>
 </section>
+@endif
 
 @endsection
