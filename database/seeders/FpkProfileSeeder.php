@@ -6,7 +6,7 @@ use App\Models\FpkProfile;
 use Illuminate\Database\Seeder;
 
 /**
- * Draft profile text sourced from CONTENT_REFERENCE.md / references/presentasifpk.pdf.
+ * Draft profile text retained from the source material used during initial setup.
  * Wording is safe to display, but the legal basis and period MUST be verified
  * against official documents before production (see TODO.md).
  */
