@@ -29,36 +29,38 @@ class ManagementSeeder extends Seeder
         ]);
 
         $core = [
-            ['Ketua', 'Ahmad Fuad Rahman, SE, MM'],
-            ['Wakil Ketua', 'Drs. Hedher Taukia, M.Pdl'],
-            ['Sekretaris', 'Dra. Atfiah El Zam Zami, MM'],
-            ['Wakil Sekretaris', 'Sahran, S.Pdl, M.Pdl'],
+            ['Ketua', 'Ahmad Fuad Rahman, S.E., M.M.'],
+            ['Wakil Ketua', 'Drs. Hedher Taukia, M.PdI.'],
+            ['Sekretaris', 'Dra. Atfiah El Zam Zami, M.M.'],
+            ['Wakil Sekretaris', 'Sahran, S.PdI., M.PdI.'],
         ];
 
+        // Each bidang lists [position, name] following the source report's
+        // Koordinator, Wakil Koordinator, Anggota, Anggota ordering.
         $divisions = [
             'Bidang Komunikasi dan Jaringan Masyarakat' => [
-                'Sani Sinarsana Kisid, ST, MT',
-                'Tetty Veronika Sormin',
-                'Ani Rusidah',
-                'Drs. Muarib, M.Si',
+                ['Koordinator', 'Sani Sinarsana Kisid, S.T., M.T.'],
+                ['Wakil Koordinator', 'Tetty Veronika Sormin'],
+                ['Anggota', 'Ani Rusidah'],
+                ['Anggota', 'Drs. Muarib, M.Si.'],
             ],
             'Bidang Dialog dan Advokasi' => [
-                'Dudung Kusnadi, S.Kp, M.Pol',
-                'Dra. Selviana Pellokila, MM',
-                'Surya Azita',
-                'Matthew Makuke',
+                ['Koordinator', 'Dudung Kusnadi, S.Kp., M.Pol.'],
+                ['Wakil Koordinator', 'Dra. Selviana Pellokila, M.M.'],
+                ['Anggota', 'Surya Azita'],
+                ['Anggota', 'Matthew Makuke'],
             ],
             'Bidang Sosialisasi dan Edukasi' => [
-                'Meiman Solala Halawa, SE, MM',
-                'Tru Nur Santy',
-                "Ja'far Shodiq",
-                'Bambang Sukoco, SE',
+                ['Koordinator', 'Meiman Solala Halawa, S.E., M.M.'],
+                ['Wakil Koordinator', 'Tru Nur Santy'],
+                ['Anggota', "Ja'far Shodiq"],
+                ['Anggota', 'Bambang Sukoco, S.E.'],
             ],
             'Bidang Kajian dan Perumusan Kebijakan' => [
-                'I Nyoman Sedana, SH',
-                'Dra. Amalia Marzuki',
-                'Ir. Yohandri Roza',
-                'Risky Noor Hamidinah',
+                ['Koordinator', 'I Nyoman Sedana, S.H.'],
+                ['Wakil Koordinator', 'Dra. Amalia Marzuki'],
+                ['Anggota', 'Ir. Yohandri Roza'],
+                ['Anggota', 'Risky Noor Hamidinah'],
             ],
         ];
 
@@ -75,10 +77,10 @@ class ManagementSeeder extends Seeder
         }
 
         foreach ($divisions as $division => $members) {
-            foreach ($members as $name) {
+            foreach ($members as [$position, $name]) {
                 $period->members()->create([
                     'name' => $name,
-                    'position' => 'Anggota',
+                    'position' => $position,
                     'division' => $division,
                     'display_order' => $order += 10,
                     'is_active' => true,
