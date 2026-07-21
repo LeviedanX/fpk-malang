@@ -5,8 +5,10 @@ namespace Tests\Feature\PublicSite;
 use App\Models\Agenda;
 use App\Models\Article;
 use App\Models\ContactSetting;
+use App\Models\FpkProfile;
 use App\Models\ManagementMember;
 use App\Models\ManagementPeriod;
+use App\Models\SiteSetting;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
@@ -90,7 +92,7 @@ class PublicPagesTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee('id="kontak"', escape: false)
-            ->assertSee('Peta lokasi FPK Kota Malang');
+            ->assertSee('Peta lokasi Forum Pembauran Kebangsaan Kota Malang');
     }
 
     public function test_home_renders_group_photo_and_swipeable_member_cards(): void
@@ -109,15 +111,62 @@ class PublicPagesTest extends TestCase
 
         $this->get('/')
             ->assertOk()
-            ->assertSee('Foto bersama pengurus FPK Kota Malang', false)
+            ->assertSee('Foto bersama pengurus Forum Pembauran Kebangsaan Kota Malang', false)
             ->assertSee('data-member-carousel', false)
             ->assertSee('Ketua Pengurus Uji')
             ->assertSee('management/ketua.webp', false);
     }
 
+    public function test_active_period_is_the_hero_and_management_period_source(): void
+    {
+        $this->removeOptionalPublicContent();
+
+        $period = ManagementPeriod::factory()->active()->create([
+            'name' => 'Periode Uji Terpadu',
+            'start_year' => 2031,
+            'end_year' => 2034,
+        ]);
+        ManagementMember::factory()->for($period, 'period')->create();
+
+        $response = $this->get('/')->assertOk();
+
+        $this->assertGreaterThanOrEqual(2, substr_count($response->getContent(), '2031-2034'));
+        $response->assertSee('Masa Bakti');
+    }
+
+    public function test_custom_hero_keeps_dynamic_logo_organization_name_and_tagline_visible(): void
+    {
+        $site = SiteSetting::query()->first();
+        $site->update([
+            'organization_name' => 'Organisasi FPK Dinamis',
+            'tagline' => 'Tagline dinamis dari pengaturan',
+            'logo_path' => 'branding/logo-dinamis.webp',
+        ]);
+
+        $profile = FpkProfile::query()->first();
+        $profile->update(['hero_image_path' => 'profile/hero-dinamis.webp']);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('Organisasi FPK Dinamis')
+            ->assertSee('Tagline dinamis dari pengaturan')
+            ->assertSee('branding/logo-dinamis.webp', false)
+            ->assertSee('profile/hero-dinamis.webp', false);
+    }
+
     public function test_article_index_renders(): void
     {
         $this->get('/artikel')->assertOk();
+    }
+
+    public function test_article_navigation_from_other_pages_returns_to_home_section(): void
+    {
+        Article::factory()->create();
+
+        $response = $this->get(route('articles.index'))->assertOk();
+        $articleAnchor = route('home').'#artikel';
+
+        $this->assertGreaterThanOrEqual(3, substr_count($response->getContent(), 'href="'.$articleAnchor.'"'));
     }
 
     public function test_published_article_is_visible(): void

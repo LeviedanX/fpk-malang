@@ -24,6 +24,7 @@ class SiteSettingSeeder extends Seeder
             'default_meta_title' => 'FPK Kota Malang - Forum Pembauran Kebangsaan',
             'default_meta_description' => 'Website resmi Forum Pembauran Kebangsaan (FPK) Kota Malang: '
                 .'profil, artikel, agenda, susunan pengurus, dan kontak.',
+            'default_meta_keywords' => 'FPK Kota Malang, pembauran kebangsaan, kerukunan, Kota Malang',
             'default_og_image_path' => null,
         ]);
     }

@@ -43,7 +43,7 @@
                 {{-- Identitas ringkas: logo + sistem --}}
                 <div class="flex flex-col items-center text-center">
                     <span class="auth-logo grid h-19 w-19 place-items-center rounded-full bg-white p-2 shadow-lg ring-1 ring-gold-400/45">
-                        <img src="{{ $faviconUrl }}" alt="Logo {{ $site->abbreviation ?: 'FPK Kota Malang' }}" class="h-full w-full object-contain">
+                        <img src="{{ $faviconUrl }}" alt="Logo {{ $site->abbreviation ?: $site->site_name }}" class="h-full w-full object-contain">
                     </span>
                     <p class="mt-4 inline-flex items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-maroon-600">
                         <span class="h-1.5 w-1.5 rounded-full bg-gold-500"></span>

@@ -51,7 +51,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Branding needed by the chrome of public, admin, and auth pages.
         View::composer(
-            ['layouts.public', 'layouts.admin', 'layouts.auth', 'public-site.*'],
+            ['layouts.public', 'layouts.admin', 'layouts.auth', 'public-site.*', 'admin.*'],
             fn ($view) => $view->with('site', SiteSetting::current())
         );
 

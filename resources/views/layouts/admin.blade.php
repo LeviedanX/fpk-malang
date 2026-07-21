@@ -43,10 +43,10 @@
             <div class="flex items-center gap-3 border-b border-white/10 px-5 py-5">
                 <a href="{{ route('admin.dashboard') }}" class="group flex min-w-0 flex-1 items-center gap-3">
                     <span class="grid h-11 w-11 flex-none place-items-center overflow-hidden rounded-full bg-cream-50 ring-2 ring-gold-400/30 transition-transform duration-300 group-hover:scale-105">
-                        <img src="{{ $adminLogoUrl }}" alt="Logo {{ $site->organization_name ?: 'FPK Kota Malang' }}" class="h-9 w-9 object-contain" width="36" height="36">
+                        <img src="{{ $adminLogoUrl }}" alt="Logo {{ $site->organization_name }}" class="h-9 w-9 object-contain" width="36" height="36">
                     </span>
                     <span class="min-w-0">
-                        <span class="block truncate font-display font-semibold text-cream-50">{{ $site->abbreviation ?: 'FPK Admin' }}</span>
+                        <span class="block truncate font-display font-semibold text-cream-50">{{ $site->abbreviation ?: $site->site_name }}</span>
                         <span class="block text-[10px] uppercase tracking-[0.2em] text-cream-100/50">Panel Administrator</span>
                     </span>
                 </a>
@@ -58,14 +58,12 @@
                         ['admin.dashboard', 'Dashboard', ['admin.dashboard'], 'M3 13h8V3H3v10zm10 8h8V11h-8v10zm0-18v6h8V3h-8zM3 21h8v-6H3v6z'],
                     ],
                     'Konten' => [
-                        ['admin.profile.edit', 'Profil FPK', ['admin.profile.*'], 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5A4.5 4.5 0 003 9.5V18c0-1.657 2.015-3 4.5-3 1.746 0 3.332.477 4.5 1.253m0-10C13.168 5.477 14.754 5 16.5 5A4.5 4.5 0 0121 9.5V18c0-1.657-2.015-3-4.5-3-1.746 0-3.332.477-4.5 1.253'],
                         ['admin.articles.index', 'Artikel', ['admin.articles.*'], 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h7l2 2h5a2 2 0 012 2v10a2 2 0 01-2 2zM7 10h10M7 14h7'],
                         ['admin.agendas.index', 'Agenda', ['admin.agendas.*'], 'M8 7V3m8 4V3M5 11h14M5 5h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z'],
                         ['admin.periods.index', 'Susunan Pengurus', ['admin.periods.*', 'admin.members.*'], 'M17 20h5v-2a4 4 0 00-4-4h-1M9 20H2v-2a4 4 0 014-4h3m4-7a4 4 0 11-8 0 4 4 0 018 0zm8 3a3 3 0 10-2.83-4'],
                     ],
                     'Pengaturan' => [
-                        ['admin.contact.edit', 'Kontak & Media Sosial', ['admin.contact.*'], 'M3 5a2 2 0 012-2h3l2 5-2 1a14 14 0 007 7l1-2 5 2v3a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z'],
-                        ['admin.settings.edit', 'Pengaturan Website', ['admin.settings.*'], 'M12 15.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7zM19.4 15a1.7 1.7 0 00.34 1.88l.06.06-2.12 2.12-.06-.06a1.7 1.7 0 00-1.88-.34 1.7 1.7 0 00-1.03 1.56V20h-3v-.08a1.7 1.7 0 00-1.03-1.56 1.7 1.7 0 00-1.88.34l-.06.06-2.12-2.12.06-.06A1.7 1.7 0 007 15.4 1.7 1.7 0 005.44 14H5v-3h.44A1.7 1.7 0 007 9.6a1.7 1.7 0 00-.34-1.88l-.06-.06 2.12-2.12.06.06A1.7 1.7 0 0010.66 6 1.7 1.7 0 0011.7 4.44V4h3v.44A1.7 1.7 0 0015.74 6a1.7 1.7 0 001.88-.34l.06-.06 2.12 2.12-.06.06A1.7 1.7 0 0019.4 9.6 1.7 1.7 0 0020.96 11H21v3h-.04A1.7 1.7 0 0019.4 15z'],
+                        ['admin.settings.edit', 'Pengaturan Website', ['admin.settings.*', 'admin.profile.*', 'admin.contact.*'], 'M12 15.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7zM19.4 15a1.7 1.7 0 00.34 1.88l.06.06-2.12 2.12-.06-.06a1.7 1.7 0 00-1.88-.34 1.7 1.7 0 00-1.03 1.56V20h-3v-.08a1.7 1.7 0 00-1.03-1.56 1.7 1.7 0 00-1.88.34l-.06.06-2.12-2.12.06-.06A1.7 1.7 0 007 15.4 1.7 1.7 0 005.44 14H5v-3h.44A1.7 1.7 0 007 9.6a1.7 1.7 0 00-.34-1.88l-.06-.06 2.12-2.12.06.06A1.7 1.7 0 0010.66 6 1.7 1.7 0 0011.7 4.44V4h3v.44A1.7 1.7 0 0015.74 6a1.7 1.7 0 001.88-.34l.06-.06 2.12 2.12-.06.06A1.7 1.7 0 0019.4 9.6 1.7 1.7 0 0020.96 11H21v3h-.04A1.7 1.7 0 0019.4 15z'],
                         ['admin.account.edit', 'Akun Admin', ['admin.account.*'], 'M5.121 17.804A9 9 0 1118.88 17.8M15 11a3 3 0 11-6 0 3 3 0 016 0z'],
                     ],
                 ])
@@ -95,7 +93,7 @@
             </nav>
 
             <div class="admin-sidebar-foot mt-auto border-t border-white/10 px-3 py-4">
-                <p class="px-3 text-[10px] uppercase tracking-[0.18em] text-cream-100/35">&copy; {{ date('Y') }} {{ $site->abbreviation ?: 'FPK Malang' }}</p>
+                <p class="px-3 text-[10px] uppercase tracking-[0.18em] text-cream-100/35">&copy; {{ date('Y') }} {{ $site->abbreviation ?: $site->site_name }}</p>
             </div>
         </aside>
 

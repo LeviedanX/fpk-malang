@@ -14,7 +14,7 @@
             <div>
                 <p class="reveal reveal-left eyebrow text-gold-400!" style="--reveal-delay: 0ms">
                     <span class="h-1.5 w-1.5 rounded-full bg-gold-400"></span>
-                    Forum Pembauran Kebangsaan &middot; Kota Malang
+                    {{ $site->organization_name }}
                 </p>
 
                 <h1 class="reveal reveal-left mt-6 font-display text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl" style="--reveal-delay: 90ms">
@@ -35,51 +35,56 @@
                 </div>
             </div>
 
-            {{-- Right: featured visual, with a composed fallback when no image is set --}}
+            {{-- Right: image, logo, organization name, and tagline remain separate elements. --}}
             <div class="reveal reveal-right reveal-scale relative" style="--reveal-delay: 200ms">
                 <div class="hero-visual parallax-layer relative aspect-4/5 overflow-hidden rounded-2xl border border-cream-100/15 bg-maroon-900/40 shadow-2xl shadow-black/30 sm:aspect-square lg:aspect-4/5" data-parallax="0.025">
-                    @if ($profile->hero_image_path)
-                        <img src="{{ \Illuminate\Support\Facades\Storage::url($profile->hero_image_path) }}"
-                             alt="Kegiatan Forum Pembauran Kebangsaan Kota Malang"
-                             width="640" height="800"
-                             fetchpriority="high" decoding="async"
-                             class="h-full w-full object-cover">
-                        <div class="pointer-events-none absolute inset-0 bg-linear-to-t from-maroon-950/70 via-transparent to-transparent" aria-hidden="true"></div>
-                    @else
-                        <img src="{{ asset('assets/images/branding/hero-card-bg.webp') }}"
-                             alt=""
-                             width="960" height="1200"
-                             fetchpriority="high" decoding="async"
-                             class="absolute inset-0 h-full w-full object-cover"
-                             aria-hidden="true">
-                        <div class="absolute inset-0 bg-black/10" aria-hidden="true"></div>
-                        <div class="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center sm:px-8">
-                            <img src="{{ asset('assets/images/branding/logo-fpk.png') }}"
-                                 alt="Logo FPK Kota Malang"
-                                 width="144" height="144"
-                                 decoding="async"
-                                 class="float-slow h-24 w-24 rounded-full bg-white p-3 shadow-2xl ring-1 ring-gold-400/35 sm:h-28 sm:w-28 md:h-36 md:w-36 md:p-4">
-                            <p class="mt-6 font-display text-xl font-bold text-cream-50 sm:text-2xl">FPK Kota Malang</p>
-                            <p class="mt-2 max-w-sm text-sm leading-relaxed text-cream-100/75">Merawat kebhinnekaan, memperkuat persatuan.</p>
-                        </div>
-                    @endif
+                    @php($heroImageUrl = $profile->hero_image_path
+                        ? \Illuminate\Support\Facades\Storage::url($profile->hero_image_path)
+                        : asset('assets/images/branding/hero-card-bg.webp'))
+                    @php($heroLogoUrl = $site->logo_path
+                        ? \Illuminate\Support\Facades\Storage::url($site->logo_path)
+                        : asset('assets/images/branding/logo-fpk.png'))
+
+                    <img src="{{ $heroImageUrl }}"
+                         alt="Gambar {{ $site->organization_name }}"
+                         width="960" height="1200"
+                         fetchpriority="high" decoding="async"
+                         class="absolute inset-0 h-full w-full object-cover">
+                    <div class="pointer-events-none absolute inset-0 bg-linear-to-t from-maroon-950/90 via-maroon-950/35 to-black/15" aria-hidden="true"></div>
+                    <div class="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center sm:px-8">
+                        <img src="{{ $heroLogoUrl }}"
+                             alt="Logo {{ $site->organization_name }}"
+                             width="144" height="144"
+                             decoding="async"
+                             class="float-slow h-24 w-24 rounded-full bg-white p-3 shadow-2xl ring-1 ring-gold-400/35 sm:h-28 sm:w-28 md:h-36 md:w-36 md:p-4">
+                        <p class="mt-6 max-w-md font-display text-xl font-bold text-cream-50 sm:text-2xl">{{ $site->organization_name }}</p>
+                        @if ($site->tagline)
+                            <p class="mt-2 max-w-sm text-sm leading-relaxed text-cream-100/85">{{ $site->tagline }}</p>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
 
-        {{-- Dasar hukum sebagai penanda kredibilitas (faktual dari SK). --}}
-        <dl class="reveal reveal-scale mt-14 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-cream-100/15 bg-cream-100/5 sm:grid-cols-3" style="--reveal-delay: 320ms">
-            @foreach ([
-                ['Dasar Hukum', 'Pergub Jatim No. 41/2009'],
-                ['Landasan', 'SK Wali Kota Malang'],
-                ['Masa Bakti', '2025 – 2027'],
-            ] as [$label, $value])
-                <div class="bg-maroon-950/40 px-5 py-4">
-                    <dt class="text-xs uppercase tracking-wider text-gold-400/90">{{ $label }}</dt>
-                    <dd class="mt-1 text-sm font-semibold text-cream-50">{{ $value }}</dd>
-                </div>
-            @endforeach
-        </dl>
+        @php($heroFacts = collect([
+            ['Dasar Hukum', $profile->institution_legal_basis],
+            ['Landasan', $profile->institution_foundation],
+            ['Masa Bakti', $activePeriod?->label()],
+        ])->filter(fn (array $fact) => filled($fact[1]))->values())
+        @if ($heroFacts->isNotEmpty())
+            <dl @class([
+                'reveal reveal-scale mt-14 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-cream-100/15 bg-cream-100/5',
+                'sm:grid-cols-2' => $heroFacts->count() === 2,
+                'sm:grid-cols-3' => $heroFacts->count() >= 3,
+            ]) style="--reveal-delay: 320ms">
+                @foreach ($heroFacts as [$label, $value])
+                    <div class="bg-maroon-950/40 px-5 py-4">
+                        <dt class="text-xs uppercase tracking-wider text-gold-400/90">{{ $label }}</dt>
+                        <dd class="mt-1 text-sm font-semibold text-cream-50">{{ $value }}</dd>
+                    </div>
+                @endforeach
+            </dl>
+        @endif
     </div>
 </section>
 
@@ -88,18 +93,18 @@
     <div class="container-x">
         <div class="reveal reveal-scale mx-auto max-w-2xl text-center">
             <span class="eyebrow">Profil Organisasi</span>
-            <h2 class="section-title mt-3">Tentang FPK Kota Malang</h2>
+            <h2 class="section-title mt-3">Tentang {{ $site->abbreviation ?: $site->site_name }}</h2>
             <span class="title-rule mx-auto"></span>
         </div>
 
-        <div class="mt-12 grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
-            <div class="reveal reveal-left surface p-6 sm:p-8">
+        <div class="mt-12 grid gap-8 lg:grid-cols-2 lg:items-stretch xl:grid-cols-[repeat(2,33rem)] xl:justify-center">
+            <div class="reveal reveal-left surface h-full min-w-0 w-full p-6 sm:p-8 xl:aspect-4/3">
                 <div class="text-base leading-relaxed text-ink-600 dark:text-ink-300 sm:text-lg">
                     @if ($profile->definition)
                         <x-public-site.rich-text :text="$profile->definition" />
                     @else
                         <p>
-                            Forum Pembauran Kebangsaan Kota Malang merupakan wadah informasi, komunikasi,
+                            {{ $site->organization_name }} merupakan wadah informasi, komunikasi,
                             konsultasi, dan kerja sama antarwarga masyarakat. FPK diarahkan untuk menumbuhkan,
                             memantapkan, memelihara, dan mengembangkan pembauran kebangsaan di tengah
                             kemajemukan masyarakat Kota Malang.
@@ -126,16 +131,18 @@
                 </ul>
             </div>
 
-            <figure class="reveal reveal-right reveal-scale overflow-hidden rounded-2xl border border-cream-200 bg-white shadow-xl shadow-maroon-950/10 dark:border-white/10 dark:bg-ink-900 dark:shadow-black/20" style="--reveal-delay: 100ms">
-                <img src="{{ asset('assets/images/about/about-fpk-vector.webp') }}"
-                     alt="Ilustrasi Tugu Malang dan Balai Kota Malang sebagai identitas FPK Kota Malang"
+            <figure class="reveal reveal-right reveal-scale surface h-full min-w-0 w-full overflow-hidden shadow-xl shadow-maroon-950/10 dark:shadow-black/20" style="--reveal-delay: 100ms">
+                <img src="{{ $profile->about_image_path
+                    ? \Illuminate\Support\Facades\Storage::url($profile->about_image_path)
+                    : asset('assets/images/about/about-fpk-vector.webp') }}"
+                     alt="Ilustrasi Tugu Malang dan Balai Kota Malang sebagai identitas {{ $site->organization_name }}"
                      width="1400" height="1050"
                      loading="lazy" decoding="async"
-                     class="aspect-4/3 h-full w-full object-cover transition duration-700 hover:scale-[1.025]">
+                     class="aspect-4/3 h-full w-full object-cover transition duration-700 hover:scale-[1.025] lg:aspect-auto">
             </figure>
         </div>
 
-        <div class="mt-10 grid gap-6 md:grid-cols-2">
+        <div class="mt-10 grid gap-8 md:auto-rows-fr md:grid-cols-2 xl:grid-cols-[repeat(2,33rem)] xl:justify-center">
             @php($aboutBlocks = [
                 ['background', 'Latar Belakang', 'M12 3v18m9-9H3', false],
                 ['objectives', 'Tujuan', 'M5 13l4 4L19 7', true],
@@ -144,16 +151,16 @@
             ])
             @foreach ($aboutBlocks as [$field, $label, $icon, $asList])
                 @if ($profile->{$field})
-                    <article class="reveal {{ $loop->odd ? 'reveal-left' : 'reveal-right' }} surface card-lift p-6" style="--reveal-delay: {{ ($loop->index % 2) * 70 }}ms">
+                    <article class="reveal {{ $loop->odd ? 'reveal-left' : 'reveal-right' }} surface card-lift flex min-w-0 w-full flex-col p-6 xl:aspect-4/3" style="--reveal-delay: {{ ($loop->index % 2) * 70 }}ms">
                         <div class="flex items-center gap-3">
                             <span class="grid h-10 w-10 flex-none place-items-center rounded-lg bg-maroon-50 text-maroon-700 dark:bg-ink-800 dark:text-gold-400">
                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $icon }}"/></svg>
                             </span>
                             <h3 class="font-display text-lg font-bold text-maroon-800 dark:text-cream-100">{{ $label }}</h3>
                         </div>
-                        <div class="mt-4 text-ink-600 dark:text-ink-300">
+                        <div class="mt-4 flex-1 text-ink-600 dark:text-ink-300">
                             @if ($asList)
-                                <x-public-site.rich-list :text="$profile->{$field}" />
+                                <x-public-site.rich-list :text="$profile->{$field}" class="h-full space-y-0! flex flex-col justify-between gap-3" />
                             @else
                                 <x-public-site.rich-text :text="$profile->{$field}" />
                             @endif
@@ -302,13 +309,13 @@
                 <figure class="reveal reveal-scale group relative mt-12 overflow-hidden rounded-2xl border border-maroon-100 bg-maroon-950 shadow-xl shadow-maroon-950/15 dark:border-white/10 dark:shadow-black/30">
                     <div class="aspect-16/7 min-h-64 sm:min-h-80">
                         <img src="{{ \Illuminate\Support\Facades\Storage::url($activePeriod->group_photo_path) }}"
-                             alt="Foto bersama pengurus FPK Kota Malang masa bakti {{ $activePeriod->label() }}"
+                             alt="Foto bersama pengurus {{ $site->organization_name }} masa bakti {{ $activePeriod->label() }}"
                              width="1400" height="613"
                              loading="lazy" decoding="async"
                              class="h-full w-full object-cover transition duration-1000 group-hover:scale-[1.015]">
                     </div>
                     <figcaption class="absolute inset-x-0 bottom-0 bg-linear-to-t from-maroon-950/90 via-maroon-950/55 to-transparent px-5 pb-5 pt-16 text-cream-50 sm:px-7 sm:pb-7">
-                        <p class="font-display text-xl font-bold sm:text-2xl">Kebersamaan Pengurus FPK Kota Malang</p>
+                        <p class="font-display text-xl font-bold sm:text-2xl">Kebersamaan Pengurus {{ $site->abbreviation ?: $site->site_name }}</p>
                         <p class="mt-1 text-sm text-cream-100/75">Masa Bakti {{ $activePeriod->label() }}</p>
                     </figcaption>
                 </figure>
@@ -398,7 +405,7 @@
 
             @if ($contact->map_embed_url)
                 <div class="reveal reveal-right overflow-hidden rounded-xl border border-cream-100/15">
-                    <iframe src="{{ $contact->map_embed_url }}" title="Peta lokasi FPK Kota Malang" class="h-72 w-full md:h-full" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+                    <iframe src="{{ $contact->map_embed_url }}" title="Peta lokasi {{ $site->organization_name }}" class="h-72 w-full md:h-full" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
                 </div>
             @endif
         </div>

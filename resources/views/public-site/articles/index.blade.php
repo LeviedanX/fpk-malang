@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Artikel')
-@section('meta_description', 'Kumpulan artikel dan informasi Forum Pembauran Kebangsaan Kota Malang.')
+@section('meta_description', 'Kumpulan artikel dan informasi '.$site->organization_name.'.')
 
 @section('content')
 <x-public-site.page-header

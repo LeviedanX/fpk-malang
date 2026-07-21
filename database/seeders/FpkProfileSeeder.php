@@ -22,6 +22,9 @@ class FpkProfileSeeder extends Seeder
             'hero_title' => 'Forum Pembauran Kebangsaan Kota Malang',
             'hero_subtitle' => 'Merawat kebhinnekaan, memperkuat persatuan warga Kota Malang.',
             'hero_image_path' => null,
+            'about_image_path' => null,
+            'institution_legal_basis' => 'Pergub Jatim No. 41/2009',
+            'institution_foundation' => 'SK Wali Kota Malang',
             'definition' => 'Forum Pembauran Kebangsaan (FPK) Kota Malang merupakan wadah informasi, '
                 .'komunikasi, konsultasi, dan kerja sama antarwarga masyarakat yang diarahkan untuk '
                 .'menumbuhkan, memantapkan, memelihara, dan mengembangkan pembauran kebangsaan.',

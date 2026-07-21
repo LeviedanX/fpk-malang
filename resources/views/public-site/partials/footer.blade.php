@@ -12,11 +12,11 @@
                             <img src="{{ asset('assets/images/branding/logo-fpk.png') }}" alt="" class="h-full w-full object-contain" width="44" height="44" loading="lazy" decoding="async">
                         </span>
                     @endif
-                    <span class="font-display text-lg font-bold text-cream-50">{{ $site->abbreviation ?: 'FPK Kota Malang' }}</span>
+                    <span class="font-display text-lg font-bold text-cream-50">{{ $site->abbreviation ?: $site->site_name }}</span>
                 </div>
-                <p class="mt-4 text-sm leading-relaxed text-cream-100/75">
-                    {{ $site->tagline ?: 'Merawat kebhinnekaan, memperkuat persatuan warga Kota Malang dalam bingkai Negara Kesatuan Republik Indonesia.' }}
-                </p>
+                @if ($site->tagline)
+                    <p class="mt-4 text-sm leading-relaxed text-cream-100/75">{{ $site->tagline }}</p>
+                @endif
             </div>
 
             <div class="reveal text-sm" style="--reveal-delay: 70ms">
@@ -24,7 +24,7 @@
                 <ul class="mt-4 space-y-2.5 text-cream-100/80">
                     <li><a href="{{ route('home') }}#tentang" class="transition hover:text-white">Tentang FPK</a></li>
                     @if ($publicContentVisibility['articles'])
-                        <li><a href="{{ route('articles.index') }}" class="transition hover:text-white">Artikel</a></li>
+                        <li><a href="{{ route('home') }}#artikel" class="transition hover:text-white">Artikel</a></li>
                     @endif
                     @if ($publicContentVisibility['agendas'])
                         <li><a href="{{ route('home') }}#agenda" class="transition hover:text-white">Agenda</a></li>

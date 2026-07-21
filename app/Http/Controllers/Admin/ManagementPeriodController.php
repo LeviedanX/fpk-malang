@@ -136,14 +136,20 @@ class ManagementPeriodController extends Controller
     private function persist(ManagementPeriod $period, array $data): void
     {
         DB::transaction(function () use ($period, $data): void {
-            $period->fill($data)->save();
-
-            if ($period->is_active) {
+            if ($data['is_active'] ?? false) {
                 ManagementPeriod::query()
-                    ->whereKeyNot($period->getKey())
+                    ->where('is_active', true)
+                    ->whereKeyNot($period->getKey() ?? 0)
+                    ->lockForUpdate()
+                    ->get();
+
+                ManagementPeriod::query()
+                    ->whereKeyNot($period->getKey() ?? 0)
                     ->where('is_active', true)
                     ->update(['is_active' => false]);
             }
+
+            $period->fill($data)->save();
         });
     }
 }

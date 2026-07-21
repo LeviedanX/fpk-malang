@@ -12,7 +12,7 @@ class ManagementPeriodFactory extends Factory
 {
     public function definition(): array
     {
-        $startYear = fake()->numberBetween(2018, 2025);
+        $startYear = fake()->numberBetween((int) now()->year + 1, (int) now()->year + 5);
 
         return [
             'name' => "Periode {$startYear}-".($startYear + 2),

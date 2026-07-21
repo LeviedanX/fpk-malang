@@ -24,6 +24,9 @@
 
     <title>{{ $metaTitle }}</title>
     <meta name="description" content="{{ $metaDescription }}">
+    @if ($site->default_meta_keywords)
+        <meta name="keywords" content="{{ $site->default_meta_keywords }}">
+    @endif
     <link rel="canonical" href="{{ $canonical }}">
 
     <meta property="og:site_name" content="{{ $site->site_name }}">

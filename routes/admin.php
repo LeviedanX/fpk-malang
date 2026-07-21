@@ -3,9 +3,7 @@
 use App\Http\Controllers\Admin\AdminAccountController;
 use App\Http\Controllers\Admin\AgendaController;
 use App\Http\Controllers\Admin\ArticleController;
-use App\Http\Controllers\Admin\ContactSettingController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\FpkProfileController;
 use App\Http\Controllers\Admin\ManagementMemberController;
 use App\Http\Controllers\Admin\ManagementPeriodController;
 use App\Http\Controllers\Admin\SiteSettingController;
@@ -17,10 +15,6 @@ Route::middleware([EnsureDesktopAdminAccess::class, 'auth'])
     ->name('admin.')
     ->group(function () {
         Route::get('/', DashboardController::class)->name('dashboard');
-
-        // Profil FPK (singleton)
-        Route::get('profil', [FpkProfileController::class, 'edit'])->name('profile.edit');
-        Route::put('profil', [FpkProfileController::class, 'update'])->name('profile.update');
 
         // Artikel
         Route::resource('artikel', ArticleController::class)
@@ -51,13 +45,16 @@ Route::middleware([EnsureDesktopAdminAccess::class, 'auth'])
         Route::delete('pengurus/foto-bersama/{period}', [ManagementPeriodController::class, 'destroyGroupPhoto'])
             ->name('members.group_photo.destroy');
 
-        // Kontak & Media Sosial (singleton)
-        Route::get('kontak', [ContactSettingController::class, 'edit'])->name('contact.edit');
-        Route::put('kontak', [ContactSettingController::class, 'update'])->name('contact.update');
-
         // Pengaturan Website (singleton)
         Route::get('pengaturan', [SiteSettingController::class, 'edit'])->name('settings.edit');
         Route::put('pengaturan', [SiteSettingController::class, 'update'])->name('settings.update');
+
+        // Bookmark lama tetap aman, tetapi seluruh pengelolaan diarahkan ke
+        // halaman Pengaturan Website yang terpadu.
+        Route::get('profil', fn () => redirect(route('admin.settings.edit').'#tentang'))
+            ->name('profile.edit');
+        Route::get('kontak', fn () => redirect(route('admin.settings.edit').'#kontak'))
+            ->name('contact.edit');
 
         // Akun Admin
         Route::get('akun', [AdminAccountController::class, 'edit'])->name('account.edit');

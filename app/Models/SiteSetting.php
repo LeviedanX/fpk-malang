@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
     'footer_text',
     'default_meta_title',
     'default_meta_description',
+    'default_meta_keywords',
     'default_og_image_path',
 ])]
 class SiteSetting extends Model

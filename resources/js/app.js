@@ -130,6 +130,57 @@ Alpine.data('passwordField', () => ({
     },
 }));
 
+Alpine.data('imagePreview', ({ initialUrl = '', initialState = 'empty' } = {}) => ({
+    initialUrl,
+    initialState,
+    previewUrl: initialUrl,
+    state: initialState,
+    fileName: '',
+    objectUrl: null,
+    previewFailed: false,
+    selectFile(event) {
+        this.revokeObjectUrl();
+
+        const file = event.target.files?.[0];
+
+        if (!file) {
+            this.restoreInitialPreview();
+            return;
+        }
+
+        this.objectUrl = URL.createObjectURL(file);
+        this.previewUrl = this.objectUrl;
+        this.fileName = file.name;
+        this.state = 'selected';
+        this.previewFailed = false;
+    },
+    markPreviewFailed() {
+        this.previewFailed = true;
+    },
+    restoreInitialPreview() {
+        this.previewUrl = this.initialUrl;
+        this.fileName = '';
+        this.state = this.initialState;
+        this.previewFailed = false;
+    },
+    revokeObjectUrl() {
+        if (!this.objectUrl) return;
+
+        URL.revokeObjectURL(this.objectUrl);
+        this.objectUrl = null;
+    },
+    statusLabel() {
+        if (this.state === 'selected') return 'Preview file baru';
+        if (this.state === 'current') return 'Gambar saat ini';
+        if (this.state === 'default') return 'Gambar bawaan';
+
+        return 'Belum ada gambar';
+    },
+    destroy() {
+        this.revokeObjectUrl();
+    },
+}));
+
 Alpine.start();
 
 /* ---------------- Motion system: reveal dua arah + progress + parallax ---------------- */

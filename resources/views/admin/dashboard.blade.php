@@ -17,7 +17,7 @@
                     {{ $greeting }}, <span class="text-gradient-gold">{{ $firstName }}</span> &#128075;
                 </h2>
                 <p class="mt-2 max-w-xl text-sm leading-relaxed text-cream-100/70">
-                    Kelola konten, agenda, dan profil resmi FPK Kota Malang dari satu tempat. Pilih tindakan cepat di bawah untuk mulai.
+                    Kelola konten, agenda, dan profil resmi {{ $site->organization_name }} dari satu tempat. Pilih tindakan cepat di bawah untuk mulai.
                 </p>
             </div>
             <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap lg:flex-col lg:items-stretch">

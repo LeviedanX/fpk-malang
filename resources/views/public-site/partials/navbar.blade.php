@@ -7,7 +7,7 @@
     ];
 
     if ($publicContentVisibility['articles']) {
-        $links[] = ['artikel', 'Artikel', $isHome ? $home.'#artikel' : route('articles.index')];
+        $links[] = ['artikel', 'Artikel', $home.'#artikel'];
     }
 
     if ($publicContentVisibility['agendas']) {
@@ -48,11 +48,11 @@
             <span class="leading-tight">
                 <span class="block font-display text-base font-bold transition-colors duration-300"
                       :class="scrolled || open ? 'text-maroon-800 dark:text-cream-100' : 'text-cream-50'">
-                    {{ $site->abbreviation ?: 'FPK Kota Malang' }}
+                    {{ $site->abbreviation ?: $site->site_name }}
                 </span>
                 <span class="block text-[11px] uppercase tracking-wider transition-colors duration-300"
                       :class="scrolled || open ? 'text-ink-400' : 'text-cream-100/65'">
-                    Forum Pembauran Kebangsaan
+                    {{ $site->organization_name }}
                 </span>
             </span>
         </a>
