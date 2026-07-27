@@ -64,6 +64,55 @@ Alpine.data('siteNav', (sections = []) => ({
     },
 }));
 
+/* ---------------- Back to Top: tampil setelah halaman cukup panjang ---------------- */
+Alpine.data('backToTop', (threshold = 480) => ({
+    visible: false,
+    onScroll: null,
+    footerObserver: null,
+    footerVisible: false,
+    ticking: false,
+    updateVisibility() {
+        this.visible = window.scrollY > threshold && !this.footerVisible;
+    },
+    init() {
+        const updateVisibility = () => {
+            this.updateVisibility();
+            this.ticking = false;
+        };
+
+        this.onScroll = () => {
+            if (this.ticking) return;
+
+            this.ticking = true;
+            window.requestAnimationFrame(updateVisibility);
+        };
+
+        this.onScroll();
+        window.addEventListener('scroll', this.onScroll, { passive: true });
+
+        const footer = document.querySelector('footer');
+        if (footer && 'IntersectionObserver' in window) {
+            this.footerObserver = new IntersectionObserver(([entry]) => {
+                this.footerVisible = entry.isIntersecting;
+                this.updateVisibility();
+            });
+            this.footerObserver.observe(footer);
+        }
+    },
+    scrollToTop() {
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        window.scrollTo({
+            top: 0,
+            behavior: reducedMotion ? 'auto' : 'smooth',
+        });
+    },
+    destroy() {
+        if (this.onScroll) window.removeEventListener('scroll', this.onScroll);
+        this.footerObserver?.disconnect();
+    },
+}));
+
 /* ---------------- Musik latar: konfigurasi admin + preferensi pengunjung ---------------- */
 Alpine.data('siteMusicPlayer', ({
     defaultPlaying = true,

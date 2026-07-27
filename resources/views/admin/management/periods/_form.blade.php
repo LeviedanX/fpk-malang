@@ -36,7 +36,7 @@
     </div>
 </x-admin.card>
 
-<div class="reveal mt-6 grid gap-2 sm:flex">
+<div class="mt-6 grid gap-2 sm:flex">
     <button type="submit" class="admin-button admin-button-primary">{{ $submitLabel }}</button>
     <a href="{{ route('admin.periods.index') }}" class="admin-button admin-button-secondary">Batal</a>
 </div>

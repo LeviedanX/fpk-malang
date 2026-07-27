@@ -66,7 +66,8 @@
 
     html {
         scroll-behavior: smooth;
-        scroll-padding-top: 5.5rem;
+        /* Navbar: logo 2.5rem + padding vertikal 0.75rem di tiap sisi. */
+        scroll-padding-top: 4rem;
         overflow-x: clip;
     }
 
@@ -591,6 +592,50 @@
 @media (min-width: 1024px) {
     .home-scene {
         padding-block: 4rem;
+    }
+}
+
+/* Section yang heading-nya perlu tampil lebih cepat setelah anchor tercapai.
+   Padding bawah standar tetap dipertahankan agar jarak antar konten tidak berubah. */
+.home-scene--compact {
+    padding-top: 0.5rem;
+}
+
+.back-to-top {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 30;
+    display: grid;
+    width: 2.75rem;
+    height: 2.75rem;
+    place-items: center;
+    border: 1px solid color-mix(in srgb, var(--color-gold-400) 38%, transparent);
+    border-radius: 9999px;
+    color: var(--color-cream-50);
+    background: var(--color-maroon-700);
+    box-shadow: 0 10px 24px rgba(46, 15, 18, 0.3);
+    transition:
+        background-color var(--motion-duration-base) var(--motion-ease-standard),
+        box-shadow var(--motion-duration-base) var(--motion-ease-standard),
+        transform var(--motion-duration-base) var(--motion-ease-emphasized);
+}
+
+.back-to-top:hover {
+    background: var(--color-maroon-800);
+    box-shadow: 0 14px 28px rgba(46, 15, 18, 0.38);
+    transform: translateY(-2px);
+}
+
+.back-to-top:focus-visible {
+    outline: 2px solid var(--color-gold-400);
+    outline-offset: 3px;
+}
+
+@media (min-width: 640px) {
+    .back-to-top {
+        right: 1.5rem;
+        bottom: 1.5rem;
     }
 }
 
