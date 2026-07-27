@@ -117,5 +117,21 @@
     </main>
 
     @include('public-site.partials.footer')
+
+    <button
+        type="button"
+        x-data="backToTop()"
+        x-show="visible"
+        x-cloak
+        x-transition.opacity.duration.200ms
+        @click="scrollToTop"
+        class="back-to-top"
+        aria-label="Kembali ke atas"
+        title="Kembali ke atas"
+    >
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m18 15-6-6-6 6" />
+        </svg>
+    </button>
 </body>
 </html>

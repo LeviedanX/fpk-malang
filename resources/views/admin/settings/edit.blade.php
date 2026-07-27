@@ -58,7 +58,14 @@
                 <x-admin.card title="Identitas dan Branding" description="Satu sumber untuk identitas yang tampil pada navbar, footer, panel admin, dan metadata.">
                     <div class="space-y-6">
                         <div class="grid gap-4 sm:grid-cols-2">
-                            <x-form.input name="site_name" label="Nama Situs" :value="$settings->site_name" maxlength="60" required hint="Maksimal 60 karakter." />
+                            <x-form.input
+                                name="site_name"
+                                label="Nama Situs"
+                                :value="$settings->site_name"
+                                maxlength="60"
+                                required
+                                hint="Digunakan sebagai identitas teknis website, nama pada panel admin dan halaman login, Open Graph, structured data, serta sebagai cadangan jika Judul SEO Default belum diisi. Navbar dan footer menggunakan kolom Singkatan apabila tersedia. Maksimal 60 karakter."
+                            />
                             <x-form.input name="organization_name" label="Nama Organisasi" :value="$settings->organization_name" maxlength="100" required hint="Maksimal 100 karakter." />
                             <x-form.input name="abbreviation" label="Singkatan" :value="$settings->abbreviation" maxlength="20" hint="Maksimal 20 karakter." />
                             <x-form.input name="tagline" label="Tagline" :value="$settings->tagline" maxlength="120" hint="Maksimal 120 karakter." />

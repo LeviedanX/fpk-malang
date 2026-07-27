@@ -27,3 +27,7 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Brief revisi lokal (bukan bagian source aplikasi)
+/REVISI_TIPIS.md
+/revisi_lagi.md

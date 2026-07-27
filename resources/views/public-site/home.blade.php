@@ -58,7 +58,7 @@
 </section>
 
 {{-- ============================ TENTANG ============================ --}}
-<section id="tentang" class="home-scene scroll-mt-24">
+<section id="tentang" class="home-scene home-scene--compact">
     <div class="container-x">
         <div class="p-6 sm:p-8 lg:p-12">
         <div class="reveal reveal-scale mx-auto max-w-2xl text-center">
@@ -126,7 +126,7 @@
 
 {{-- ============================ AGENDA ============================ --}}
 @if ($upcomingAgendas->isNotEmpty())
-<section id="agenda" class="home-scene scroll-mt-24">
+<section id="agenda" class="home-scene">
     <div class="container-x">
         <div class="mx-auto max-w-4xl p-6 sm:p-8 lg:p-12">
         <div class="reveal reveal-scale text-center">
@@ -154,7 +154,7 @@
 
 {{-- ============================ GALERI ============================ --}}
 @if ($galleryImages->isNotEmpty())
-<section id="galeri" class="home-scene scroll-mt-24" data-public-gallery>
+<section id="galeri" class="home-scene home-scene--compact" data-public-gallery>
     <div class="container-x">
         <div class="p-6 sm:p-8 lg:p-12">
             <div class="reveal reveal-scale text-center">
@@ -195,7 +195,7 @@
 
 {{-- ============================ ARTIKEL ============================ --}}
 @if ($featuredArticle)
-<section id="artikel" class="home-scene scroll-mt-24">
+<section id="artikel" class="home-scene home-scene--compact">
     <div class="container-x">
         <div class="p-6 sm:p-8 lg:p-12">
         <div class="reveal reveal-left flex flex-wrap items-end justify-between gap-4">
@@ -279,7 +279,7 @@
 
 {{-- ============================ PENGURUS ============================ --}}
 @if ($activePeriod && ($activePeriod->group_photo_path || $activePeriod->activeMembers->isNotEmpty()))
-<section id="pengurus" class="home-scene scroll-mt-24">
+<section id="pengurus" class="home-scene">
     <div class="container-x">
         <div class="p-6 sm:p-8 lg:p-12">
         <div class="reveal reveal-scale text-center">
@@ -352,7 +352,7 @@
 
 {{-- ============================ KONTAK ============================ --}}
 @if ($publicContentVisibility['contact'])
-<section id="kontak" class="home-scene scroll-mt-24 text-cream-50">
+<section id="kontak" class="home-scene text-cream-50">
     <div class="container-x">
         <div class="home-scene-panel home-scene-panel--dark p-6 sm:p-8 lg:p-12">
         <div class="reveal reveal-scale text-center">
