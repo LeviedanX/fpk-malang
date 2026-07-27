@@ -15,22 +15,59 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('login.store') }}" class="mt-6 space-y-4">
+    <form method="POST" action="{{ route('login.store') }}" class="mt-7 space-y-5">
         @csrf
 
-        <x-form.input name="email" label="Email" type="email" required autofocus autocomplete="username" />
+        <div class="auth-field">
+            <label for="email" class="auth-field-label">
+                Email <span aria-hidden="true">*</span>
+            </label>
+            <input
+                type="email"
+                name="email"
+                id="email"
+                value="{{ old('email') }}"
+                required
+                autofocus
+                autocomplete="username"
+                inputmode="email"
+                autocapitalize="none"
+                spellcheck="false"
+                @error('email') aria-invalid="true" @enderror
+                class="auth-input block w-full @error('email') auth-input-invalid @enderror"
+            >
+            @error('email')
+                <p class="mt-1.5 text-xs font-medium text-rose-600">{{ $message }}</p>
+            @enderror
+        </div>
 
-        <div class="space-y-1.5" x-data="passwordField">
-            <label for="password" class="block text-sm font-medium text-slate-700">Kata sandi <span class="text-maroon-700">*</span></label>
+        <div class="auth-field" x-data="passwordField">
+            <label for="password" class="auth-field-label">
+                Kata sandi <span aria-hidden="true">*</span>
+            </label>
             <div class="relative">
-                <input :type="visible ? 'text' : 'password'" name="password" id="password" required autocomplete="current-password"
-                    class="form-control block w-full pr-12">
-                <button type="button" @click="toggle()" class="absolute inset-y-0 right-0 grid w-11 place-items-center text-slate-400 transition hover:text-maroon-700" :aria-label="visible ? 'Sembunyikan password' : 'Tampilkan password'">
+                <input
+                    :type="visible ? 'text' : 'password'"
+                    name="password"
+                    id="password"
+                    required
+                    autocomplete="current-password"
+                    @error('password') aria-invalid="true" @enderror
+                    class="auth-input block w-full pr-12 @error('password') auth-input-invalid @enderror"
+                >
+                <button
+                    type="button"
+                    @click="toggle()"
+                    class="auth-password-toggle absolute inset-y-1 right-1 grid w-10 place-items-center rounded-lg"
+                    :aria-label="visible ? 'Sembunyikan password' : 'Tampilkan password'"
+                >
                     <svg x-show="!visible" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6z"/><circle cx="12" cy="12" r="2.5"/></svg>
                     <svg x-show="visible" x-cloak class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3l18 18M10.6 10.7A2 2 0 0013.3 13.4M9.9 5.2A10.8 10.8 0 0112 5c6 0 9.5 7 9.5 7a17.8 17.8 0 01-2.1 3M6.2 6.2C3.8 8 2.5 12 2.5 12s3.5 7 9.5 7a9.8 9.8 0 004.1-.9"/></svg>
                 </button>
             </div>
-            @error('password')<p class="text-xs text-rose-600">{{ $message }}</p>@enderror
+            @error('password')
+                <p class="mt-1.5 text-xs font-medium text-rose-600">{{ $message }}</p>
+            @enderror
         </div>
 
         <button type="submit" class="admin-button admin-button-primary mt-1 w-full">

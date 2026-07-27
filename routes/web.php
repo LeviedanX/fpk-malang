@@ -3,6 +3,7 @@
 use App\Http\Controllers\PublicSite\AgendaController;
 use App\Http\Controllers\PublicSite\ArticleController;
 use App\Http\Controllers\PublicSite\HomeController;
+use App\Http\Controllers\PublicSite\RobotsController;
 use App\Http\Controllers\PublicSite\SitemapController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,6 +22,7 @@ Route::redirect('/agenda', '/#agenda')->name('agendas.index');
 Route::get('/agenda/{agenda:slug}', [AgendaController::class, 'show'])->name('agendas.show');
 
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
+Route::get('/robots.txt', RobotsController::class)->name('robots');
 
 /*
 |--------------------------------------------------------------------------

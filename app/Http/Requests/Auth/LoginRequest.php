@@ -2,15 +2,20 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Support\AdminActivityLogger;
+use App\Support\AdminDeviceIdentity;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class LoginRequest extends FormRequest
 {
+    private const LOCKOUT_SECONDS = 3600;
+
+    private const MAX_ATTEMPTS = 3;
+
     public function authorize(): bool
     {
         return true;
@@ -37,14 +42,25 @@ class LoginRequest extends FormRequest
         $this->ensureIsNotRateLimited();
 
         if (! Auth::attempt($this->only('email', 'password'))) {
-            RateLimiter::hit($this->throttleKey());
+            foreach ($this->throttleKeys() as $key) {
+                RateLimiter::hit($key, self::LOCKOUT_SECONDS);
+            }
+
+            app(AdminActivityLogger::class)->log(
+                $this,
+                'auth.login_failed',
+                'Percobaan login admin gagal.',
+                statusCode: 422,
+            );
 
             throw ValidationException::withMessages([
                 'email' => __('auth.failed'),
             ]);
         }
 
-        RateLimiter::clear($this->throttleKey());
+        foreach ($this->throttleKeys() as $key) {
+            RateLimiter::clear($key);
+        }
     }
 
     /**
@@ -54,27 +70,36 @@ class LoginRequest extends FormRequest
      */
     public function ensureIsNotRateLimited(): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        $blocked = collect($this->throttleKeys())
+            ->contains(fn (string $key): bool => RateLimiter::tooManyAttempts($key, self::MAX_ATTEMPTS));
+
+        if (! $blocked) {
             return;
         }
 
         event(new Lockout($this));
-
-        $seconds = RateLimiter::availableIn($this->throttleKey());
+        app(AdminActivityLogger::class)->log(
+            $this,
+            'auth.login_blocked',
+            'Percobaan login admin ditolak karena IP atau perangkat sedang diblokir.',
+            statusCode: 422,
+        );
 
         throw ValidationException::withMessages([
-            'email' => __('auth.throttle', [
-                'seconds' => $seconds,
-                'minutes' => ceil($seconds / 60),
-            ]),
+            'email' => __('auth.failed'),
         ]);
     }
 
     /**
-     * Get the rate limiting throttle key for the request.
+     * @return array{string, string}
      */
-    public function throttleKey(): string
+    public function throttleKeys(): array
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        $identity = app(AdminDeviceIdentity::class);
+
+        return [
+            'admin-login:ip:'.$identity->ipKey($this),
+            'admin-login:device:'.$identity->key($this),
+        ];
     }
 }

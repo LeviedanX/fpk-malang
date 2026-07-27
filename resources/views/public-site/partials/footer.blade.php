@@ -1,4 +1,4 @@
-<footer class="relative overflow-hidden bg-maroon-950 text-cream-100">
+<footer class="relative z-10 overflow-hidden bg-maroon-950 text-cream-100">
     <div class="hero-motif parallax-layer pointer-events-none absolute inset-0 opacity-40" data-parallax="0.012" aria-hidden="true"></div>
 
     <div class="container-x relative py-14">
@@ -9,25 +9,28 @@
                         <img src="{{ \Illuminate\Support\Facades\Storage::url($site->logo_path) }}" alt="Logo {{ $site->organization_name }}" class="h-11 w-auto" width="44" height="44" loading="lazy" decoding="async">
                     @else
                         <span class="grid h-11 w-11 place-items-center overflow-hidden rounded-full bg-cream-50 p-1 shadow-sm ring-1 ring-gold-400/35" aria-hidden="true">
-                            <img src="{{ asset('assets/images/branding/logo-fpk.png') }}" alt="" class="h-full w-full object-contain" width="44" height="44" loading="lazy" decoding="async">
+                            <img src="{{ asset('assets/images/branding/logo-fpk.webp') }}" alt="" class="h-full w-full object-contain" width="44" height="44" loading="lazy" decoding="async">
                         </span>
                     @endif
                     <span class="font-display text-lg font-bold text-cream-50">{{ $site->abbreviation ?: $site->site_name }}</span>
                 </div>
                 @if ($site->tagline)
-                    <p class="mt-4 text-sm leading-relaxed text-cream-100/75">{{ $site->tagline }}</p>
+                    <p class="mt-4 text-sm font-medium leading-relaxed text-cream-100/90">{{ $site->tagline }}</p>
                 @endif
             </div>
 
             <div class="reveal text-sm" style="--reveal-delay: 70ms">
                 <p class="font-semibold uppercase tracking-wider text-gold-400">Navigasi</p>
-                <ul class="mt-4 space-y-2.5 text-cream-100/80">
+                <ul class="mt-4 space-y-2.5 font-medium text-cream-100/90">
                     <li><a href="{{ route('home') }}#tentang" class="transition hover:text-white">Tentang FPK</a></li>
-                    @if ($publicContentVisibility['articles'])
-                        <li><a href="{{ route('home') }}#artikel" class="transition hover:text-white">Artikel</a></li>
-                    @endif
                     @if ($publicContentVisibility['agendas'])
                         <li><a href="{{ route('home') }}#agenda" class="transition hover:text-white">Agenda</a></li>
+                    @endif
+                    @if ($publicContentVisibility['gallery'])
+                        <li><a href="{{ route('home') }}#galeri" class="transition hover:text-white">Galeri</a></li>
+                    @endif
+                    @if ($publicContentVisibility['articles'])
+                        <li><a href="{{ route('home') }}#artikel" class="transition hover:text-white">Artikel</a></li>
                     @endif
                     @if ($publicContentVisibility['management'])
                         <li><a href="{{ route('home') }}#pengurus" class="transition hover:text-white">Susunan Pengurus</a></li>
@@ -41,7 +44,7 @@
             @if ($contact->hasAnyContact())
                 <div class="reveal reveal-right text-sm" style="--reveal-delay: 140ms">
                     <p class="font-semibold uppercase tracking-wider text-gold-400">Kontak</p>
-                    <ul class="mt-4 space-y-2.5 text-cream-100/80">
+                    <ul class="mt-4 space-y-2.5 font-medium text-cream-100/90">
                         @if ($contact->address)<li>{{ $contact->address }}</li>@endif
                         @if ($contact->email)<li><a href="mailto:{{ $contact->email }}" class="transition hover:text-white">{{ $contact->email }}</a></li>@endif
                         @if ($contact->phone)<li>{{ $contact->phone }}</li>@endif
@@ -62,7 +65,7 @@
             @endif
         </div>
 
-        <div class="reveal mt-10 flex flex-col items-center gap-3 border-t border-cream-100/15 pt-6 text-center text-xs text-cream-100/65 sm:flex-row sm:justify-between">
+        <div class="reveal mt-10 flex flex-col items-center gap-3 border-t border-cream-100/15 pt-6 text-center text-xs font-medium text-cream-100/80 sm:flex-row sm:justify-between">
             <span>&copy; {{ now()->year }} {{ $site->footer_text ?: $site->organization_name }}.</span>
 
             <div class="flex items-center gap-3">

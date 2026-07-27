@@ -69,8 +69,12 @@ class Article extends Model
             'is_featured', 'status', 'published_at',
         ];
 
-        return static::query()->select($columns)->latestPublished()->where('is_featured', true)->first()
-            ?? static::query()->select($columns)->latestPublished()->first();
+        return static::query()
+            ->select($columns)
+            ->published()
+            ->orderByDesc('is_featured')
+            ->orderByDesc('published_at')
+            ->first();
     }
 
     public function isPublished(): bool

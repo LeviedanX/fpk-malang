@@ -14,11 +14,11 @@
 @endphp
 
 <div
-    class="space-y-2"
+    class="admin-form-field"
     x-data="imagePreview({ initialUrl: @js($currentUrl), initialState: @js($initialState) })"
     data-image-preview-field="{{ $name }}"
 >
-    <label for="{{ $name }}" class="block text-sm font-medium text-slate-700">{{ $label }}</label>
+    <label for="{{ $name }}" class="admin-form-label">{{ $label }}</label>
 
     <div
         class="relative grid aspect-16/10 w-full max-w-md place-items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-100"
@@ -72,10 +72,10 @@
     >File dipilih: <span x-text="fileName"></span></p>
 
     @if ($hint)
-        <p id="{{ $name }}-hint" class="text-xs text-slate-500">{{ $hint }}</p>
+        <p id="{{ $name }}-hint" class="admin-form-hint">{{ $hint }}</p>
     @endif
 
     @error($name)
-        <p class="text-xs text-rose-600">{{ $message }}</p>
+        <p class="admin-form-error">{{ $message }}</p>
     @enderror
 </div>

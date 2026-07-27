@@ -4,6 +4,7 @@ namespace App\Http\Controllers\PublicSite;
 
 use App\Http\Controllers\Controller;
 use App\Models\Article;
+use App\Models\FpkProfile;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -37,6 +38,7 @@ class ArticleController extends Controller
             'articles' => $articles,
             'search' => $search,
             'featured' => $articles->onFirstPage() ? $featured : null,
+            'profile' => FpkProfile::current(),
         ]);
     }
 
@@ -46,6 +48,7 @@ class ArticleController extends Controller
 
         return view('public-site.articles.show', [
             'article' => $article,
+            'profile' => FpkProfile::current(),
         ]);
     }
 }

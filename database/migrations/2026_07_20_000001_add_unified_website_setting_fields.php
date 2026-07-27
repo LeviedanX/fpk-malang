@@ -16,7 +16,7 @@ return new class extends Migration
         });
 
         Schema::table('fpk_profiles', function (Blueprint $table) {
-            $table->string('about_image_path')->nullable()->after('hero_image_path');
+            $table->string('about_image_path')->nullable()->after('hero_subtitle');
             $table->string('institution_legal_basis', 120)->nullable()->after('about_image_path');
             $table->string('institution_foundation', 120)->nullable()->after('institution_legal_basis');
         });

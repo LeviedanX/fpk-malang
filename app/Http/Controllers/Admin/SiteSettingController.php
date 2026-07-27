@@ -12,6 +12,7 @@ use App\Support\ImageStorage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class SiteSettingController extends Controller
@@ -42,12 +43,16 @@ class SiteSettingController extends Controller
             'default_meta_title',
             'default_meta_description',
             'default_meta_keywords',
+            'background_music_visible',
+            'background_music_default_playing',
+            'background_music_volume',
         ]);
 
         $imageMap = [
             'logo' => ['column' => 'logo_path', 'dir' => 'branding'],
             'favicon' => ['column' => 'favicon_path', 'dir' => 'branding'],
             'default_og_image' => ['column' => 'default_og_image_path', 'dir' => 'branding'],
+            'admin_login_background' => ['column' => 'admin_login_background_path', 'dir' => 'auth'],
         ];
 
         foreach ($imageMap as $field => $meta) {
@@ -60,9 +65,45 @@ class SiteSettingController extends Controller
             }
         }
 
+        if (! $request->hasFile('admin_login_background')
+            && $request->boolean('remove_admin_login_background')) {
+            ImageStorage::delete($settings->admin_login_background_path);
+            $siteData['admin_login_background_path'] = null;
+        }
+
+        if ($request->hasFile('background_music')) {
+            if ($settings->background_music_path) {
+                Storage::disk('public')->delete($settings->background_music_path);
+            }
+            $siteData['background_music_path'] = $request->file('background_music')
+                ->store(config('fpk.uploads.directories.audio'), 'public');
+        } elseif ($request->boolean('remove_background_music') && $settings->background_music_path) {
+            Storage::disk('public')->delete($settings->background_music_path);
+            $siteData['background_music_path'] = null;
+        }
+
+        $pendingSettings = clone $settings;
+        $pendingSettings->fill($siteData);
+
+        if ($pendingSettings->isDirty([
+            'background_music_path',
+            'background_music_visible',
+            'background_music_default_playing',
+            'background_music_volume',
+        ])) {
+            $siteData['background_music_preference_version'] =
+                max(1, ((int) $settings->background_music_preference_version) + 1);
+        }
+
         $profileData = Arr::only($validated, [
+            'hero_eyebrow',
             'hero_title',
             'hero_subtitle',
+            'hero_primary_cta_label',
+            'hero_secondary_cta_label',
+            'hero_legal_basis_label',
+            'hero_foundation_label',
+            'hero_period_label',
             'institution_legal_basis',
             'institution_foundation',
             'definition',
@@ -73,7 +114,8 @@ class SiteSettingController extends Controller
         ]);
 
         $profileImageMap = [
-            'hero_image' => ['column' => 'hero_image_path', 'dir' => 'profile'],
+            'hero_background' => ['column' => 'hero_background_path', 'dir' => 'profile'],
+            'hero_mobile_background' => ['column' => 'hero_mobile_background_path', 'dir' => 'profile'],
             'about_image' => ['column' => 'about_image_path', 'dir' => 'profile'],
         ];
 
@@ -85,6 +127,16 @@ class SiteSettingController extends Controller
                     $meta['dir']
                 );
             }
+        }
+
+        if (! $request->hasFile('hero_background') && $request->boolean('remove_hero_background')) {
+            ImageStorage::delete($profile->hero_background_path);
+            $profileData['hero_background_path'] = null;
+        }
+
+        if (! $request->hasFile('hero_mobile_background') && $request->boolean('remove_hero_mobile_background')) {
+            ImageStorage::delete($profile->hero_mobile_background_path);
+            $profileData['hero_mobile_background_path'] = null;
         }
 
         $contactData = Arr::only($validated, [

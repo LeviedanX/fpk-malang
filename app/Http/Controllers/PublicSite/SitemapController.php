@@ -17,7 +17,7 @@ class SitemapController extends Controller
             ->get(['slug', 'updated_at']);
 
         $agendas = Agenda::query()
-            ->published()
+            ->visibleOnPublic()
             ->orderByDesc('published_at')
             ->get(['slug', 'updated_at']);
 
@@ -26,6 +26,7 @@ class SitemapController extends Controller
                 'articles' => $articles,
                 'agendas' => $agendas,
             ])
-            ->header('Content-Type', 'application/xml');
+            ->header('Content-Type', 'application/xml')
+            ->header('Cache-Control', 'public, max-age=3600');
     }
 }

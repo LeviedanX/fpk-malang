@@ -39,14 +39,14 @@
         <div x-show="show" x-cloak class="fixed inset-0 z-[80] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="admin-confirm-title">
             {{-- Backdrop --}}
             <div x-show="show"
-                 x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-                 x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                 x-transition:enter="transition duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)]" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                 x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
                  class="absolute inset-0 bg-ink-950/60 backdrop-blur-sm" x-on:click="cancel()"></div>
 
             {{-- Card --}}
             <div x-show="show"
-                 x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 scale-95" x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-                 x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0 scale-100" x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+                 x-transition:enter="transition duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]" x-transition:enter-start="opacity-0 translate-y-3 scale-[0.97]" x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                 x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 scale-100" x-transition:leave-end="opacity-0 translate-y-2 scale-[0.98]"
                  class="admin-confirm-card relative w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl">
                 <div class="flex flex-col items-center gap-4 px-6 pb-6 pt-8 text-center sm:px-8 sm:pt-9">
                     <span class="admin-confirm-icon grid h-16 w-16 flex-none place-items-center rounded-full">

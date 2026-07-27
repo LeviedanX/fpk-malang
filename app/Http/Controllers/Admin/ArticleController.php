@@ -37,6 +37,23 @@ class ArticleController extends Controller
         ]);
     }
 
+    public function archive(Request $request): View
+    {
+        $search = trim((string) $request->query('q', ''));
+
+        $articles = Article::onlyTrashed()
+            ->select(['id', 'title', 'slug', 'thumbnail_path', 'deleted_at'])
+            ->when($search !== '', fn ($query) => $query->where('title', 'like', "%{$search}%"))
+            ->orderByDesc('deleted_at')
+            ->paginate(config('fpk.pagination.articles_admin'))
+            ->withQueryString();
+
+        return view('admin.articles.archive', [
+            'articles' => $articles,
+            'search' => $search,
+        ]);
+    }
+
     public function create(): View
     {
         return view('admin.articles.create', [
@@ -91,7 +108,30 @@ class ArticleController extends Controller
 
         return redirect()
             ->route('admin.articles.index')
-            ->with('status', 'Artikel berhasil dihapus.');
+            ->with('status', 'Artikel berhasil diarsipkan dan masih dapat dipulihkan.');
+    }
+
+    public function restore(string $article): RedirectResponse
+    {
+        $archivedArticle = $this->findArchived($article);
+        $archivedArticle->restore();
+
+        return redirect()
+            ->route('admin.articles.archive')
+            ->with('status', 'Artikel berhasil dipulihkan.');
+    }
+
+    public function forceDelete(string $article): RedirectResponse
+    {
+        $archivedArticle = $this->findArchived($article);
+        $thumbnailPath = $archivedArticle->thumbnail_path;
+
+        $archivedArticle->forceDelete();
+        ImageStorage::delete($thumbnailPath);
+
+        return redirect()
+            ->route('admin.articles.archive')
+            ->with('status', 'Artikel dan gambar sampulnya berhasil dihapus permanen.');
     }
 
     /**
@@ -114,5 +154,12 @@ class ArticleController extends Controller
         }
 
         return $data;
+    }
+
+    private function findArchived(string $slug): Article
+    {
+        return Article::onlyTrashed()
+            ->where('slug', $slug)
+            ->firstOrFail();
     }
 }

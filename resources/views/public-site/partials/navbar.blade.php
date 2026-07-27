@@ -6,52 +6,53 @@
         ['tentang', 'Tentang FPK', $home.'#tentang'],
     ];
 
-    if ($publicContentVisibility['articles']) {
-        $links[] = ['artikel', 'Artikel', $home.'#artikel'];
-    }
-
     if ($publicContentVisibility['agendas']) {
         $links[] = ['agenda', 'Agenda', $home.'#agenda'];
+    }
+
+    if ($publicContentVisibility['gallery']) {
+        $links[] = ['galeri', 'Galeri', $home.'#galeri'];
+    }
+
+    if ($publicContentVisibility['articles']) {
+        $links[] = ['artikel', 'Artikel', $home.'#artikel'];
     }
 
     if ($publicContentVisibility['management']) {
         $links[] = ['pengurus', 'Pengurus', $home.'#pengurus'];
     }
 
-    $trackedSections = collect($links)->pluck(0);
-
     if ($publicContentVisibility['contact']) {
-        $trackedSections->push('kontak');
+        $links[] = ['kontak', 'Kontak', $home.'#kontak'];
     }
 
-    $trackedSections = $trackedSections->values();
+    $trackedSections = collect($links)->pluck(0)->values();
 @endphp
 <header
     x-data="siteNav({{ \Illuminate\Support\Js::from($trackedSections) }})"
-    class="fixed inset-x-0 top-0 z-40 transform-gpu transition-all duration-500 ease-out"
+    class="fixed inset-x-0 top-0 z-40 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
     :class="[
         scrolled || open
-            ? 'border-b border-maroon-100/70 bg-cream-50/90 backdrop-blur-md shadow-sm dark:border-ink-800 dark:bg-ink-950/90'
-            : 'border-b border-transparent bg-transparent',
-        hidden && !open ? '-translate-y-full' : 'translate-y-0'
+            ? 'border-b border-maroon-100/70 bg-cream-50/90 backdrop-blur-md shadow-sm'
+            : 'border-b border-transparent bg-transparent'
     ]"
 >
     <nav class="container-x flex items-center justify-between gap-4 py-3" aria-label="Navigasi utama">
-        <a href="{{ $home }}#beranda" class="group flex items-center gap-3 transition-transform duration-300 hover:scale-[1.02]">
+        <a href="{{ $home }}#beranda" class="group flex items-center gap-3 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.02]">
             @if ($site->logo_path)
                 <img src="{{ \Illuminate\Support\Facades\Storage::url($site->logo_path) }}" alt="Logo {{ $site->organization_name }}" class="h-10 w-auto" width="40" height="40">
             @else
                 <span class="grid h-10 w-10 place-items-center overflow-hidden rounded-full bg-white p-1 shadow-sm ring-2 ring-gold-400/40" aria-hidden="true">
-                    <img src="{{ asset('assets/images/branding/logo-fpk.png') }}" alt="" class="h-full w-full object-contain">
+                    <img src="{{ asset('assets/images/branding/logo-fpk.webp') }}" alt="" class="h-full w-full object-contain" width="40" height="40" decoding="async">
                 </span>
             @endif
             <span class="leading-tight">
-                <span class="block font-display text-base font-bold transition-colors duration-300"
-                      :class="scrolled || open ? 'text-maroon-800 dark:text-cream-100' : 'text-cream-50'">
+                <span class="block font-display text-base font-bold transition-colors duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)]"
+                      :class="scrolled || open ? 'text-maroon-800' : 'text-cream-50'">
                     {{ $site->abbreviation ?: $site->site_name }}
                 </span>
-                <span class="block text-[11px] uppercase tracking-wider transition-colors duration-300"
-                      :class="scrolled || open ? 'text-ink-400' : 'text-cream-100/65'">
+                <span class="block text-[11px] uppercase tracking-wider transition-colors duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)]"
+                      :class="scrolled || open ? 'text-ink-600' : 'text-cream-100/85'">
                     {{ $site->organization_name }}
                 </span>
             </span>
@@ -62,18 +63,19 @@
                 <li>
                     <a href="{{ $href }}"
                        @if ($isHome)
+                           :aria-current="isActive('{{ $id }}') ? 'location' : null"
                            :class="isActive('{{ $id }}')
-                               ? (scrolled || open ? 'text-maroon-700 dark:text-gold-400' : 'text-gold-400')
-                               : (scrolled || open ? 'text-ink-600 hover:text-maroon-700 dark:text-ink-300 dark:hover:text-gold-400' : 'text-cream-100/75 hover:text-cream-50')"
+                               ? (scrolled || open ? 'text-maroon-700' : 'text-gold-400')
+                               : (scrolled || open ? 'text-ink-700 hover:text-maroon-700' : 'text-cream-100/90 hover:text-cream-50')"
                        @else
                            :class="scrolled || open
-                               ? 'text-ink-600 hover:text-maroon-700 dark:text-ink-300 dark:hover:text-gold-400'
-                               : 'text-cream-100/75 hover:text-cream-50'"
+                               ? 'text-ink-700 hover:text-maroon-700'
+                               : 'text-cream-100/90 hover:text-cream-50'"
                        @endif
-                       class="nav-link relative rounded-md px-3 py-2 text-sm font-medium transition-colors duration-300">
+                       class="nav-link relative rounded-md px-3 py-2 text-sm font-semibold transition-colors duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)]">
                         {{ $label }}
                         @if ($isHome)
-                            <span class="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-gold-500 transition-transform duration-300"
+                            <span class="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-gold-500 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
                                   :class="isActive('{{ $id }}') ? 'scale-x-100' : 'scale-x-0'"></span>
                         @endif
                     </a>
@@ -82,24 +84,45 @@
         </ul>
 
         <div class="flex items-center gap-2">
-            <button type="button" @click="$store.theme.toggle()"
-                class="icon-button grid h-9 w-9 place-items-center rounded-md"
-                :class="scrolled || open
-                    ? 'text-ink-500 hover:bg-maroon-50 hover:text-maroon-700 dark:text-ink-300 dark:hover:bg-ink-800'
-                    : 'text-cream-100/80 hover:bg-white/10 hover:text-cream-50'"
-                :aria-label="$store.theme.dark ? 'Aktifkan mode terang' : 'Aktifkan mode gelap'">
-                <svg x-show="!$store.theme.dark" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
-                <svg x-show="$store.theme.dark" x-cloak class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.36 6.36l-1.42-1.42M7.06 7.06L5.64 5.64m12.72 0l-1.42 1.42M7.06 16.94l-1.42 1.42M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-            </button>
-
-            @if ($publicContentVisibility['contact'])
-                <a href="{{ $home }}#kontak" class="hidden btn-primary px-4! py-2! sm:inline-flex">Kontak</a>
+            @if ($site->background_music_path && $site->background_music_visible)
+                <div
+                    x-data="siteMusicPlayer({
+                        defaultPlaying: @js($site->background_music_default_playing),
+                        volume: @js($site->background_music_volume),
+                        preferenceVersion: @js($site->background_music_preference_version),
+                    })"
+                    data-site-music-player
+                    data-music-default-playing="{{ $site->background_music_default_playing ? 'on' : 'off' }}"
+                    data-music-volume="{{ $site->background_music_volume }}"
+                    data-music-preference-version="{{ $site->background_music_preference_version }}"
+                    :data-music-playback-state="actuallyPlaying ? 'playing' : (playbackBlocked ? 'blocked' : (playing ? 'starting' : 'off'))"
+                    class="contents"
+                >
+                    <audio x-ref="audio" preload="none" loop data-site-music-audio>
+                        <source src="{{ \Illuminate\Support\Facades\Storage::url($site->background_music_path) }}">
+                    </audio>
+                    <button type="button" @click="toggle()"
+                        data-site-music-toggle
+                        class="icon-button relative grid h-9 w-9 place-items-center rounded-md"
+                        :class="scrolled || open
+                            ? 'text-maroon-800 hover:bg-maroon-50'
+                            : 'text-cream-50 hover:bg-white/10'"
+                        :aria-pressed="playing"
+                        :aria-label="!playing ? 'Nyalakan musik latar' : (actuallyPlaying ? 'Matikan musik latar' : 'Putar musik latar')"
+                        :title="playbackBlocked ? 'Scroll, klik, sentuh, atau tekan tombol untuk memulai musik' : null">
+                        <span class="sr-only" x-text="!playing ? 'Nyalakan musik latar' : (actuallyPlaying ? 'Matikan musik latar' : 'Putar musik latar')"></span>
+                        <svg x-show="playing && actuallyPlaying" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 18V6l10-2v12M9 18a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM19 16a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/></svg>
+                        <svg x-show="playing && !actuallyPlaying" x-cloak class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10-6.5z"/></svg>
+                        <svg x-show="!playing" x-cloak class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 18V6l10-2v12M9 18a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM19 16a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/><path stroke-linecap="round" d="M3 3l18 18"/></svg>
+                        <span x-show="playing && !actuallyPlaying" x-cloak class="absolute right-1 top-1 h-1.5 w-1.5 animate-pulse rounded-full bg-gold-400" aria-hidden="true"></span>
+                    </button>
+                </div>
             @endif
 
             <button type="button" @click="open = !open"
                 class="icon-button grid h-9 w-9 place-items-center rounded-md lg:hidden"
                 :class="scrolled || open
-                    ? 'text-maroon-800 hover:bg-maroon-50 dark:text-cream-100 dark:hover:bg-ink-800'
+                    ? 'text-maroon-800 hover:bg-maroon-50'
                     : 'text-cream-50 hover:bg-white/10'"
                 :aria-expanded="open" aria-controls="mobile-menu">
                 <span class="sr-only">Menu navigasi</span>
@@ -108,14 +131,19 @@
         </div>
     </nav>
 
-    <div id="mobile-menu" x-show="open" x-cloak x-collapse.duration.250ms class="border-t border-maroon-100 bg-cream-50 lg:hidden dark:border-ink-800 dark:bg-ink-950">
+    <div id="mobile-menu" x-show="open" x-cloak x-collapse.duration.350ms class="border-t border-maroon-100 bg-cream-50 lg:hidden">
         <ul class="container-x space-y-1 py-3" @click="open = false">
             @foreach ($links as [$id, $label, $href])
-                <li><a href="{{ $href }}" class="block rounded-md px-3 py-2.5 text-sm font-medium text-ink-700 transition-all duration-300 hover:translate-x-1 hover:bg-maroon-50 hover:text-maroon-700 dark:text-ink-200 dark:hover:bg-ink-800">{{ $label }}</a></li>
+                <li>
+                    <a href="{{ $href }}"
+                       @if ($isHome)
+                           :aria-current="isActive('{{ $id }}') ? 'location' : null"
+                       @endif
+                       class="block rounded-md px-3 py-2.5 text-sm font-medium text-ink-700 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:translate-x-1 hover:bg-maroon-50 hover:text-maroon-700">
+                        {{ $label }}
+                    </a>
+                </li>
             @endforeach
-            @if ($publicContentVisibility['contact'])
-                <li><a href="{{ $home }}#kontak" class="mt-1 block rounded-md bg-maroon-700 px-3 py-2.5 text-center text-sm font-semibold text-cream-50">Kontak</a></li>
-            @endif
         </ul>
     </div>
 </header>

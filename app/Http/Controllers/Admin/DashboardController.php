@@ -16,16 +16,16 @@ class DashboardController extends Controller
         return view('admin.dashboard', [
             'articlesTotal' => Article::query()->count(),
             'articlesPublished' => Article::query()->published()->count(),
+            'articlesDraft' => Article::query()->where('status', PublicationStatus::Draft)->count(),
             'agendasTotal' => Agenda::query()->count(),
-            'agendasUpcoming' => Agenda::query()->upcoming()->count(),
+            'agendasDraft' => Agenda::query()->where('publication_status', PublicationStatus::Draft)->count(),
             'membersTotal' => ManagementMember::query()->count(),
             'latestArticles' => Article::query()
                 ->orderByDesc('created_at')
                 ->limit(5)
                 ->get(['id', 'title', 'slug', 'status', 'published_at', 'created_at']),
             'nearestAgendas' => Agenda::query()
-                ->where('publication_status', PublicationStatus::Published)
-                ->where('starts_at', '>=', now())
+                ->visibleOnPublic()
                 ->orderBy('starts_at')
                 ->limit(5)
                 ->get(['id', 'title', 'slug', 'starts_at', 'event_status']),

@@ -8,8 +8,8 @@
     'hint' => null,
 ])
 
-<div class="space-y-1.5">
-    <label for="{{ $name }}" class="block text-sm font-medium text-slate-700">
+<div class="admin-form-field">
+    <label for="{{ $name }}" class="admin-form-label">
         {{ $label }}
         @if ($required)<span class="text-maroon-700">*</span>@endif
     </label>
@@ -31,10 +31,10 @@
     </select>
 
     @if ($hint)
-        <p class="text-xs text-slate-500">{{ $hint }}</p>
+        <p class="admin-form-hint">{{ $hint }}</p>
     @endif
 
     @error($name)
-        <p class="text-xs text-rose-600">{{ $message }}</p>
+        <p class="admin-form-error">{{ $message }}</p>
     @enderror
 </div>

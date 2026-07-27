@@ -9,31 +9,42 @@
         ? \Illuminate\Support\Facades\Storage::url($site->favicon_path)
         : ($site->logo_path
             ? \Illuminate\Support\Facades\Storage::url($site->logo_path)
-            : asset('assets/images/branding/logo-fpk.png')))
+            : asset('assets/images/branding/favicon-fpk.png')))
+    @php($adminLoginBackgroundUrl = $site->admin_login_background_path
+        ? \Illuminate\Support\Facades\Storage::url($site->admin_login_background_path)
+        : null)
     <link rel="icon" href="{{ $faviconUrl }}">
     <link rel="apple-touch-icon" href="{{ $faviconUrl }}">
-    <script>
+    <script nonce="{{ request()->attributes->get('csp_nonce') }}">
         document.documentElement.classList.add('js');
-        if (/Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1) {
-            document.documentElement.classList.add('admin-mobile-device');
-        }
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="auth-shell relative min-h-dvh overflow-x-hidden bg-maroon-950 font-sans text-slate-800 antialiased">
-    <x-admin.desktop-only-notice />
+    @if ($adminLoginBackgroundUrl)
+        <div class="pointer-events-none fixed inset-0" data-admin-login-background="custom" aria-hidden="true">
+            <img
+                src="{{ $adminLoginBackgroundUrl }}"
+                alt=""
+                class="h-full w-full scale-110 object-cover blur-md"
+                decoding="async"
+                fetchpriority="high"
+            >
+            <div class="absolute inset-0 bg-maroon-950/78"></div>
+            <div class="absolute inset-0 bg-linear-to-br from-maroon-950/60 via-black/25 to-maroon-950/58"></div>
+        </div>
+    @else
+        <div class="pointer-events-none fixed inset-0" data-admin-login-background="default" aria-hidden="true">
+            <div class="hero-motif absolute inset-0 opacity-[0.14]"></div>
+            <div class="hero-glow absolute inset-0"></div>
+            <div class="float-slow absolute -left-44 top-[-14%] h-160 w-160 rounded-full bg-maroon-600/25 blur-3xl"></div>
+            <div class="absolute -right-40 bottom-[-20%] h-152 w-152 rounded-full bg-gold-500/12 blur-3xl"></div>
+            <div class="absolute left-1/2 top-1/2 h-208 w-208 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(217,164,65,0.10),transparent)]"></div>
+            <div class="absolute inset-0 bg-linear-to-b from-black/25 via-transparent to-black/50"></div>
+        </div>
+    @endif
 
-    {{-- Latar dekoratif berlapis --}}
-    <div class="pointer-events-none fixed inset-0 hidden lg:block" aria-hidden="true">
-        <div class="hero-motif absolute inset-0 opacity-[0.14]"></div>
-        <div class="hero-glow absolute inset-0"></div>
-        <div class="float-slow absolute -left-44 top-[-14%] h-160 w-160 rounded-full bg-maroon-600/25 blur-3xl"></div>
-        <div class="absolute -right-40 bottom-[-20%] h-152 w-152 rounded-full bg-gold-500/12 blur-3xl"></div>
-        <div class="absolute left-1/2 top-1/2 h-208 w-208 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(217,164,65,0.10),transparent)]"></div>
-        <div class="absolute inset-0 bg-linear-to-b from-black/25 via-transparent to-black/50"></div>
-    </div>
-
-    <main class="admin-desktop-content relative mx-auto hidden min-h-dvh w-full items-center justify-center px-8 py-12 lg:flex" data-admin-desktop-content>
+    <main class="admin-desktop-content relative mx-auto flex min-h-dvh w-full items-center justify-center px-4 py-8 sm:px-8 sm:py-12" data-admin-desktop-content>
 
         <section class="auth-card relative w-full max-w-sm overflow-hidden rounded-3xl border border-white/12 bg-white shadow-2xl shadow-black/40">
             {{-- Aksen emas tipis di tepi atas kartu --}}
@@ -56,7 +67,7 @@
                 {{-- Tombol kembali ke beranda --}}
                 <div class="mt-8 border-t border-slate-100 pt-5 text-center">
                     <a href="{{ route('home') }}" class="auth-back group inline-flex items-center gap-1.5 text-sm font-semibold text-maroon-600 transition-colors hover:text-maroon-800">
-                        <svg class="h-4 w-4 transition-transform duration-300 ease-out group-hover:-translate-x-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                        <svg class="h-4 w-4 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-x-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
                         <span>Kembali ke Beranda</span>
                     </a>
                 </div>

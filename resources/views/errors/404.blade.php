@@ -1,6 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Halaman tidak ditemukan')
+@section('robots', 'noindex, follow')
 
 @section('content')
     <section class="relative isolate flex min-h-[70vh] items-center overflow-hidden bg-maroon-950 text-cream-50">

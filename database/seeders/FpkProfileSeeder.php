@@ -19,9 +19,16 @@ class FpkProfileSeeder extends Seeder
         }
 
         FpkProfile::create([
+            'hero_eyebrow' => 'Forum Pembauran Kebangsaan Kota Malang',
             'hero_title' => 'Forum Pembauran Kebangsaan Kota Malang',
             'hero_subtitle' => 'Merawat kebhinnekaan, memperkuat persatuan warga Kota Malang.',
-            'hero_image_path' => null,
+            'hero_background_path' => null,
+            'hero_mobile_background_path' => null,
+            'hero_primary_cta_label' => 'Tentang FPK',
+            'hero_secondary_cta_label' => 'Lihat Agenda',
+            'hero_legal_basis_label' => 'Dasar Hukum',
+            'hero_foundation_label' => 'Landasan',
+            'hero_period_label' => 'Masa Bakti',
             'about_image_path' => null,
             'institution_legal_basis' => 'Pergub Jatim No. 41/2009',
             'institution_foundation' => 'SK Wali Kota Malang',

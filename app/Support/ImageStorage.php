@@ -4,15 +4,13 @@ namespace App\Support;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\ImageManager;
 use Throwable;
 
 /**
  * Centralises image persistence on the "public" disk: server-generated random
  * file names, stored under a configured sub-directory, with safe replacement and
- * deletion of previous files. Stored images are downscaled and re-encoded when an
- * image driver (GD or Imagick) and intervention/image are available; otherwise the
- * original is kept untouched.
+ * deletion of previous files. Stored images are downscaled and re-encoded to
+ * WebP when GD is available; otherwise the validated original is kept untouched.
  */
 class ImageStorage
 {
@@ -32,9 +30,7 @@ class ImageStorage
         // Laravel generates a random, unguessable file name for us.
         $path = $file->store($directory, self::disk());
 
-        self::optimize($path);
-
-        return $path;
+        return self::optimize($path, $directoryKey);
     }
 
     /**
@@ -60,48 +56,90 @@ class ImageStorage
     }
 
     /**
-     * Downscale oversized images and re-encode to trim file size. No-op when no
-     * image driver / library is available, or on any processing error (the
-     * validated original is kept in that case).
+     * Downscale oversized images and re-encode to WebP. No-op when GD/WebP is
+     * unavailable or on any processing error (the original remains intact).
      */
-    private static function optimize(string $path): void
+    private static function optimize(string $path, string $directoryKey): string
     {
-        $maxWidth = (int) config('fpk.uploads.optimize_max_width', 1600);
-
-        $manager = self::imageManager();
-
-        if (! $manager) {
-            return;
+        if (! function_exists('imagecreatefromstring') || ! function_exists('imagewebp')) {
+            return $path;
         }
 
-        try {
-            $absolute = Storage::disk(self::disk())->path($path);
-            $image = $manager->read($absolute);
+        $source = null;
+        $output = null;
 
-            if ($image->width() > $maxWidth) {
-                $image->scaleDown(width: $maxWidth);
+        try {
+            $disk = Storage::disk(self::disk());
+            $source = @imagecreatefromstring($disk->get($path));
+
+            if ($source === false) {
+                return $path;
             }
 
-            $image->save($absolute, quality: 82);
+            $width = imagesx($source);
+            $height = imagesy($source);
+            $maxWidth = self::optimizedMaxWidth($directoryKey, $width, $height);
+            $output = $source;
+
+            if ($width > $maxWidth) {
+                $targetHeight = max(1, (int) round($height * $maxWidth / $width));
+                $output = imagecreatetruecolor($maxWidth, $targetHeight);
+                imagealphablending($output, false);
+                imagesavealpha($output, true);
+                $transparent = imagecolorallocatealpha($output, 0, 0, 0, 127);
+                imagefill($output, 0, 0, $transparent);
+                imagecopyresampled(
+                    $output,
+                    $source,
+                    0,
+                    0,
+                    0,
+                    0,
+                    $maxWidth,
+                    $targetHeight,
+                    $width,
+                    $height,
+                );
+            }
+
+            $directory = pathinfo($path, PATHINFO_DIRNAME);
+            $filename = pathinfo($path, PATHINFO_FILENAME).'.webp';
+            $optimizedPath = ($directory === '.' ? '' : "{$directory}/").$filename;
+            $quality = (int) config('fpk.uploads.optimize_quality', 80);
+
+            if (! imagewebp($output, $disk->path($optimizedPath), $quality)
+                || ! $disk->exists($optimizedPath)
+                || $disk->size($optimizedPath) === 0) {
+                return $path;
+            }
+
+            if ($optimizedPath !== $path) {
+                $disk->delete($path);
+            }
+
+            return $optimizedPath;
         } catch (Throwable) {
-            // Keep the original file on any failure.
+            return $path;
+        } finally {
+            if ($output !== null && $output !== $source) {
+                imagedestroy($output);
+            }
+
+            if ($source !== null && $source !== false) {
+                imagedestroy($source);
+            }
         }
     }
 
-    private static function imageManager(): ?ImageManager
+    private static function optimizedMaxWidth(string $directoryKey, int $width, int $height): int
     {
-        if (! class_exists(ImageManager::class)) {
-            return null;
+        if ($directoryKey === 'management') {
+            return $width >= $height ? 1600 : 720;
         }
 
-        if (extension_loaded('imagick')) {
-            return ImageManager::imagick();
-        }
-
-        if (extension_loaded('gd')) {
-            return ImageManager::gd();
-        }
-
-        return null;
+        return (int) config(
+            "fpk.uploads.optimize_max_widths.{$directoryKey}",
+            config('fpk.uploads.optimize_max_width', 1600),
+        );
     }
 }

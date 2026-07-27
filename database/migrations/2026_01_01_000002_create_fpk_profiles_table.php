@@ -12,7 +12,6 @@ return new class extends Migration
             $table->id();
             $table->string('hero_title');
             $table->string('hero_subtitle')->nullable();
-            $table->string('hero_image_path')->nullable();
             $table->text('definition')->nullable();
             $table->text('background')->nullable();
             $table->text('objectives')->nullable();

@@ -18,6 +18,7 @@ class AccountUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'current_password' => ['required', 'current_password'],
             'name' => ['required', 'string', 'max:255'],
             'email' => [
                 'required', 'string', 'email', 'max:255',
@@ -32,6 +33,7 @@ class AccountUpdateRequest extends FormRequest
     public function attributes(): array
     {
         return [
+            'current_password' => 'password saat ini',
             'name' => 'nama',
             'email' => 'email',
         ];

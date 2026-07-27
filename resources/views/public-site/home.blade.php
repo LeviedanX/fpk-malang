@@ -3,18 +3,16 @@
 @section('content')
 
 {{-- ============================ HERO ============================ --}}
-<section id="beranda" class="relative isolate overflow-hidden bg-maroon-950 text-cream-50">
-    <div class="hero-motif parallax-layer pointer-events-none absolute inset-0 -z-10" data-parallax="0.012" aria-hidden="true"></div>
-    <div class="hero-glow parallax-layer pointer-events-none absolute inset-0 -z-10" data-parallax="0.032" aria-hidden="true"></div>
-    <div class="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-40 bg-linear-to-t from-maroon-950 to-transparent" aria-hidden="true"></div>
+<x-public-site.synced-background :profile="$profile" fixed />
 
-    <div class="container-x relative flex min-h-[88vh] flex-col justify-center pb-20 pt-36 sm:pt-40">
-        <div class="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
-            {{-- Left: message --}}
+<div class="home-scenes">
+<section id="beranda" class="relative isolate overflow-hidden text-cream-50">
+    <div class="container-x relative flex min-h-[88svh] flex-col justify-center pb-20 pt-36 sm:pt-40">
+        <div class="max-w-3xl">
             <div>
                 <p class="reveal reveal-left eyebrow text-gold-400!" style="--reveal-delay: 0ms">
                     <span class="h-1.5 w-1.5 rounded-full bg-gold-400"></span>
-                    {{ $site->organization_name }}
+                    {{ $profile->hero_eyebrow ?: $site->organization_name }}
                 </p>
 
                 <h1 class="reveal reveal-left mt-6 font-display text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl" style="--reveal-delay: 90ms">
@@ -28,59 +26,30 @@
                 @endif
 
                 <div class="reveal reveal-left mt-9 flex flex-wrap gap-3" style="--reveal-delay: 250ms">
-                    <a href="#tentang" class="btn-gold">Tentang FPK</a>
+                    <a href="#tentang" class="btn-gold">{{ $profile->hero_primary_cta_label ?: 'Tentang FPK' }}</a>
                     @if ($publicContentVisibility['agendas'])
-                        <a href="#agenda" class="btn-ghost-light">Lihat Agenda</a>
+                        <a href="#agenda" class="btn-ghost-light">{{ $profile->hero_secondary_cta_label ?: 'Lihat Agenda' }}</a>
                     @endif
                 </div>
             </div>
 
-            {{-- Right: image, logo, organization name, and tagline remain separate elements. --}}
-            <div class="reveal reveal-right reveal-scale relative" style="--reveal-delay: 200ms">
-                <div class="hero-visual parallax-layer relative aspect-4/5 overflow-hidden rounded-2xl border border-cream-100/15 bg-maroon-900/40 shadow-2xl shadow-black/30 sm:aspect-square lg:aspect-4/5" data-parallax="0.025">
-                    @php($heroImageUrl = $profile->hero_image_path
-                        ? \Illuminate\Support\Facades\Storage::url($profile->hero_image_path)
-                        : asset('assets/images/branding/hero-card-bg.webp'))
-                    @php($heroLogoUrl = $site->logo_path
-                        ? \Illuminate\Support\Facades\Storage::url($site->logo_path)
-                        : asset('assets/images/branding/logo-fpk.png'))
-
-                    <img src="{{ $heroImageUrl }}"
-                         alt="Gambar {{ $site->organization_name }}"
-                         width="960" height="1200"
-                         fetchpriority="high" decoding="async"
-                         class="absolute inset-0 h-full w-full object-cover">
-                    <div class="pointer-events-none absolute inset-0 bg-linear-to-t from-maroon-950/90 via-maroon-950/35 to-black/15" aria-hidden="true"></div>
-                    <div class="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center sm:px-8">
-                        <img src="{{ $heroLogoUrl }}"
-                             alt="Logo {{ $site->organization_name }}"
-                             width="144" height="144"
-                             decoding="async"
-                             class="float-slow h-24 w-24 rounded-full bg-white p-3 shadow-2xl ring-1 ring-gold-400/35 sm:h-28 sm:w-28 md:h-36 md:w-36 md:p-4">
-                        <p class="mt-6 max-w-md font-display text-xl font-bold text-cream-50 sm:text-2xl">{{ $site->organization_name }}</p>
-                        @if ($site->tagline)
-                            <p class="mt-2 max-w-sm text-sm leading-relaxed text-cream-100/85">{{ $site->tagline }}</p>
-                        @endif
-                    </div>
-                </div>
-            </div>
         </div>
 
         @php($heroFacts = collect([
-            ['Dasar Hukum', $profile->institution_legal_basis],
-            ['Landasan', $profile->institution_foundation],
-            ['Masa Bakti', $activePeriod?->label()],
+            [$profile->hero_legal_basis_label ?: 'Dasar Hukum', $profile->institution_legal_basis],
+            [$profile->hero_foundation_label ?: 'Landasan', $profile->institution_foundation],
+            [$profile->hero_period_label ?: 'Masa Bakti', $activePeriod?->label()],
         ])->filter(fn (array $fact) => filled($fact[1]))->values())
         @if ($heroFacts->isNotEmpty())
             <dl @class([
-                'reveal reveal-scale mt-14 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-cream-100/15 bg-cream-100/5',
+                'public-facts-card reveal reveal-scale mt-14 grid grid-cols-1 overflow-hidden rounded-xl',
                 'sm:grid-cols-2' => $heroFacts->count() === 2,
                 'sm:grid-cols-3' => $heroFacts->count() >= 3,
             ]) style="--reveal-delay: 320ms">
                 @foreach ($heroFacts as [$label, $value])
-                    <div class="bg-maroon-950/40 px-5 py-4">
-                        <dt class="text-xs uppercase tracking-wider text-gold-400/90">{{ $label }}</dt>
-                        <dd class="mt-1 text-sm font-semibold text-cream-50">{{ $value }}</dd>
+                    <div class="public-facts-card__item px-5 py-4">
+                        <dt class="text-xs font-semibold uppercase tracking-wider">{{ $label }}</dt>
+                        <dd class="mt-1 text-sm font-semibold text-ink-800">{{ $value }}</dd>
                     </div>
                 @endforeach
             </dl>
@@ -89,78 +58,60 @@
 </section>
 
 {{-- ============================ TENTANG ============================ --}}
-<section id="tentang" class="section scroll-mt-24 bg-cream-50 dark:bg-ink-950">
+<section id="tentang" class="home-scene scroll-mt-24">
     <div class="container-x">
+        <div class="p-6 sm:p-8 lg:p-12">
         <div class="reveal reveal-scale mx-auto max-w-2xl text-center">
-            <span class="eyebrow">Profil Organisasi</span>
-            <h2 class="section-title mt-3">Tentang {{ $site->abbreviation ?: $site->site_name }}</h2>
+            <span class="eyebrow text-gold-400!">Profil Organisasi</span>
+            <h2 class="section-title mt-3 text-cream-50!">Tentang {{ $site->abbreviation ?: $site->site_name }}</h2>
             <span class="title-rule mx-auto"></span>
         </div>
 
-        <div class="mt-12 grid gap-8 lg:grid-cols-2 lg:items-stretch xl:grid-cols-[repeat(2,33rem)] xl:justify-center">
-            <div class="reveal reveal-left surface h-full min-w-0 w-full p-6 sm:p-8 xl:aspect-4/3">
-                <div class="text-base leading-relaxed text-ink-600 dark:text-ink-300 sm:text-lg">
-                    @if ($profile->definition)
-                        <x-public-site.rich-text :text="$profile->definition" />
-                    @else
-                        <p>
-                            {{ $site->organization_name }} merupakan wadah informasi, komunikasi,
-                            konsultasi, dan kerja sama antarwarga masyarakat. FPK diarahkan untuk menumbuhkan,
-                            memantapkan, memelihara, dan mengembangkan pembauran kebangsaan di tengah
-                            kemajemukan masyarakat Kota Malang.
-                        </p>
-                    @endif
-                </div>
+        {{-- Grid ini sengaja identik dengan grid blok profil di bawahnya, dan kartu
+             gabungan meng-span 2 kolom, supaya lebarnya persis sama di semua breakpoint. --}}
+        <div class="mt-12 grid gap-8 md:grid-cols-2 xl:grid-cols-[repeat(2,33rem)] xl:justify-center">
+            <article class="about-feature-card reveal reveal-scale grid min-w-0 overflow-hidden md:col-span-2 lg:grid-cols-2 lg:items-stretch">
+                <figure class="about-feature-card__media group relative h-full min-w-0 overflow-hidden">
+                    <img src="{{ $profile->about_image_path
+                        ? \Illuminate\Support\Facades\Storage::url($profile->about_image_path)
+                        : asset('assets/images/about/about-fpk-vector.webp') }}"
+                         alt="Ilustrasi Tugu Malang dan Balai Kota Malang sebagai identitas {{ $site->organization_name }}"
+                         width="1400" height="1050"
+                         loading="lazy" decoding="async" fetchpriority="low"
+                         class="aspect-4/3 h-full w-full object-cover transition duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.025] lg:aspect-auto">
+                </figure>
 
-                <ul class="mt-6 space-y-3">
-                    @foreach ([
-                        'Menumbuhkan toleransi dan saling menghormati.',
-                        'Meningkatkan integrasi dan persatuan masyarakat.',
-                        'Mencegah konflik sosial dan disintegrasi.',
-                        'Membangun solidaritas dalam bingkai NKRI.',
-                    ] as $point)
-                        <li class="flex gap-3 text-sm leading-relaxed text-ink-600 dark:text-ink-300">
-                            <span class="mt-0.5 grid h-6 w-6 flex-none place-items-center rounded-full bg-maroon-50 text-maroon-700 ring-1 ring-maroon-100 dark:bg-ink-800 dark:text-gold-400 dark:ring-white/10" aria-hidden="true">
-                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                                </svg>
-                            </span>
-                            <span>{{ $point }}</span>
-                        </li>
-                    @endforeach
-                </ul>
-            </div>
-
-            <figure class="reveal reveal-right reveal-scale surface h-full min-w-0 w-full overflow-hidden shadow-xl shadow-maroon-950/10 dark:shadow-black/20" style="--reveal-delay: 100ms">
-                <img src="{{ $profile->about_image_path
-                    ? \Illuminate\Support\Facades\Storage::url($profile->about_image_path)
-                    : asset('assets/images/about/about-fpk-vector.webp') }}"
-                     alt="Ilustrasi Tugu Malang dan Balai Kota Malang sebagai identitas {{ $site->organization_name }}"
-                     width="1400" height="1050"
-                     loading="lazy" decoding="async"
-                     class="aspect-4/3 h-full w-full object-cover transition duration-700 hover:scale-[1.025] lg:aspect-auto">
-            </figure>
+                @if ($profile->definition)
+                    <div class="about-feature-card__content flex h-full min-w-0 flex-col justify-center p-7 sm:p-10 lg:p-12">
+                        <p class="about-card-kicker">Mengenal FPK</p>
+                        <h3 class="about-card-title mt-2">Pengertian</h3>
+                        <span class="about-card-rule" aria-hidden="true"></span>
+                        <div class="about-card-copy mt-5 text-base sm:text-[1.05rem]">
+                            <x-public-site.rich-text :text="$profile->definition" />
+                        </div>
+                    </div>
+                @endif
+            </article>
         </div>
 
         <div class="mt-10 grid gap-8 md:auto-rows-fr md:grid-cols-2 xl:grid-cols-[repeat(2,33rem)] xl:justify-center">
             @php($aboutBlocks = [
-                ['background', 'Latar Belakang', 'M12 3v18m9-9H3', false],
-                ['objectives', 'Tujuan', 'M5 13l4 4L19 7', true],
-                ['core_tasks', 'Tugas Pokok', 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2', true],
-                ['legal_basis', 'Dasar Hukum', 'M3 6l9-4 9 4M4 10v10h16V10M9 21v-6h6v6', true],
+                ['background', 'Latar Belakang', 'Konteks Organisasi', false, 'story'],
+                ['objectives', 'Tujuan', 'Arah Bersama', true, 'purpose'],
+                ['core_tasks', 'Tugas Pokok', 'Mandat Utama', true, 'mission'],
+                ['legal_basis', 'Dasar Hukum', 'Landasan Resmi', true, 'legal'],
             ])
-            @foreach ($aboutBlocks as [$field, $label, $icon, $asList])
+            @foreach ($aboutBlocks as [$field, $label, $kicker, $asList, $tone])
                 @if ($profile->{$field})
-                    <article class="reveal {{ $loop->odd ? 'reveal-left' : 'reveal-right' }} surface card-lift flex min-w-0 w-full flex-col p-6 xl:aspect-4/3" style="--reveal-delay: {{ ($loop->index % 2) * 70 }}ms">
-                        <div class="flex items-center gap-3">
-                            <span class="grid h-10 w-10 flex-none place-items-center rounded-lg bg-maroon-50 text-maroon-700 dark:bg-ink-800 dark:text-gold-400">
-                                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $icon }}"/></svg>
-                            </span>
-                            <h3 class="font-display text-lg font-bold text-maroon-800 dark:text-cream-100">{{ $label }}</h3>
+                    <article class="about-info-card about-info-card--{{ $tone }} reveal {{ $loop->odd ? 'reveal-left' : 'reveal-right' }} flex min-w-0 w-full flex-col p-7 sm:p-8" style="--reveal-delay: {{ ($loop->index % 2) * 70 }}ms">
+                        <div class="relative z-10 min-w-0">
+                            <p class="about-card-kicker">{{ $kicker }}</p>
+                            <h3 class="about-card-title mt-2">{{ $label }}</h3>
                         </div>
-                        <div class="mt-4 flex-1 text-ink-600 dark:text-ink-300">
+                        <span class="about-card-rule relative z-10" aria-hidden="true"></span>
+                        <div class="about-card-copy relative z-10 mt-5 flex-1">
                             @if ($asList)
-                                <x-public-site.rich-list :text="$profile->{$field}" class="h-full space-y-0! flex flex-col justify-between gap-3" />
+                                <x-public-site.rich-list :text="$profile->{$field}" class="space-y-3.5!" />
                             @else
                                 <x-public-site.rich-text :text="$profile->{$field}" />
                             @endif
@@ -169,30 +120,101 @@
                 @endif
             @endforeach
         </div>
+        </div>
     </div>
 </section>
 
+{{-- ============================ AGENDA ============================ --}}
+@if ($upcomingAgendas->isNotEmpty())
+<section id="agenda" class="home-scene scroll-mt-24">
+    <div class="container-x">
+        <div class="mx-auto max-w-4xl p-6 sm:p-8 lg:p-12">
+        <div class="reveal reveal-scale text-center">
+            <span class="eyebrow text-gold-400!">Jadwal Kegiatan</span>
+            <h2 class="section-title mt-3 text-cream-50!">Agenda Kegiatan</h2>
+            <span class="title-rule mx-auto"></span>
+        </div>
+
+        <div class="reveal mt-12">
+            <h3 class="font-display text-xl font-bold text-cream-50">Mendatang &amp; Berlangsung</h3>
+            <span class="title-rule"></span>
+        </div>
+        <div class="mt-6 space-y-4">
+            @foreach ($upcomingAgendas as $agenda)
+                <div class="reveal" style="--reveal-delay: {{ $loop->index * 70 }}ms">
+                    <x-public-site.agenda-card :agenda="$agenda" />
+                </div>
+            @endforeach
+        </div>
+
+        </div>
+    </div>
+</section>
+@endif
+
+{{-- ============================ GALERI ============================ --}}
+@if ($galleryImages->isNotEmpty())
+<section id="galeri" class="home-scene scroll-mt-24" data-public-gallery>
+    <div class="container-x">
+        <div class="p-6 sm:p-8 lg:p-12">
+            <div class="reveal reveal-scale text-center">
+                <span class="eyebrow text-gold-400!">Dokumentasi Kegiatan</span>
+                <h2 class="section-title mt-3 text-cream-50!">Galeri</h2>
+                <span class="title-rule mx-auto"></span>
+            </div>
+
+            <div @class([
+                'mt-10 grid gap-3 sm:gap-4',
+                'mx-auto max-w-3xl grid-cols-1' => $galleryImages->count() === 1,
+                'sm:grid-cols-2' => $galleryImages->count() === 2,
+                'grid-cols-2 lg:grid-cols-3' => $galleryImages->count() >= 3,
+            ])>
+                @foreach ($galleryImages as $galleryImage)
+                    <figure
+                        class="reveal reveal-scale group overflow-hidden rounded-2xl border border-white/20 bg-maroon-950/30 shadow-xl shadow-black/15"
+                        style="--reveal-delay: {{ ($loop->index % 6) * 55 }}ms"
+                        data-public-gallery-item
+                    >
+                        <img
+                            src="{{ \Illuminate\Support\Facades\Storage::url($galleryImage->image_path) }}"
+                            alt="Dokumentasi kegiatan {{ $site->abbreviation ?: $site->site_name }} foto ke-{{ $loop->iteration }}"
+                            width="800"
+                            height="600"
+                            loading="lazy"
+                            decoding="async"
+                            fetchpriority="low"
+                            class="aspect-4/3 h-full w-full object-cover transition duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.025]"
+                        >
+                    </figure>
+                @endforeach
+            </div>
+        </div>
+    </div>
+</section>
+@endif
+
 {{-- ============================ ARTIKEL ============================ --}}
 @if ($featuredArticle)
-<section id="artikel" class="section scroll-mt-24 bg-white dark:bg-ink-900">
+<section id="artikel" class="home-scene scroll-mt-24">
     <div class="container-x">
+        <div class="p-6 sm:p-8 lg:p-12">
         <div class="reveal reveal-left flex flex-wrap items-end justify-between gap-4">
             <div>
-                <span class="eyebrow">Kabar Terbaru</span>
-                <h2 class="section-title mt-3">Artikel Terbaru</h2>
+                <span class="eyebrow text-gold-400!">Kabar Terbaru</span>
+                <h2 class="section-title mt-3 text-cream-50!">Artikel Terbaru</h2>
                 <span class="title-rule"></span>
             </div>
-            <a href="{{ route('articles.index') }}" class="text-sm font-semibold text-maroon-700 hover:text-maroon-800 dark:text-gold-400">Lihat semua artikel &rarr;</a>
+            <a href="{{ route('articles.index') }}" class="text-sm font-semibold text-cream-100 hover:text-gold-300">Lihat semua artikel &rarr;</a>
         </div>
 
         <div class="mt-10 grid gap-6 lg:grid-cols-2 lg:items-stretch">
                 {{-- Featured article: dominant editorial card. --}}
                 <article class="reveal reveal-left group surface card-lift flex flex-col overflow-hidden">
-                    <a href="{{ route('articles.show', $featuredArticle) }}" class="relative block aspect-16/10 overflow-hidden bg-cream-100 dark:bg-ink-800">
+                    <a href="{{ route('articles.show', $featuredArticle) }}" class="relative block aspect-16/10 overflow-hidden bg-cream-100">
                         @if ($featuredArticle->thumbnail_path)
-                            <img src="{{ \Illuminate\Support\Facades\Storage::url($featuredArticle->thumbnail_path) }}" alt="{{ $featuredArticle->title }}" loading="lazy" decoding="async" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                            <img src="{{ \Illuminate\Support\Facades\Storage::url($featuredArticle->thumbnail_path) }}" alt="{{ $featuredArticle->title }}" loading="lazy" decoding="async" fetchpriority="low" class="h-full w-full object-cover transition duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105">
                         @else
-                            <span class="flex h-full w-full items-center justify-center font-display text-5xl text-maroon-200 dark:text-ink-600" aria-hidden="true">FPK</span>
+                            <span class="flex h-full w-full items-center justify-center font-display text-5xl text-maroon-200" aria-hidden="true">FPK</span>
                         @endif
                         <span class="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-gold-500 px-3 py-1 text-xs font-semibold text-maroon-950 shadow-sm">
                             <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.8 6.2 20.9l1.1-6.5L2.6 9.8l6.5-.9z"/></svg>
@@ -205,13 +227,13 @@
                                 {{ $featuredArticle->published_at->translatedFormat('d F Y') }}
                             </time>
                         @endif
-                        <h3 class="mt-2 font-display text-2xl font-bold leading-snug text-ink-800 dark:text-cream-100">
-                            <a href="{{ route('articles.show', $featuredArticle) }}" class="transition hover:text-maroon-700 dark:hover:text-gold-400">{{ $featuredArticle->title }}</a>
+                        <h3 class="mt-2 font-display text-2xl font-bold leading-snug text-ink-800">
+                            <a href="{{ route('articles.show', $featuredArticle) }}" class="transition hover:text-maroon-700">{{ $featuredArticle->title }}</a>
                         </h3>
                         @if ($featuredArticle->excerpt)
-                            <p class="mt-3 line-clamp-3 text-sm leading-relaxed text-ink-500 dark:text-ink-400">{{ $featuredArticle->excerpt }}</p>
+                            <p class="mt-3 line-clamp-3 text-sm font-medium leading-relaxed text-ink-700">{{ $featuredArticle->excerpt }}</p>
                         @endif
-                        <a href="{{ route('articles.show', $featuredArticle) }}" class="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-maroon-700 transition group-hover:gap-2 dark:text-gold-400">
+                        <a href="{{ route('articles.show', $featuredArticle) }}" class="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-maroon-700 transition group-hover:gap-2">
                             Baca selengkapnya <span aria-hidden="true">&rarr;</span>
                         </a>
                     </div>
@@ -219,14 +241,14 @@
 
                 {{-- Secondary articles: compact horizontal rows. --}}
                 @if ($latestArticles->isNotEmpty())
-                    <div class="flex flex-col divide-y divide-cream-200 dark:divide-ink-800">
+                    <div class="flex flex-col gap-4">
                         @foreach ($latestArticles as $article)
-                            <article class="reveal reveal-right group flex gap-4 py-4 first:pt-0 last:pb-0" style="--reveal-delay: {{ $loop->index * 80 }}ms">
-                                <a href="{{ route('articles.show', $article) }}" class="block aspect-square w-24 flex-none overflow-hidden rounded-lg bg-cream-100 dark:bg-ink-800 sm:w-28">
+                            <article class="reveal reveal-right group surface card-lift flex gap-4 overflow-hidden p-4" style="--reveal-delay: {{ $loop->index * 80 }}ms">
+                                <a href="{{ route('articles.show', $article) }}" class="block aspect-square w-24 flex-none overflow-hidden rounded-lg bg-cream-100 sm:w-28">
                                     @if ($article->thumbnail_path)
-                                        <img src="{{ \Illuminate\Support\Facades\Storage::url($article->thumbnail_path) }}" alt="{{ $article->title }}" loading="lazy" decoding="async" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                                        <img src="{{ \Illuminate\Support\Facades\Storage::url($article->thumbnail_path) }}" alt="{{ $article->title }}" loading="lazy" decoding="async" fetchpriority="low" class="h-full w-full object-cover transition duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105">
                                     @else
-                                        <span class="flex h-full w-full items-center justify-center font-display text-lg text-maroon-200 dark:text-ink-600" aria-hidden="true">FPK</span>
+                                        <span class="flex h-full w-full items-center justify-center font-display text-lg text-maroon-200" aria-hidden="true">FPK</span>
                                     @endif
                                 </a>
                                 <div class="min-w-0 flex-1">
@@ -235,139 +257,104 @@
                                             {{ $article->published_at->translatedFormat('d F Y') }}
                                         </time>
                                     @endif
-                                    <h3 class="mt-1 font-display text-base font-bold leading-snug text-ink-800 dark:text-cream-100">
-                                        <a href="{{ route('articles.show', $article) }}" class="transition hover:text-maroon-700 dark:hover:text-gold-400">{{ $article->title }}</a>
+                                    <h3 class="mt-1 font-display text-base font-bold leading-snug text-ink-800">
+                                        <a href="{{ route('articles.show', $article) }}" class="transition hover:text-maroon-700">{{ $article->title }}</a>
                                     </h3>
                                     @if ($article->excerpt)
-                                        <p class="mt-1 line-clamp-2 text-sm text-ink-500 dark:text-ink-400">{{ $article->excerpt }}</p>
+                                        <p class="mt-1 line-clamp-2 text-sm font-medium text-ink-700">{{ $article->excerpt }}</p>
                                     @endif
+                                    <a href="{{ route('articles.show', $article) }}" class="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-maroon-700 transition hover:text-maroon-800">
+                                        Baca artikel <span aria-hidden="true">&rarr;</span>
+                                    </a>
                                 </div>
                             </article>
                         @endforeach
                     </div>
                 @endif
         </div>
-    </div>
-</section>
-@endif
-
-{{-- ============================ AGENDA ============================ --}}
-@if ($upcomingAgendas->isNotEmpty() || $pastAgendas->isNotEmpty())
-<section id="agenda" class="section scroll-mt-24 bg-cream-50 dark:bg-ink-950">
-    <div class="container-x max-w-4xl!">
-        <div class="reveal reveal-scale text-center">
-            <span class="eyebrow">Jadwal Kegiatan</span>
-            <h2 class="section-title mt-3">Agenda Kegiatan</h2>
-            <span class="title-rule mx-auto"></span>
         </div>
-
-        @if ($upcomingAgendas->isNotEmpty())
-            <div class="reveal mt-12">
-                <h3 class="font-display text-xl font-bold text-maroon-800 dark:text-cream-100">Mendatang</h3>
-                <span class="title-rule"></span>
-            </div>
-            <div class="mt-6 space-y-4">
-                @foreach ($upcomingAgendas as $agenda)
-                    <div class="reveal" style="--reveal-delay: {{ $loop->index * 70 }}ms">
-                        <x-public-site.agenda-card :agenda="$agenda" />
-                    </div>
-                @endforeach
-            </div>
-        @endif
-
-        @if ($pastAgendas->isNotEmpty())
-            <div class="reveal {{ $upcomingAgendas->isNotEmpty() ? 'mt-14' : 'mt-12' }}">
-                <h3 class="font-display text-xl font-bold text-maroon-800 dark:text-cream-100">Terlaksana</h3>
-                <span class="title-rule"></span>
-            </div>
-            <div class="mt-6 space-y-4">
-                @foreach ($pastAgendas as $agenda)
-                    <div class="reveal" style="--reveal-delay: {{ ($loop->index % 4) * 70 }}ms">
-                        <x-public-site.agenda-card :agenda="$agenda" />
-                    </div>
-                @endforeach
-            </div>
-        @endif
     </div>
 </section>
 @endif
 
 {{-- ============================ PENGURUS ============================ --}}
 @if ($activePeriod && ($activePeriod->group_photo_path || $activePeriod->activeMembers->isNotEmpty()))
-<section id="pengurus" class="section scroll-mt-24 bg-white dark:bg-ink-900">
+<section id="pengurus" class="home-scene scroll-mt-24">
     <div class="container-x">
+        <div class="p-6 sm:p-8 lg:p-12">
         <div class="reveal reveal-scale text-center">
-            <span class="eyebrow">Struktur Organisasi</span>
-            <h2 class="section-title mt-3">Susunan Pengurus</h2>
+            <span class="eyebrow text-gold-400!">Struktur Organisasi</span>
+            <h2 class="section-title mt-3 text-cream-50!">Susunan Pengurus</h2>
             <span class="title-rule mx-auto"></span>
             @if ($activePeriod)
-                <p class="mt-3 text-ink-500 dark:text-ink-400">Masa Bakti {{ $activePeriod->label() }}</p>
+                <p class="mt-3 text-cream-100/80">Masa Bakti {{ $activePeriod->label() }}</p>
             @endif
         </div>
 
         @if ($activePeriod->group_photo_path)
-                <figure class="reveal reveal-scale group relative mt-12 overflow-hidden rounded-2xl border border-maroon-100 bg-maroon-950 shadow-xl shadow-maroon-950/15 dark:border-white/10 dark:shadow-black/30">
-                    <div class="aspect-16/7 min-h-64 sm:min-h-80">
-                        <img src="{{ \Illuminate\Support\Facades\Storage::url($activePeriod->group_photo_path) }}"
-                             alt="Foto bersama pengurus {{ $site->organization_name }} masa bakti {{ $activePeriod->label() }}"
-                             width="1400" height="613"
-                             loading="lazy" decoding="async"
-                             class="h-full w-full object-cover transition duration-1000 group-hover:scale-[1.015]">
-                    </div>
-                    <figcaption class="absolute inset-x-0 bottom-0 bg-linear-to-t from-maroon-950/90 via-maroon-950/55 to-transparent px-5 pb-5 pt-16 text-cream-50 sm:px-7 sm:pb-7">
-                        <p class="font-display text-xl font-bold sm:text-2xl">Kebersamaan Pengurus {{ $site->abbreviation ?: $site->site_name }}</p>
-                        <p class="mt-1 text-sm text-cream-100/75">Masa Bakti {{ $activePeriod->label() }}</p>
-                    </figcaption>
-                </figure>
+            <figure class="reveal reveal-scale group relative mt-12 overflow-hidden rounded-2xl border border-maroon-100 bg-maroon-950 shadow-xl shadow-maroon-950/15">
+                <div class="aspect-16/7 min-h-64 sm:min-h-80">
+                    <img src="{{ \Illuminate\Support\Facades\Storage::url($activePeriod->group_photo_path) }}"
+                         alt="Foto bersama pengurus {{ $site->organization_name }} masa bakti {{ $activePeriod->label() }}"
+                         width="1400" height="613"
+                         loading="lazy" decoding="async" fetchpriority="low"
+                         class="h-full w-full object-cover transition duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.015]">
+                </div>
+                <figcaption class="absolute inset-x-0 bottom-0 bg-linear-to-t from-maroon-950/90 via-maroon-950/55 to-transparent px-5 pb-5 pt-16 text-cream-50 sm:px-7 sm:pb-7">
+                    <p class="font-display text-xl font-bold sm:text-2xl">Kebersamaan Pengurus {{ $site->abbreviation ?: $site->site_name }}</p>
+                    <p class="mt-1 text-sm text-cream-100/75">Masa Bakti {{ $activePeriod->label() }}</p>
+                </figcaption>
+            </figure>
         @endif
 
         @if ($activePeriod->activeMembers->isNotEmpty())
-                <div x-data="memberCarousel" data-member-carousel
-                     class="reveal reveal-scale mt-10"
-                     x-on:resize.window.debounce.150ms="sync()"
-                     x-on:keydown.arrow-left.prevent="move(-1)"
-                     x-on:keydown.arrow-right.prevent="move(1)">
-                    <div class="mb-5 flex items-end justify-between gap-4">
-                        <div>
-                            <p class="eyebrow">Profil Pengurus</p>
-                            <h3 class="mt-2 font-display text-2xl font-bold text-maroon-800 dark:text-cream-100">Kenali Pengurus Kami</h3>
-                            <p class="mt-1 text-sm text-ink-500 dark:text-ink-400">Geser kartu ke samping untuk melihat seluruh pengurus.</p>
-                        </div>
-
-                        <div class="hidden gap-2 sm:flex" aria-label="Kontrol carousel pengurus">
-                            <button type="button" x-on:click="move(-1)" :disabled="!canPrevious"
-                                    class="icon-button grid h-11 w-11 place-items-center rounded-full border border-maroon-200 bg-white text-maroon-700 shadow-sm disabled:cursor-not-allowed disabled:opacity-35 dark:border-ink-700 dark:bg-ink-900 dark:text-gold-400"
-                                    aria-label="Pengurus sebelumnya">
-                                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
-                            </button>
-                            <button type="button" x-on:click="move(1)" :disabled="!canNext"
-                                    class="icon-button grid h-11 w-11 place-items-center rounded-full border border-maroon-200 bg-white text-maroon-700 shadow-sm disabled:cursor-not-allowed disabled:opacity-35 dark:border-ink-700 dark:bg-ink-900 dark:text-gold-400"
-                                    aria-label="Pengurus berikutnya">
-                                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-                            </button>
-                        </div>
+            <div x-data="memberCarousel" data-member-carousel
+                 class="reveal reveal-scale mt-10"
+                 x-on:resize.window.debounce.150ms="sync()"
+                 x-on:keydown.arrow-left.prevent="move(-1)"
+                 x-on:keydown.arrow-right.prevent="move(1)">
+                <div class="mb-5 flex items-end justify-between gap-4">
+                    <div>
+                        <p class="eyebrow text-gold-400!">Profil Pengurus</p>
+                        <h3 class="mt-2 font-display text-2xl font-bold text-cream-50">Kenali Pengurus Kami</h3>
+                        <p class="mt-1 text-sm text-cream-100/80">Geser kartu ke samping untuk melihat seluruh pengurus.</p>
                     </div>
 
-                    <div x-ref="track" x-on:scroll.debounce.80ms="sync()" tabindex="0"
-                         class="member-carousel-track -mx-4 flex gap-5 overflow-x-auto px-4 pb-5 sm:-mx-6 sm:gap-6 sm:px-6 lg:-mx-8 lg:px-8"
-                         aria-label="Daftar kartu pengurus">
-                        @foreach ($activePeriod->activeMembers as $member)
-                            <x-public-site.member-card :member="$member"
-                                data-member-card
-                                class="w-[78vw] max-w-70 flex-none snap-start sm:w-64 lg:w-68" />
-                        @endforeach
+                    <div class="hidden gap-2 sm:flex" aria-label="Kontrol carousel pengurus">
+                        <button type="button" x-on:click="move(-1)" :disabled="!canPrevious"
+                                class="icon-button grid h-11 w-11 place-items-center rounded-full border border-maroon-200 bg-white text-maroon-700 shadow-sm disabled:cursor-not-allowed disabled:opacity-35"
+                                aria-label="Pengurus sebelumnya">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                        </button>
+                        <button type="button" x-on:click="move(1)" :disabled="!canNext"
+                                class="icon-button grid h-11 w-11 place-items-center rounded-full border border-maroon-200 bg-white text-maroon-700 shadow-sm disabled:cursor-not-allowed disabled:opacity-35"
+                                aria-label="Pengurus berikutnya">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                        </button>
                     </div>
                 </div>
+
+                <div x-ref="track" x-on:scroll.debounce.80ms="sync()" tabindex="0"
+                     class="member-carousel-track -mx-6 flex items-stretch gap-5 overflow-x-auto px-6 pb-5 sm:-mx-8 sm:gap-6 sm:px-8 lg:mx-0 lg:px-0"
+                     aria-label="Daftar kartu pengurus">
+                    @foreach ($activePeriod->activeMembers as $member)
+                        <x-public-site.member-card :member="$member"
+                            data-member-card
+                            class="h-128 w-full flex-none snap-start sm:w-64 lg:w-[calc((100%-3rem)/3)] lg:max-w-none" />
+                    @endforeach
+                </div>
+            </div>
         @endif
+        </div>
     </div>
 </section>
 @endif
 
 {{-- ============================ KONTAK ============================ --}}
 @if ($publicContentVisibility['contact'])
-<section id="kontak" class="section relative isolate scroll-mt-24 overflow-hidden bg-maroon-950 text-cream-50">
-    <div class="hero-motif parallax-layer pointer-events-none absolute inset-0 -z-10 opacity-40" data-parallax="0.018" aria-hidden="true"></div>
+<section id="kontak" class="home-scene scroll-mt-24 text-cream-50">
     <div class="container-x">
+        <div class="home-scene-panel home-scene-panel--dark p-6 sm:p-8 lg:p-12">
         <div class="reveal reveal-scale text-center">
             <span class="eyebrow text-gold-400!">Hubungi Kami</span>
             <h2 class="section-title mt-3 text-cream-100!">Kontak &amp; Media Sosial</h2>
@@ -405,12 +392,14 @@
 
             @if ($contact->map_embed_url)
                 <div class="reveal reveal-right overflow-hidden rounded-xl border border-cream-100/15">
-                    <iframe src="{{ $contact->map_embed_url }}" title="Peta lokasi {{ $site->organization_name }}" class="h-72 w-full md:h-full" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+                    <iframe src="{{ $contact->map_embed_url }}" title="Peta lokasi {{ $site->organization_name }}" class="h-72 w-full md:h-full" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-popups allow-forms" allowfullscreen></iframe>
                 </div>
             @endif
+        </div>
         </div>
     </div>
 </section>
 @endif
+</div>
 
 @endsection

@@ -15,7 +15,10 @@
             <button type="submit" class="admin-button admin-button-dark">Filter</button>
         </form>
 
-        <a href="{{ route('admin.articles.create') }}" class="admin-button admin-button-primary">+ Tambah Artikel</a>
+        <div class="flex flex-wrap gap-2">
+            <a href="{{ route('admin.articles.archive') }}" class="admin-button admin-button-secondary">Lihat Arsip</a>
+            <a href="{{ route('admin.articles.create') }}" class="admin-button admin-button-primary">+ Tambah Artikel</a>
+        </div>
     </div>
 
     <div class="admin-table-wrap">
@@ -50,10 +53,10 @@
                         <td data-label="Aksi" class="px-4 py-3">
                             <div class="admin-actions">
                                 <a href="{{ route('admin.articles.edit', $article) }}" class="admin-action">Ubah</a>
-                                <form method="POST" action="{{ route('admin.articles.destroy', $article) }}" data-confirm="Artikel &quot;{{ $article->title }}&quot; akan dihapus." data-confirm-title="Hapus Artikel?">
+                                <form method="POST" action="{{ route('admin.articles.destroy', $article) }}" data-confirm="Artikel &quot;{{ $article->title }}&quot; akan dipindahkan ke arsip dan masih dapat dipulihkan." data-confirm-title="Arsipkan Artikel?">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="admin-action admin-action-danger">Hapus</button>
+                                    <button type="submit" class="admin-action admin-action-danger">Arsipkan</button>
                                 </form>
                             </div>
                         </td>

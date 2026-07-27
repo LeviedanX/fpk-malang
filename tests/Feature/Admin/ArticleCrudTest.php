@@ -126,4 +126,70 @@ class ArticleCrudTest extends TestCase
 
         $this->assertSoftDeleted($article);
     }
+
+    public function test_admin_can_manage_an_archived_article_without_losing_its_thumbnail(): void
+    {
+        Storage::fake('public');
+        $user = User::factory()->create();
+        Storage::disk('public')->put('articles/arsip.png', 'thumbnail');
+
+        $article = Article::factory()->create([
+            'title' => 'Artikel Untuk Dipulihkan',
+            'thumbnail_path' => 'articles/arsip.png',
+        ]);
+
+        $this->actingAs($user)
+            ->delete(route('admin.articles.destroy', $article))
+            ->assertRedirect(route('admin.articles.index'))
+            ->assertSessionHas('status', 'Artikel berhasil diarsipkan dan masih dapat dipulihkan.');
+
+        Storage::disk('public')->assertExists('articles/arsip.png');
+
+        $this->actingAs($user)
+            ->get(route('admin.articles.archive'))
+            ->assertOk()
+            ->assertSee('Artikel Untuk Dipulihkan')
+            ->assertSee('Pulihkan')
+            ->assertSee('Hapus Permanen');
+
+        $this->actingAs($user)
+            ->patch(route('admin.articles.restore', $article))
+            ->assertRedirect(route('admin.articles.archive'));
+
+        $this->assertNotSoftDeleted($article);
+        Storage::disk('public')->assertExists('articles/arsip.png');
+    }
+
+    public function test_permanent_article_deletion_removes_database_row_and_thumbnail(): void
+    {
+        Storage::fake('public');
+        $user = User::factory()->create();
+        Storage::disk('public')->put('articles/permanen.png', 'thumbnail');
+
+        $article = Article::factory()->create([
+            'thumbnail_path' => 'articles/permanen.png',
+        ]);
+        $article->delete();
+
+        $this->actingAs($user)
+            ->delete(route('admin.articles.force-delete', $article))
+            ->assertRedirect(route('admin.articles.archive'));
+
+        $this->assertDatabaseMissing('articles', ['id' => $article->id]);
+        Storage::disk('public')->assertMissing('articles/permanen.png');
+    }
+
+    public function test_archived_article_keeps_its_slug_reserved(): void
+    {
+        $user = User::factory()->create();
+        $article = Article::factory()->create(['slug' => 'slug-dalam-arsip']);
+        $article->delete();
+
+        $this->actingAs($user)->post(route('admin.articles.store'), [
+            'title' => 'Artikel Baru',
+            'slug' => 'slug-dalam-arsip',
+            'body' => '<p>Isi.</p>',
+            'status' => 'draft',
+        ])->assertSessionHasErrors('slug');
+    }
 }

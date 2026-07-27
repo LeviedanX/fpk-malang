@@ -46,7 +46,7 @@ class AgendaRequest extends FormRequest
             'poster' => $this->imageRules(),
             'location' => ['nullable', 'string', 'max:255'],
             'starts_at' => ['required', 'date'],
-            'ends_at' => ['nullable', 'date', 'after_or_equal:starts_at'],
+            'ends_at' => ['nullable', 'date', 'after:starts_at'],
             'event_status' => ['required', new Enum(AgendaStatus::class)],
             'publication_status' => ['required', new Enum(PublicationStatus::class)],
             'published_at' => ['nullable', 'date'],
@@ -69,6 +69,16 @@ class AgendaRequest extends FormRequest
             'event_status' => 'status acara',
             'publication_status' => 'status publikasi',
             'published_at' => 'waktu terbit',
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'ends_at.after' => 'Waktu selesai harus lebih besar daripada waktu mulai.',
         ];
     }
 }
