@@ -36,6 +36,7 @@
             ? 'border-b border-maroon-100/70 bg-cream-50/90 backdrop-blur-md shadow-sm'
             : 'border-b border-transparent bg-transparent'
     ]"
+    @keydown.escape.window="closeMenu()"
 >
     <nav class="container-x flex items-center justify-between gap-4 py-3" aria-label="Navigasi utama">
         <a href="{{ $home }}#beranda" class="group flex items-center gap-3 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.02]">
@@ -43,7 +44,9 @@
                 <img src="{{ \Illuminate\Support\Facades\Storage::url($site->logo_path) }}" alt="Logo {{ $site->organization_name }}" class="h-10 w-auto" width="40" height="40">
             @else
                 <span class="grid h-10 w-10 place-items-center overflow-hidden rounded-full bg-white p-1 shadow-sm ring-2 ring-gold-400/40" aria-hidden="true">
-                    <img src="{{ asset('assets/images/branding/logo-fpk.webp') }}" alt="" class="h-full w-full object-contain" width="40" height="40" decoding="async">
+                    <img src="{{ asset('assets/images/branding/logo-fpk-48.webp') }}"
+                         srcset="{{ asset('assets/images/branding/logo-fpk-48.webp') }} 1x, {{ asset('assets/images/branding/logo-fpk-96.webp') }} 2x"
+                         alt="" class="h-full w-full object-contain" width="40" height="40" decoding="async">
                 </span>
             @endif
             <span class="leading-tight">
@@ -87,7 +90,6 @@
             @if ($site->background_music_path && $site->background_music_visible)
                 <div
                     x-data="siteMusicPlayer({
-                        defaultPlaying: @js($site->background_music_default_playing),
                         volume: @js($site->background_music_volume),
                         preferenceVersion: @js($site->background_music_preference_version),
                     })"
@@ -103,13 +105,12 @@
                     </audio>
                     <button type="button" @click="toggle()"
                         data-site-music-toggle
-                        class="icon-button relative grid h-9 w-9 place-items-center rounded-md"
+                        class="icon-button relative grid h-11 w-11 place-items-center rounded-md"
                         :class="scrolled || open
                             ? 'text-maroon-800 hover:bg-maroon-50'
                             : 'text-cream-50 hover:bg-white/10'"
-                        :aria-pressed="playing"
-                        :aria-label="!playing ? 'Nyalakan musik latar' : (actuallyPlaying ? 'Matikan musik latar' : 'Putar musik latar')"
-                        :title="playbackBlocked ? 'Scroll, klik, sentuh, atau tekan tombol untuk memulai musik' : null">
+                        :aria-pressed="actuallyPlaying"
+                        :aria-label="!playing ? 'Nyalakan musik latar' : (actuallyPlaying ? 'Matikan musik latar' : 'Putar musik latar')">
                         <span class="sr-only" x-text="!playing ? 'Nyalakan musik latar' : (actuallyPlaying ? 'Matikan musik latar' : 'Putar musik latar')"></span>
                         <svg x-show="playing && actuallyPlaying" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 18V6l10-2v12M9 18a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM19 16a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/></svg>
                         <svg x-show="playing && !actuallyPlaying" x-cloak class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10-6.5z"/></svg>
@@ -119,8 +120,9 @@
                 </div>
             @endif
 
-            <button type="button" @click="open = !open"
-                class="icon-button grid h-9 w-9 place-items-center rounded-md lg:hidden"
+            <button type="button" @click="toggleMenu($event)"
+                x-ref="menuToggle"
+                class="icon-button grid h-11 w-11 place-items-center rounded-md lg:hidden"
                 :class="scrolled || open
                     ? 'text-maroon-800 hover:bg-maroon-50'
                     : 'text-cream-50 hover:bg-white/10'"
@@ -131,8 +133,10 @@
         </div>
     </nav>
 
-    <div id="mobile-menu" x-show="open" x-cloak x-collapse.duration.350ms class="border-t border-maroon-100 bg-cream-50 lg:hidden">
-        <ul class="container-x space-y-1 py-3" @click="open = false">
+    <div id="mobile-menu" x-ref="mobileMenu" x-show="open" x-cloak x-collapse.duration.350ms
+         @keydown.tab="trapMenuFocus($event)"
+         class="border-t border-maroon-100 bg-cream-50 lg:hidden">
+        <ul class="container-x space-y-1 py-3" @click="closeMenu(false)">
             @foreach ($links as [$id, $label, $href])
                 <li>
                     <a href="{{ $href }}"

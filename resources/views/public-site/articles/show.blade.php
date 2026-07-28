@@ -65,7 +65,9 @@
         </header>
 
         @if ($article->thumbnail_path)
-            <img src="{{ \Illuminate\Support\Facades\Storage::url($article->thumbnail_path) }}" alt="{{ $article->title }}" fetchpriority="high" decoding="async" class="reveal reveal-scale mt-8 w-full rounded-xl object-cover shadow-sm">
+            <img src="{{ \Illuminate\Support\Facades\Storage::url($article->thumbnail_path) }}" alt="{{ $article->title }}"
+                 width="1200" height="675" fetchpriority="high" decoding="async"
+                 class="reveal reveal-scale mt-8 aspect-video w-full rounded-xl object-cover shadow-sm">
         @endif
 
         <div class="public-detail-copy reveal prose prose-invert prose-lg mt-8 max-w-none prose-headings:font-display">

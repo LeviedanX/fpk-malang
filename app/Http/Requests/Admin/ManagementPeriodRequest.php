@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin;
 
 use App\Http\Requests\Concerns\HandlesImageRules;
+use App\Models\ManagementPeriod;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ManagementPeriodRequest extends FormRequest
@@ -26,16 +27,23 @@ class ManagementPeriodRequest extends FormRequest
      */
     public function rules(): array
     {
+        $period = $this->route('period');
+        $requiresFutureEndYear = ! $period instanceof ManagementPeriod || $this->boolean('is_active');
+        $endYearRules = [
+            'required',
+            'integer',
+            'digits:4',
+            'gt:start_year',
+        ];
+
+        if ($requiresFutureEndYear) {
+            $endYearRules[] = 'min:'.((int) now()->year + 1);
+        }
+
         return [
             'name' => ['required', 'string', 'max:100'],
             'start_year' => ['required', 'integer', 'digits:4', 'min:1945'],
-            'end_year' => [
-                'required',
-                'integer',
-                'digits:4',
-                'gt:start_year',
-                'min:'.((int) now()->year + 1),
-            ],
+            'end_year' => $endYearRules,
             'group_photo' => $this->imageRules(),
             'is_active' => ['boolean'],
         ];

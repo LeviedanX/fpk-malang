@@ -5,7 +5,6 @@ namespace App\Support;
 use App\Models\AdminActivityLog;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Schema;
 use Throwable;
 
 class AdminActivityLogger
@@ -26,10 +25,6 @@ class AdminActivityLogger
         ?array $metadata = null,
     ): void {
         try {
-            if (! Schema::hasTable('admin_activity_logs')) {
-                return;
-            }
-
             AdminActivityLog::create([
                 'user_id' => $user?->getKey(),
                 'event' => mb_substr($event, 0, 100),
@@ -93,6 +88,10 @@ class AdminActivityLogger
             'admin.members.destroy' => 'Menghapus anggota pengurus.',
             'admin.members.group_photo' => 'Memperbarui foto bersama pengurus.',
             'admin.members.group_photo.destroy' => 'Menghapus foto bersama pengurus.',
+            'admin.chat.reply' => 'Membalas pesan tamu.',
+            'admin.chat.status' => 'Mengubah status percakapan tamu.',
+            'admin.chat.block' => 'Mengubah pemblokiran percakapan tamu.',
+            'admin.chat.destroy' => 'Menghapus percakapan tamu.',
             'admin.settings.edit' => 'Membuka pengaturan website.',
             'admin.settings.update' => 'Memperbarui pengaturan website.',
             'admin.account.edit' => 'Membuka Pengaturan Admin.',

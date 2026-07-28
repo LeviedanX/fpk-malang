@@ -65,7 +65,7 @@ class AuthenticationTest extends TestCase
         $this->post('/register')->assertNotFound();
     }
 
-    public function test_login_blocks_ip_and_device_for_one_hour_after_three_failures(): void
+    public function test_login_uses_account_scoped_progressive_throttling_without_locking_shared_ip_early(): void
     {
         $user = User::factory()->create(['password' => Hash::make('correct-password')]);
         $client = $this
@@ -79,42 +79,36 @@ class AuthenticationTest extends TestCase
             ])->assertSessionHasErrors('email');
         }
 
-        $response = $client->post('/admin/login', [
+        $client->post('/admin/login', [
             'email' => $user->email,
             'password' => 'correct-password',
-        ]);
-
-        $response->assertSessionHasErrors('email');
-        $message = collect(session('errors')->get('email'))->implode(' ');
-        $this->assertSame('Email atau password yang Anda masukkan salah.', $message);
-        $this->assertStringNotContainsString('coba lagi', mb_strtolower($message));
-        $this->assertGuest();
-
-        $this->withServerVariables(['REMOTE_ADDR' => '198.51.100.88'])
-            ->withHeader('User-Agent', 'Dedicated Lockout Test Device')
-            ->post('/admin/login', [
-                'email' => $user->email,
-                'password' => 'correct-password',
-            ])
-            ->assertSessionHasErrors('email');
-
-        $this->withServerVariables(['REMOTE_ADDR' => '198.51.100.77'])
-            ->withHeader('User-Agent', 'Different Browser On Blocked IP')
-            ->post('/admin/login', [
-                'email' => $user->email,
-                'password' => 'correct-password',
-            ])
-            ->assertSessionHasErrors('email');
-
-        $this->travel(3601)->seconds();
-
-        $this->withServerVariables(['REMOTE_ADDR' => '198.51.100.77'])
-            ->withHeader('User-Agent', 'Dedicated Lockout Test Device')
-            ->post('/admin/login', [
-                'email' => $user->email,
-                'password' => 'correct-password',
-            ])->assertRedirect(route('admin.dashboard'));
+        ])->assertRedirect(route('admin.dashboard'));
 
         $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_login_blocks_account_and_ip_pair_after_five_failures_for_fifteen_minutes(): void
+    {
+        $user = User::factory()->create(['password' => Hash::make('correct-password')]);
+        $client = $this->withServerVariables(['REMOTE_ADDR' => '198.51.100.99']);
+
+        foreach (range(1, 5) as $attempt) {
+            $client->post('/admin/login', [
+                'email' => $user->email,
+                'password' => 'wrong-password-'.$attempt,
+            ])->assertSessionHasErrors('email');
+        }
+
+        $client->post('/admin/login', [
+            'email' => $user->email,
+            'password' => 'correct-password',
+        ])->assertSessionHasErrors('email');
+
+        $this->travel(901)->seconds();
+
+        $client->post('/admin/login', [
+            'email' => $user->email,
+            'password' => 'correct-password',
+        ])->assertRedirect(route('admin.dashboard'));
     }
 }

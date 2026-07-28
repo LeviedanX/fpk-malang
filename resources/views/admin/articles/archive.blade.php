@@ -6,7 +6,7 @@
 @section('content')
     <div class="admin-toolbar">
         <form method="GET" action="{{ route('admin.articles.archive') }}" class="admin-filter">
-            <input type="search" name="q" value="{{ $search }}" placeholder="Cari judul arsip..." class="form-control text-sm sm:min-w-56">
+            <input type="search" name="q" value="{{ $search }}" placeholder="Cari judul arsip..." maxlength="100" class="form-control text-sm sm:min-w-56">
             <button type="submit" class="admin-button admin-button-dark">Cari</button>
         </form>
 

@@ -8,8 +8,7 @@ use Throwable;
 
 /**
  * Centralises image persistence on the "public" disk: server-generated random
- * file names, stored under a configured sub-directory, with safe replacement and
- * deletion of previous files. Stored images are downscaled and re-encoded to
+ * file names and stored under a configured sub-directory. Stored images are downscaled and re-encoded to
  * WebP when GD is available; otherwise the validated original is kept untouched.
  */
 class ImageStorage
@@ -31,18 +30,6 @@ class ImageStorage
         $path = $file->store($directory, self::disk());
 
         return self::optimize($path, $directoryKey);
-    }
-
-    /**
-     * Replace an existing image with a new upload, deleting the old file.
-     */
-    public static function replace(UploadedFile $file, ?string $oldPath, string $directoryKey): string
-    {
-        $newPath = self::store($file, $directoryKey);
-
-        self::delete($oldPath);
-
-        return $newPath;
     }
 
     /**

@@ -12,9 +12,7 @@ use Illuminate\Validation\ValidationException;
 
 class LoginRequest extends FormRequest
 {
-    private const LOCKOUT_SECONDS = 3600;
-
-    private const MAX_ATTEMPTS = 3;
+    private const LOCKOUT_SECONDS = 900;
 
     public function authorize(): bool
     {
@@ -27,8 +25,8 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
-            'password' => ['required', 'string'],
+            'email' => ['required', 'string', 'email', 'max:255'],
+            'password' => ['required', 'string', 'max:1024'],
         ];
     }
 
@@ -42,8 +40,8 @@ class LoginRequest extends FormRequest
         $this->ensureIsNotRateLimited();
 
         if (! Auth::attempt($this->only('email', 'password'))) {
-            foreach ($this->throttleKeys() as $key) {
-                RateLimiter::hit($key, self::LOCKOUT_SECONDS);
+            foreach ($this->throttleLimits() as $limit) {
+                RateLimiter::hit($limit['key'], $limit['decay']);
             }
 
             app(AdminActivityLogger::class)->log(
@@ -58,9 +56,7 @@ class LoginRequest extends FormRequest
             ]);
         }
 
-        foreach ($this->throttleKeys() as $key) {
-            RateLimiter::clear($key);
-        }
+        RateLimiter::clear($this->accountThrottleKey());
     }
 
     /**
@@ -70,8 +66,11 @@ class LoginRequest extends FormRequest
      */
     public function ensureIsNotRateLimited(): void
     {
-        $blocked = collect($this->throttleKeys())
-            ->contains(fn (string $key): bool => RateLimiter::tooManyAttempts($key, self::MAX_ATTEMPTS));
+        $blocked = collect($this->throttleLimits())
+            ->contains(fn (array $limit): bool => RateLimiter::tooManyAttempts(
+                $limit['key'],
+                $limit['attempts'],
+            ));
 
         if (! $blocked) {
             return;
@@ -91,15 +90,24 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * @return array{string, string}
+     * @return list<array{key: string, attempts: int, decay: int}>
      */
-    public function throttleKeys(): array
+    public function throttleLimits(): array
     {
         $identity = app(AdminDeviceIdentity::class);
 
         return [
-            'admin-login:ip:'.$identity->ipKey($this),
-            'admin-login:device:'.$identity->key($this),
+            ['key' => $this->accountThrottleKey(), 'attempts' => 5, 'decay' => self::LOCKOUT_SECONDS],
+            ['key' => 'admin-login:device:'.$identity->key($this), 'attempts' => 10, 'decay' => self::LOCKOUT_SECONDS],
+            ['key' => 'admin-login:ip:'.$identity->ipKey($this), 'attempts' => 20, 'decay' => self::LOCKOUT_SECONDS],
         ];
+    }
+
+    private function accountThrottleKey(): string
+    {
+        $identity = app(AdminDeviceIdentity::class);
+        $email = mb_strtolower(trim((string) $this->input('email')));
+
+        return 'admin-login:account:'.hash('sha256', $email.'|'.$identity->ipKey($this));
     }
 }

@@ -49,6 +49,9 @@ class AgendaFactory extends Factory
                 'starts_at' => $startsAt,
                 'ends_at' => (clone $startsAt)->modify('+3 hours'),
                 'event_status' => AgendaStatus::Completed,
+                // published_at harus mendahului jadwal: agendas_publication_timestamp_check
+                // menolak agenda yang terbit setelah kegiatannya berakhir.
+                'published_at' => (clone $startsAt)->modify('-1 day'),
             ];
         });
     }

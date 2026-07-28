@@ -56,6 +56,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Trusted Proxies
+    |--------------------------------------------------------------------------
+    |
+    | Comma separated list of proxy IPs/CIDRs, or "*" to trust any proxy. This
+    | must live in a config file: bootstrap/app.php runs after configuration
+    | caching, and php artisan optimize skips loading .env entirely, so env()
+    | would silently return null there and leave the proxies untrusted.
+    |
+    */
+
+    'trusted_proxies' => env('TRUSTED_PROXIES', ''),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |

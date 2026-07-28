@@ -7,7 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ArticleRequest;
 use App\Models\Article;
 use App\Support\HtmlSanitizer;
-use App\Support\ImageStorage;
+use App\Support\MediaTransaction;
+use App\Support\SearchTerm;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -16,12 +17,13 @@ class ArticleController extends Controller
 {
     public function index(Request $request): View
     {
-        $search = trim((string) $request->query('q', ''));
+        $search = SearchTerm::fromRequest($request);
+        $pattern = SearchTerm::likePattern($search);
         $status = $request->query('status');
 
         $articles = Article::query()
             ->select(['id', 'title', 'slug', 'is_featured', 'status', 'published_at', 'created_at'])
-            ->when($search !== '', fn ($query) => $query->where('title', 'like', "%{$search}%"))
+            ->when($search !== '', fn ($query) => $query->where('title', 'like', $pattern))
             ->when(
                 in_array($status, [PublicationStatus::Draft->value, PublicationStatus::Published->value], true),
                 fn ($query) => $query->where('status', $status)
@@ -39,11 +41,12 @@ class ArticleController extends Controller
 
     public function archive(Request $request): View
     {
-        $search = trim((string) $request->query('q', ''));
+        $search = SearchTerm::fromRequest($request);
+        $pattern = SearchTerm::likePattern($search);
 
         $articles = Article::onlyTrashed()
             ->select(['id', 'title', 'slug', 'thumbnail_path', 'deleted_at'])
-            ->when($search !== '', fn ($query) => $query->where('title', 'like', "%{$search}%"))
+            ->when($search !== '', fn ($query) => $query->where('title', 'like', $pattern))
             ->orderByDesc('deleted_at')
             ->paginate(config('fpk.pagination.articles_admin'))
             ->withQueryString();
@@ -64,12 +67,13 @@ class ArticleController extends Controller
     public function store(ArticleRequest $request): RedirectResponse
     {
         $data = $this->buildData($request);
+        $media = new MediaTransaction;
 
         if ($request->hasFile('thumbnail')) {
-            $data['thumbnail_path'] = ImageStorage::store($request->file('thumbnail'), 'articles');
+            $data['thumbnail_path'] = $media->storeImage($request->file('thumbnail'), 'articles');
         }
 
-        Article::create($data);
+        $media->commit(fn () => Article::create($data));
 
         return redirect()
             ->route('admin.articles.index')
@@ -86,16 +90,17 @@ class ArticleController extends Controller
     public function update(ArticleRequest $request, Article $article): RedirectResponse
     {
         $data = $this->buildData($request, $article);
+        $media = new MediaTransaction;
 
         if ($request->hasFile('thumbnail')) {
-            $data['thumbnail_path'] = ImageStorage::replace(
+            $data['thumbnail_path'] = $media->replaceImage(
                 $request->file('thumbnail'),
                 $article->thumbnail_path,
                 'articles'
             );
         }
 
-        $article->update($data);
+        $media->commit(fn () => $article->update($data));
 
         return redirect()
             ->route('admin.articles.index')
@@ -124,10 +129,10 @@ class ArticleController extends Controller
     public function forceDelete(string $article): RedirectResponse
     {
         $archivedArticle = $this->findArchived($article);
-        $thumbnailPath = $archivedArticle->thumbnail_path;
+        $media = new MediaTransaction;
+        $media->deleteAfterCommit($archivedArticle->thumbnail_path);
 
-        $archivedArticle->forceDelete();
-        ImageStorage::delete($thumbnailPath);
+        $media->commit(fn () => $archivedArticle->forceDelete());
 
         return redirect()
             ->route('admin.articles.archive')

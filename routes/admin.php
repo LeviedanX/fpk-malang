@@ -3,17 +3,21 @@
 use App\Http\Controllers\Admin\AdminAccountController;
 use App\Http\Controllers\Admin\AgendaController;
 use App\Http\Controllers\Admin\ArticleController;
+use App\Http\Controllers\Admin\ChatController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\GalleryImageController;
 use App\Http\Controllers\Admin\ManagementMemberController;
 use App\Http\Controllers\Admin\ManagementPeriodController;
 use App\Http\Controllers\Admin\SiteSettingController;
 use App\Http\Middleware\EnsureAdminSettingsUnlocked;
+use App\Http\Middleware\EnsureDesktopBrowser;
 use App\Http\Middleware\LogAdminActivity;
 use App\Http\Middleware\SecureAdminSession;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', SecureAdminSession::class, LogAdminActivity::class])
+// EnsureDesktopBrowser berada paling depan: ponsel dan tablet ditolak sebelum
+// sentuhan database mana pun, termasuk sebelum sesi admin diperiksa.
+Route::middleware([EnsureDesktopBrowser::class, 'auth', SecureAdminSession::class, LogAdminActivity::class])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
@@ -44,6 +48,17 @@ Route::middleware(['auth', SecureAdminSession::class, LogAdminActivity::class])
         Route::post('galeri', [GalleryImageController::class, 'store'])->name('galleries.store');
         Route::put('galeri', [GalleryImageController::class, 'update'])->name('galleries.update');
         Route::delete('galeri/{galleryImage}', [GalleryImageController::class, 'destroy'])->name('galleries.destroy');
+
+        // Chat tamu
+        Route::get('chat', [ChatController::class, 'index'])->name('chat.index');
+        Route::get('chat/belum-dibaca', [ChatController::class, 'unread'])->name('chat.unread');
+        Route::get('chat/{conversation}', [ChatController::class, 'show'])->name('chat.show');
+        Route::get('chat/{conversation}/polling', [ChatController::class, 'poll'])->name('chat.poll');
+        Route::get('chat/{conversation}/riwayat', [ChatController::class, 'history'])->name('chat.history');
+        Route::post('chat/{conversation}/balas', [ChatController::class, 'reply'])->name('chat.reply');
+        Route::patch('chat/{conversation}/status', [ChatController::class, 'status'])->name('chat.status');
+        Route::patch('chat/{conversation}/blokir', [ChatController::class, 'block'])->name('chat.block');
+        Route::delete('chat/{conversation}', [ChatController::class, 'destroy'])->name('chat.destroy');
 
         // Susunan Pengurus
         Route::resource('pengurus/periode', ManagementPeriodController::class)
@@ -83,6 +98,7 @@ Route::middleware(['auth', SecureAdminSession::class, LogAdminActivity::class])
             Route::put('pengaturan-admin/profil', [AdminAccountController::class, 'update'])->name('account.update');
             Route::put('pengaturan-admin/password', [AdminAccountController::class, 'updatePassword'])->name('account.password');
             Route::put('pengaturan-admin/pin', [AdminAccountController::class, 'updatePin'])->name('account.pin.update');
+            Route::get('pengaturan-admin/log-aktivitas/export', [AdminAccountController::class, 'exportActivityLogs'])->name('account.logs.export');
             Route::delete('pengaturan-admin/log-aktivitas', [AdminAccountController::class, 'clearActivityLogs'])->name('account.logs.clear');
         });
     });

@@ -8,7 +8,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AgendaRequest;
 use App\Models\Agenda;
 use App\Models\AgendaLog;
-use App\Support\ImageStorage;
+use App\Support\MediaTransaction;
+use App\Support\SearchTerm;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -17,17 +18,14 @@ class AgendaController extends Controller
 {
     public function index(Request $request): View
     {
-        $search = trim((string) $request->query('q', ''));
+        $search = SearchTerm::fromRequest($request);
+        $pattern = SearchTerm::likePattern($search);
         $status = $request->query('status');
 
         $agendas = Agenda::query()
-            ->select(['id', 'title', 'slug', 'starts_at', 'ends_at', 'event_status', 'publication_status'])
-            ->where(function ($query): void {
-                $query
-                    ->where('publication_status', PublicationStatus::Draft)
-                    ->orWhere(fn ($query) => $query->visibleOnPublic());
-            })
-            ->when($search !== '', fn ($query) => $query->where('title', 'like', "%{$search}%"))
+            ->select(['id', 'title', 'slug', 'starts_at', 'ends_at', 'event_status', 'publication_status', 'published_at'])
+            ->currentOrUpcoming()
+            ->when($search !== '', fn ($query) => $query->where('title', 'like', $pattern))
             ->when(
                 in_array($status, [PublicationStatus::Draft->value, PublicationStatus::Published->value], true),
                 fn ($query) => $query->where('publication_status', $status)
@@ -45,11 +43,12 @@ class AgendaController extends Controller
 
     public function archive(Request $request): View
     {
-        $search = trim((string) $request->query('q', ''));
+        $search = SearchTerm::fromRequest($request);
+        $pattern = SearchTerm::likePattern($search);
 
         $agendas = Agenda::onlyTrashed()
             ->select(['id', 'title', 'slug', 'poster_path', 'starts_at', 'deleted_at'])
-            ->when($search !== '', fn ($query) => $query->where('title', 'like', "%{$search}%"))
+            ->when($search !== '', fn ($query) => $query->where('title', 'like', $pattern))
             ->orderByDesc('deleted_at')
             ->paginate(config('fpk.pagination.agendas_admin'))
             ->withQueryString();
@@ -62,26 +61,13 @@ class AgendaController extends Controller
 
     public function history(Request $request): View
     {
-        $search = trim((string) $request->query('q', ''));
+        $search = SearchTerm::fromRequest($request);
+        $pattern = SearchTerm::likePattern($search);
 
         $agendas = Agenda::withTrashed()
             ->withCount('logs')
-            ->when($search !== '', fn ($query) => $query->where('title', 'like', "%{$search}%"))
-            ->where(function ($query): void {
-                $query
-                    ->whereNotNull('deleted_at')
-                    ->orWhere('event_status', AgendaStatus::Cancelled)
-                    ->orWhere('ends_at', '<', now())
-                    ->orWhere(function ($query): void {
-                        $query
-                            ->where('starts_at', '<', now())
-                            ->whereNull('ends_at')
-                            ->whereIn('event_status', [
-                                AgendaStatus::Completed,
-                                AgendaStatus::Cancelled,
-                            ]);
-                    });
-            })
+            ->when($search !== '', fn ($query) => $query->where('title', 'like', $pattern))
+            ->historical()
             ->orderByDesc('starts_at')
             ->paginate(config('fpk.pagination.agendas_admin'))
             ->withQueryString();
@@ -117,13 +103,16 @@ class AgendaController extends Controller
     public function store(AgendaRequest $request): RedirectResponse
     {
         $data = $this->buildData($request);
+        $media = new MediaTransaction;
 
         if ($request->hasFile('poster')) {
-            $data['poster_path'] = ImageStorage::store($request->file('poster'), 'agendas');
+            $data['poster_path'] = $media->storeImage($request->file('poster'), 'agendas');
         }
 
-        $agenda = Agenda::create($data);
-        $this->recordLog($agenda, 'created', statusTo: $agenda->event_status?->value);
+        $media->commit(function () use ($data): void {
+            $agenda = Agenda::create($data);
+            $this->recordLog($agenda, 'created', statusTo: $agenda->event_status?->value);
+        });
 
         return redirect()
             ->route('admin.agendas.index')
@@ -141,23 +130,26 @@ class AgendaController extends Controller
     {
         $statusBefore = $agenda->effectiveEventStatus()->value;
         $data = $this->buildData($request, $agenda);
+        $media = new MediaTransaction;
 
         if ($request->hasFile('poster')) {
-            $data['poster_path'] = ImageStorage::replace(
+            $data['poster_path'] = $media->replaceImage(
                 $request->file('poster'),
                 $agenda->poster_path,
                 'agendas'
             );
         }
 
-        $agenda->update($data);
-        $this->recordLog(
-            $agenda,
-            'updated',
-            statusFrom: $statusBefore,
-            statusTo: $agenda->event_status?->value,
-            changes: array_keys($agenda->getChanges()),
-        );
+        $media->commit(function () use ($agenda, $data, $statusBefore): void {
+            $agenda->update($data);
+            $this->recordLog(
+                $agenda,
+                'updated',
+                statusFrom: $statusBefore,
+                statusTo: $agenda->event_status?->value,
+                changes: array_keys($agenda->getChanges()),
+            );
+        });
 
         return redirect()
             ->route('admin.agendas.index')
@@ -189,11 +181,11 @@ class AgendaController extends Controller
 
     public function forceDelete(string $agenda): RedirectResponse
     {
-        $archivedAgenda = $this->findForHistory($agenda);
-        $posterPath = $archivedAgenda->poster_path;
+        $historicalAgenda = $this->findForHistory($agenda);
+        $media = new MediaTransaction;
+        $media->deleteAfterCommit($historicalAgenda->poster_path);
 
-        $archivedAgenda->forceDelete();
-        ImageStorage::delete($posterPath);
+        $media->commit(fn () => $historicalAgenda->forceDelete());
 
         return redirect()
             ->route('admin.agendas.archive')
@@ -217,7 +209,7 @@ class AgendaController extends Controller
         }
 
         if ($data['publication_status'] === PublicationStatus::Draft->value) {
-            $data['published_at'] = $data['published_at'] ?? null;
+            $data['published_at'] = null;
         }
 
         return $data;
@@ -234,6 +226,7 @@ class AgendaController extends Controller
     {
         return Agenda::withTrashed()
             ->where('slug', $slug)
+            ->historical()
             ->firstOrFail();
     }
 

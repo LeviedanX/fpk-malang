@@ -2,8 +2,14 @@
 @plugin '@tailwindcss/typography';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
 @source '../views/**/*.blade.php';
+
+/* storage/framework/views sengaja TIDAK dipindai. Direktori itu hanya berisi
+   hasil kompilasi dari ../views, jadi tidak menyumbang satu kelas pun (sudah
+   diverifikasi: output build byte-identical dengan dan tanpa sumber tersebut).
+   Isinya bersifat sementara dan bisa basi, sehingga memindainya membuat ukuran
+   bundel bergantung pada apakah cache view kebetulan terisi dan seberapa lama
+   — sempat menambah ~16 kB CSS mati dari template versi lama. */
 
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
@@ -453,7 +459,7 @@
 
 /* Progressive enhancement: hidden state only applies when JS is available, so
    content stays visible for no-JS visitors and crawlers. */
-.js .reveal {
+.motion-ready .reveal {
     --reveal-x: 0px;
     --reveal-y: 18px;
     --reveal-scale: 0.992;
@@ -466,33 +472,64 @@
     will-change: opacity, transform;
 }
 
-.js .reveal[data-reveal-origin="top"] {
+.motion-ready .reveal[data-reveal-origin="top"] {
     --reveal-y: -18px;
 }
 
-.js .reveal-left {
+.motion-ready .reveal-left {
     --reveal-x: -10px;
 }
 
-.js .reveal-right {
+.motion-ready .reveal-right {
     --reveal-x: 10px;
 }
 
-.js .reveal-scale {
+.motion-ready .reveal-scale {
     --reveal-scale: 0.975;
 }
 
-.js .reveal.is-visible {
+.motion-ready .reveal.is-visible {
     opacity: 1;
     transform: none;
     will-change: auto;
 }
 
-.js #beranda .reveal {
+.motion-ready #beranda .reveal {
     opacity: 1;
     transform: none;
     transition: none;
     will-change: auto;
+}
+
+/* Panel admin adalah alat kerja, bukan halaman promosi: setiap perpindahan
+   menu membayar transisi 460-560 ms ditambah stagger hingga 220 ms per blok,
+   sehingga konten baru selesai muncul ~700 ms setelah HTML-nya sebenarnya
+   sudah sampai. Lebih buruk lagi, .motion-ready baru dipasang JS setelah
+   DOM siap, jadi konten sempat terlihat, berkedip hilang, lalu muncul lagi.
+   Di sini blok tampil sejak frame pertama; kehalusan dijaga oleh satu fade
+   singkat pada pembungkusnya (lihat .admin-shell [data-admin-content]).
+   Situs publik tidak terpengaruh. */
+.motion-ready .admin-shell .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    transition-delay: 0ms;
+    will-change: auto;
+}
+
+/* Animasi CSS murni: jalan begitu stylesheet terpasang, tanpa menunggu JS. */
+.admin-shell [data-admin-content] {
+    animation: admin-content-in 140ms var(--motion-ease-standard) both;
+}
+
+@keyframes admin-content-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .parallax-layer {
@@ -565,9 +602,18 @@
     z-index: 10;
 }
 
+/* Dua kategori spacing section: standard (bawaan) dan compact.
+   Hanya jarak atas yang diperkecil pada varian compact; jarak bawah tetap
+   agar transisi antarsection tidak berubah. */
 .home-scene {
     position: relative;
-    padding-block: 2.5rem;
+    --scene-pad-top: 2.5rem;
+    --scene-pad-bottom: 2.5rem;
+    padding-block: var(--scene-pad-top) var(--scene-pad-bottom);
+}
+
+.home-scene--compact {
+    --scene-pad-top: 1.25rem;
 }
 
 .home-scene-panel {
@@ -584,13 +630,23 @@
 
 @media (min-width: 640px) {
     .home-scene {
-        padding-block: 3.5rem;
+        --scene-pad-top: 3.5rem;
+        --scene-pad-bottom: 3.5rem;
+    }
+
+    .home-scene--compact {
+        --scene-pad-top: 1.75rem;
     }
 }
 
 @media (min-width: 1024px) {
     .home-scene {
-        padding-block: 4rem;
+        --scene-pad-top: 4rem;
+        --scene-pad-bottom: 4rem;
+    }
+
+    .home-scene--compact {
+        --scene-pad-top: 2rem;
     }
 }
 
@@ -860,21 +916,6 @@
     background: linear-gradient(135deg, rgb(255 228 230), rgb(254 205 211)); /* rose-100 -> rose-200 */
     color: rgb(190 18 60); /* rose-700 */
     box-shadow: 0 0 0 8px rgba(244, 63, 94, 0.08);
-}
-
-.admin-icon-button {
-    width: 2.5rem;
-    height: 2.5rem;
-    flex: none;
-    border-radius: 0.75rem;
-    transition:
-        color var(--motion-duration-base) var(--motion-ease-standard),
-        background-color var(--motion-duration-base) var(--motion-ease-standard),
-        transform var(--motion-duration-base) var(--motion-ease-emphasized);
-}
-
-.admin-icon-button:hover {
-    transform: translateY(-1px);
 }
 
 .admin-shell {
@@ -1755,12 +1796,6 @@
     50% { transform: translateY(-8px); }
 }
 
-/* ---------------- Rich text (prose Trix/artikel) ---------------- */
-
-.prose-content :where(h2, h3) {
-    font-family: var(--font-display);
-}
-
 /* ---------------- Trix editor (admin) ---------------- */
 
 trix-toolbar .trix-button-group--file-tools {
@@ -1829,11 +1864,644 @@ trix-editor a {
     }
 }
 
+/* ---------------- Back to top ---------------- */
+
+/* Dok tombol mengambang di sudut kanan bawah. Peluncur chat memegang posisi
+   sudut; tombol "kembali ke atas" ditumpuk tepat di atasnya lewat variabel yang
+   sama sehingga keduanya tidak pernah saling menimpa di ukuran layar mana pun. */
+:root {
+    --dock-inset: 1.25rem;
+    --dock-launcher-size: 3.25rem;
+    --dock-gap: 0.7rem;
+}
+
+@media (min-width: 640px) {
+    :root {
+        --dock-inset: 1.75rem;
+        --dock-launcher-size: 3.5rem;
+    }
+}
+
+.back-to-top {
+    position: fixed;
+    right: var(--dock-inset);
+    bottom: calc(var(--dock-inset) + var(--dock-launcher-size) + var(--dock-gap));
+    z-index: 40;
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 9999px;
+    border: 1px solid color-mix(in srgb, var(--color-gold-400) 55%, transparent);
+    background: linear-gradient(140deg, var(--color-maroon-700), var(--color-maroon-800));
+    color: var(--color-cream-50);
+    box-shadow: 0 10px 24px rgba(46, 15, 18, 0.32);
+    cursor: pointer;
+    /* visibility (bukan display) menjaga tombol tetap dapat ditransisikan dan
+       sekaligus mengeluarkannya dari urutan fokus keyboard saat tersembunyi. */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(0.5rem);
+    transition:
+        opacity 240ms var(--motion-ease-standard),
+        transform 240ms var(--motion-ease-standard),
+        visibility 0s linear 240ms,
+        background-color 200ms var(--motion-ease-standard);
+}
+
+/* Tanpa JavaScript atribut ini tidak pernah dilepas, sehingga tombol yang tak
+   berfungsi tidak pernah tampil. */
+.back-to-top[hidden] {
+    display: none;
+}
+
+.back-to-top.is-visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition:
+        opacity 240ms var(--motion-ease-standard),
+        transform 240ms var(--motion-ease-standard),
+        visibility 0s,
+        background-color 200ms var(--motion-ease-standard);
+}
+
+.back-to-top:hover {
+    background: linear-gradient(140deg, var(--color-maroon-800), var(--color-maroon-700));
+    border-color: var(--color-gold-400);
+}
+
+.back-to-top:focus-visible {
+    outline: 2px solid var(--color-gold-400);
+    outline-offset: 3px;
+}
+
+.back-to-top__icon {
+    width: 1.15rem;
+    height: 1.15rem;
+}
+
+@media (min-width: 640px) {
+    .back-to-top {
+        width: 3rem;
+        height: 3rem;
+    }
+
+    .back-to-top__icon {
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+}
+
+/* ---------------- Chat sisi admin ---------------- */
+
+.admin-nav-badge {
+    margin-left: auto;
+    min-width: 1.3rem;
+    padding: 0.1rem 0.35rem;
+    border-radius: 9999px;
+    background: var(--color-gold-400);
+    color: var(--color-maroon-950);
+    font-size: 0.65rem;
+    font-weight: 700;
+    line-height: 1.15;
+    text-align: center;
+}
+
+.admin-nav-badge[hidden] {
+    display: none;
+}
+
+.admin-chat-log {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 0.9rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    background: #f8fafc;
+    scrollbar-width: thin;
+}
+
+/* Di panel admin arah gelembung dibalik: balasan admin di kanan, pesan tamu
+   di kiri—kebalikan dari widget publik. */
+.chat-bubble--admin-side {
+    margin-left: auto;
+    border-bottom-right-radius: 0.35rem;
+    background: linear-gradient(140deg, var(--color-maroon-700), var(--color-maroon-800));
+    color: var(--color-cream-50);
+}
+
+.chat-bubble--guest-side {
+    margin-right: auto;
+    border-bottom-left-radius: 0.35rem;
+    background: #fff;
+    border: 1px solid var(--color-ink-100);
+    color: #33353b;
+}
+
+/* ---------------- Chat tamu ---------------- */
+
+.chat-widget {
+    position: fixed;
+    right: var(--dock-inset);
+    bottom: var(--dock-inset);
+    z-index: 45;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.75rem;
+}
+
+.chat-launcher {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: var(--dock-launcher-size);
+    height: var(--dock-launcher-size);
+    border-radius: 9999px;
+    border: 1px solid color-mix(in srgb, var(--color-gold-400) 55%, transparent);
+    background: linear-gradient(140deg, var(--color-maroon-700), var(--color-maroon-900));
+    color: var(--color-cream-50);
+    box-shadow: 0 12px 28px rgba(46, 15, 18, 0.38);
+    cursor: pointer;
+    transition:
+        transform 220ms var(--motion-ease-standard),
+        border-color 200ms var(--motion-ease-standard),
+        box-shadow 220ms var(--motion-ease-standard);
+}
+
+.chat-launcher:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-gold-400);
+    box-shadow: 0 16px 32px rgba(46, 15, 18, 0.46);
+}
+
+.chat-launcher:focus-visible {
+    outline: 2px solid var(--color-gold-400);
+    outline-offset: 3px;
+}
+
+.chat-launcher__icon {
+    grid-area: 1 / 1;
+    width: 1.4rem;
+    height: 1.4rem;
+    transition:
+        opacity 200ms var(--motion-ease-standard),
+        transform 240ms var(--motion-ease-standard);
+}
+
+.chat-launcher__icon--close,
+.chat-launcher.is-open .chat-launcher__icon--chat {
+    opacity: 0;
+    transform: rotate(-45deg) scale(0.7);
+}
+
+.chat-launcher.is-open .chat-launcher__icon--close {
+    opacity: 1;
+    transform: rotate(0) scale(1);
+}
+
+.chat-launcher__badge {
+    position: absolute;
+    top: -0.15rem;
+    right: -0.15rem;
+    min-width: 1.15rem;
+    height: 1.15rem;
+    padding: 0 0.3rem;
+    display: grid;
+    place-items: center;
+    border-radius: 9999px;
+    background: var(--color-gold-400);
+    color: var(--color-maroon-950);
+    font-size: 0.65rem;
+    font-weight: 700;
+    line-height: 1;
+    box-shadow: 0 0 0 2px var(--color-maroon-900);
+}
+
+.chat-panel {
+    display: flex;
+    flex-direction: column;
+    width: min(23rem, calc(100vw - 2rem));
+    /* dvh menjaga tinggi tetap benar saat bilah alamat browser seluler
+       menyusut atau memanjang saat digulir. */
+    height: min(31rem, calc(100dvh - var(--dock-inset) * 2 - var(--dock-launcher-size) - 1.5rem));
+    overflow: hidden;
+    border-radius: 1.15rem;
+    border: 1px solid color-mix(in srgb, var(--color-gold-400) 30%, transparent);
+    background: var(--color-cream-50);
+    box-shadow: 0 24px 60px rgba(46, 15, 18, 0.4);
+}
+
+.chat-panel-enter {
+    transition:
+        opacity 220ms var(--motion-ease-emphasized),
+        transform 260ms var(--motion-ease-emphasized);
+}
+
+.chat-panel-leave {
+    transition:
+        opacity 150ms var(--motion-ease-exit),
+        transform 180ms var(--motion-ease-exit);
+}
+
+.chat-panel-enter-start {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.97);
+}
+
+.chat-panel-enter-end {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.chat-panel__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.85rem 0.9rem;
+    background: linear-gradient(135deg, var(--color-maroon-800), var(--color-maroon-950));
+    color: var(--color-cream-50);
+}
+
+.chat-panel__identity {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-width: 0;
+}
+
+.chat-panel__avatar {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2.1rem;
+    height: 2.1rem;
+    border-radius: 9999px;
+    background: color-mix(in srgb, var(--color-gold-400) 22%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-gold-400) 45%, transparent);
+    color: var(--color-gold-300);
+}
+
+.chat-panel__avatar svg {
+    width: 1.1rem;
+    height: 1.1rem;
+}
+
+.chat-panel__title {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.chat-panel__subtitle {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.1rem;
+    font-size: 0.7rem;
+    color: color-mix(in srgb, var(--color-cream-100) 72%, transparent);
+}
+
+.chat-panel__dot {
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 9999px;
+    background: #4ade80;
+    box-shadow: 0 0 0 2px color-mix(in srgb, #4ade80 25%, transparent);
+}
+
+.chat-icon-button {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.65rem;
+    color: inherit;
+    cursor: pointer;
+    transition: background-color 180ms var(--motion-ease-standard);
+}
+
+.chat-icon-button:hover {
+    background: color-mix(in srgb, currentColor 14%, transparent);
+}
+
+.chat-icon-button:focus-visible,
+.chat-icon-button:focus-within {
+    outline: 2px solid var(--color-gold-400);
+    outline-offset: 1px;
+}
+
+.chat-icon-button svg {
+    width: 1.05rem;
+    height: 1.05rem;
+}
+
+.chat-icon-button--muted {
+    color: var(--color-ink-500);
+}
+
+.chat-icon-button--muted:hover {
+    color: var(--color-maroon-700);
+}
+
+.chat-icon-button.is-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.chat-log {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    background:
+        radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--color-gold-400) 7%, transparent), transparent 45%),
+        var(--color-cream-50);
+    scrollbar-width: thin;
+}
+
+.chat-log__top {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 0.25rem;
+}
+
+.chat-log__loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    padding: 1.5rem 0;
+    font-size: 0.8rem;
+    color: var(--color-ink-400);
+}
+
+.chat-spinner {
+    width: 0.85rem;
+    height: 0.85rem;
+    border-radius: 9999px;
+    border: 2px solid color-mix(in srgb, var(--color-maroon-600) 25%, transparent);
+    border-top-color: var(--color-maroon-600);
+    animation: chat-spin 700ms linear infinite;
+}
+
+@keyframes chat-spin {
+    to { transform: rotate(360deg); }
+}
+
+.chat-more-button {
+    border-radius: 9999px;
+    border: 1px solid var(--color-ink-200);
+    background: #fff;
+    padding: 0.25rem 0.8rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--color-ink-500);
+    cursor: pointer;
+}
+
+.chat-more-button:hover {
+    color: var(--color-maroon-700);
+    border-color: var(--color-maroon-300);
+}
+
+.chat-day {
+    margin: 0.6rem 0 0.35rem;
+    text-align: center;
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-ink-400);
+}
+
+.chat-bubble {
+    max-width: 85%;
+    width: fit-content;
+    padding: 0.5rem 0.7rem;
+    border-radius: 1rem;
+    font-size: 0.84rem;
+    line-height: 1.45;
+    box-shadow: 0 1px 2px rgba(46, 15, 18, 0.06);
+    animation: chat-bubble-in 220ms var(--motion-ease-emphasized) both;
+}
+
+@keyframes chat-bubble-in {
+    from { opacity: 0; transform: translateY(0.35rem); }
+    to { opacity: 1; transform: none; }
+}
+
+.chat-bubble--guest {
+    margin-left: auto;
+    border-bottom-right-radius: 0.35rem;
+    background: linear-gradient(140deg, var(--color-maroon-700), var(--color-maroon-800));
+    color: var(--color-cream-50);
+}
+
+.chat-bubble--admin {
+    margin-right: auto;
+    border-bottom-left-radius: 0.35rem;
+    background: #fff;
+    border: 1px solid var(--color-ink-100);
+    color: var(--color-ink-800, #33353b);
+}
+
+.chat-bubble--greeting {
+    max-width: 100%;
+}
+
+.chat-bubble.is-pending {
+    opacity: 0.65;
+}
+
+.chat-bubble.is-failed {
+    background: linear-gradient(140deg, #9f1239, #7f1d1d);
+}
+
+.chat-bubble__body {
+    /* Pesan tamu dirender sebagai teks murni oleh Alpine (x-text); pre-line
+       hanya mempertahankan baris baru yang mereka ketik. */
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+.chat-bubble__figure {
+    display: block;
+    margin-bottom: 0.35rem;
+    border-radius: 0.6rem;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--color-ink-300) 25%, transparent);
+}
+
+.chat-bubble__figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 14rem;
+    object-fit: cover;
+}
+
+.chat-bubble__meta {
+    margin-top: 0.15rem;
+    font-size: 0.62rem;
+    opacity: 0.66;
+    text-align: right;
+}
+
+.chat-alert {
+    padding: 0.5rem 0.9rem;
+    background: #fef2f2;
+    border-top: 1px solid #fecaca;
+    color: #9f1239;
+    font-size: 0.75rem;
+}
+
+.chat-composer {
+    padding: 0.6rem 0.7rem 0.7rem;
+    border-top: 1px solid var(--color-ink-100);
+    background: #fff;
+}
+
+.chat-composer__row {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.4rem;
+}
+
+.chat-composer__input {
+    flex: 1;
+    min-width: 0;
+    max-height: 7.5rem;
+    padding: 0.5rem 0.7rem;
+    border-radius: 1rem;
+    border: 1px solid var(--color-ink-200);
+    background: var(--color-cream-50);
+    font-size: 0.84rem;
+    line-height: 1.4;
+    resize: none;
+    /* 16px minimum di iOS agar Safari tidak memperbesar halaman saat fokus. */
+    font-size: max(0.84rem, 16px);
+}
+
+@media (min-width: 640px) {
+    .chat-composer__input {
+        font-size: 0.84rem;
+    }
+}
+
+.chat-composer__input:focus {
+    outline: none;
+    border-color: var(--color-maroon-400);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-maroon-500) 16%, transparent);
+}
+
+.chat-send-button {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 9999px;
+    background: linear-gradient(140deg, var(--color-maroon-700), var(--color-maroon-900));
+    color: var(--color-cream-50);
+    cursor: pointer;
+    transition: opacity 180ms var(--motion-ease-standard), transform 180ms var(--motion-ease-standard);
+}
+
+.chat-send-button svg {
+    width: 1.05rem;
+    height: 1.05rem;
+}
+
+.chat-send-button:hover:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+.chat-send-button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.chat-send-button:focus-visible {
+    outline: 2px solid var(--color-gold-400);
+    outline-offset: 2px;
+}
+
+.chat-composer__hint {
+    margin-top: 0.35rem;
+    padding-left: 0.2rem;
+    font-size: 0.62rem;
+    color: var(--color-ink-400);
+}
+
+.chat-composer__preview {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 0.5rem;
+}
+
+.chat-composer__preview img {
+    display: block;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 0.55rem;
+    object-fit: cover;
+    border: 1px solid var(--color-ink-200);
+}
+
+.chat-composer__preview-remove {
+    position: absolute;
+    top: -0.4rem;
+    right: -0.4rem;
+    display: grid;
+    place-items: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 9999px;
+    background: var(--color-maroon-800);
+    color: var(--color-cream-50);
+    cursor: pointer;
+}
+
+.chat-composer__preview-remove svg {
+    width: 0.7rem;
+    height: 0.7rem;
+}
+
+/* Layar sangat kecil: panel melebar penuh agar area ketik tetap nyaman. */
+@media (max-width: 24rem) {
+    .chat-widget {
+        left: var(--dock-inset);
+    }
+
+    .chat-panel {
+        width: 100%;
+    }
+}
+
 /* ---------------- Reduced motion ---------------- */
 
 @media (prefers-reduced-motion: reduce) {
     html {
         scroll-behavior: auto;
+    }
+
+    .back-to-top {
+        transform: none;
     }
 
     *, *::before, *::after {
@@ -1842,12 +2510,12 @@ trix-editor a {
         transition-duration: 0.001ms !important;
     }
 
-    .js .reveal {
+    .motion-ready .reveal {
         opacity: 1;
         transform: none;
     }
 
-    .js #konten {
+    .motion-ready #konten {
         animation: none;
     }
 
@@ -1864,6 +2532,15 @@ trix-editor a {
     .hero-glow,
     .float-slow {
         animation: none;
+    }
+
+    .chat-bubble {
+        animation: none;
+    }
+
+    .chat-launcher:hover,
+    .chat-send-button:hover:not(:disabled) {
+        transform: none;
     }
 
 }

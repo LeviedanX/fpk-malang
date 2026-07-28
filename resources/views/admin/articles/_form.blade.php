@@ -40,7 +40,8 @@
             <x-form.image-field name="thumbnail" label="Thumbnail" :current="$article->thumbnail_path" />
         </x-admin.card>
 
-        <div class="reveal flex flex-col gap-2">
+        {{-- Tanpa class reveal: tombol aksi harus tampil sejak render. --}}
+        <div class="flex flex-col gap-2">
             <button type="submit" class="admin-button admin-button-primary">{{ $submitLabel }}</button>
             <a href="{{ route('admin.articles.index') }}" class="admin-button admin-button-secondary">Batal</a>
         </div>

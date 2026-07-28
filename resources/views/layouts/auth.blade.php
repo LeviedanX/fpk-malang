@@ -16,6 +16,12 @@
     <link rel="icon" href="{{ $faviconUrl }}">
     <link rel="apple-touch-icon" href="{{ $faviconUrl }}">
     <script nonce="{{ request()->attributes->get('csp_nonce') }}">
+        /* Lihat catatan yang sama di layouts.admin: iPad mode desktop hanya
+           dapat dikenali lewat kombinasi Mac + layar sentuh di sisi klien. */
+        if (/Macintosh|Mac OS X/.test(navigator.userAgent)
+            && (navigator.maxTouchPoints > 0 || 'ontouchstart' in window)) {
+            window.location.replace('{{ route('desktop-only') }}');
+        }
         document.documentElement.classList.add('js');
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])

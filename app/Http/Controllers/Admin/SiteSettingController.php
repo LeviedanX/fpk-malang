@@ -8,11 +8,10 @@ use App\Models\ContactSetting;
 use App\Models\FpkProfile;
 use App\Models\ManagementPeriod;
 use App\Models\SiteSetting;
-use App\Support\ImageStorage;
+use App\Support\MediaTransaction;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class SiteSettingController extends Controller
@@ -20,19 +19,20 @@ class SiteSettingController extends Controller
     public function edit(): View
     {
         return view('admin.settings.edit', [
-            'settings' => SiteSetting::query()->first() ?? new SiteSetting,
-            'profile' => FpkProfile::query()->first() ?? new FpkProfile,
-            'contact' => ContactSetting::query()->first() ?? new ContactSetting,
+            'settings' => SiteSetting::query()->where('singleton_key', 1)->first() ?? new SiteSetting(['singleton_key' => 1]),
+            'profile' => FpkProfile::query()->where('singleton_key', 1)->first() ?? new FpkProfile(['singleton_key' => 1]),
+            'contact' => ContactSetting::query()->where('singleton_key', 1)->first() ?? new ContactSetting(['singleton_key' => 1]),
             'activePeriod' => ManagementPeriod::query()->active()->first(),
         ]);
     }
 
     public function update(SiteSettingRequest $request): RedirectResponse
     {
-        $settings = SiteSetting::query()->first() ?? new SiteSetting;
-        $profile = FpkProfile::query()->first() ?? new FpkProfile;
-        $contact = ContactSetting::query()->first() ?? new ContactSetting;
+        $settings = SiteSetting::query()->where('singleton_key', 1)->first() ?? new SiteSetting(['singleton_key' => 1]);
+        $profile = FpkProfile::query()->where('singleton_key', 1)->first() ?? new FpkProfile(['singleton_key' => 1]);
+        $contact = ContactSetting::query()->where('singleton_key', 1)->first() ?? new ContactSetting(['singleton_key' => 1]);
         $validated = $request->validated();
+        $media = new MediaTransaction;
 
         $siteData = Arr::only($validated, [
             'site_name',
@@ -57,7 +57,7 @@ class SiteSettingController extends Controller
 
         foreach ($imageMap as $field => $meta) {
             if ($request->hasFile($field)) {
-                $siteData[$meta['column']] = ImageStorage::replace(
+                $siteData[$meta['column']] = $media->replaceImage(
                     $request->file($field),
                     $settings->{$meta['column']},
                     $meta['dir']
@@ -67,18 +67,18 @@ class SiteSettingController extends Controller
 
         if (! $request->hasFile('admin_login_background')
             && $request->boolean('remove_admin_login_background')) {
-            ImageStorage::delete($settings->admin_login_background_path);
+            $media->deleteAfterCommit($settings->admin_login_background_path);
             $siteData['admin_login_background_path'] = null;
         }
 
         if ($request->hasFile('background_music')) {
-            if ($settings->background_music_path) {
-                Storage::disk('public')->delete($settings->background_music_path);
-            }
-            $siteData['background_music_path'] = $request->file('background_music')
-                ->store(config('fpk.uploads.directories.audio'), 'public');
+            $siteData['background_music_path'] = $media->storeFile(
+                $request->file('background_music'),
+                config('fpk.uploads.directories.audio'),
+            );
+            $media->deleteAfterCommit($settings->background_music_path);
         } elseif ($request->boolean('remove_background_music') && $settings->background_music_path) {
-            Storage::disk('public')->delete($settings->background_music_path);
+            $media->deleteAfterCommit($settings->background_music_path);
             $siteData['background_music_path'] = null;
         }
 
@@ -121,7 +121,7 @@ class SiteSettingController extends Controller
 
         foreach ($profileImageMap as $field => $meta) {
             if ($request->hasFile($field)) {
-                $profileData[$meta['column']] = ImageStorage::replace(
+                $profileData[$meta['column']] = $media->replaceImage(
                     $request->file($field),
                     $profile->{$meta['column']},
                     $meta['dir']
@@ -130,12 +130,12 @@ class SiteSettingController extends Controller
         }
 
         if (! $request->hasFile('hero_background') && $request->boolean('remove_hero_background')) {
-            ImageStorage::delete($profile->hero_background_path);
+            $media->deleteAfterCommit($profile->hero_background_path);
             $profileData['hero_background_path'] = null;
         }
 
         if (! $request->hasFile('hero_mobile_background') && $request->boolean('remove_hero_mobile_background')) {
-            ImageStorage::delete($profile->hero_mobile_background_path);
+            $media->deleteAfterCommit($profile->hero_mobile_background_path);
             $profileData['hero_mobile_background_path'] = null;
         }
 
@@ -152,11 +152,12 @@ class SiteSettingController extends Controller
             'tiktok_url',
         ]);
 
-        DB::transaction(function () use ($settings, $siteData, $profile, $profileData, $contact, $contactData): void {
+        $media->commit(function () use ($settings, $siteData, $profile, $profileData, $contact, $contactData): void {
             $settings->fill($siteData)->save();
             $profile->fill($profileData)->save();
             $contact->fill($contactData)->save();
         });
+        Cache::forget('fpk.public_content_visibility');
 
         $section = $validated['settings_section'] ?? 'identitas';
 

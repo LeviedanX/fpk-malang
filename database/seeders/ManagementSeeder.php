@@ -6,12 +6,12 @@ use App\Models\ManagementPeriod;
 use Illuminate\Database\Seeder;
 
 /**
- * Seeds the 2025-2027 management structure as read from CONTENT_REFERENCE.md.
+ * Seeds the 2025-2027 management structure transcribed during initial setup.
  *
  * IMPORTANT: the period is created INACTIVE so this unverified data is NOT shown
  * publicly by default. Every name, title, spelling, position, and photo must be
- * verified against official documents before the admin activates this period
- * (see TODO.md, Phase 12/14).
+ * verified against official documents before the admin activates this period.
+ * See the content approval gate in README.md ("Gerbang sebelum live").
  */
 class ManagementSeeder extends Seeder
 {

@@ -9,7 +9,9 @@
                         <img src="{{ \Illuminate\Support\Facades\Storage::url($site->logo_path) }}" alt="Logo {{ $site->organization_name }}" class="h-11 w-auto" width="44" height="44" loading="lazy" decoding="async">
                     @else
                         <span class="grid h-11 w-11 place-items-center overflow-hidden rounded-full bg-cream-50 p-1 shadow-sm ring-1 ring-gold-400/35" aria-hidden="true">
-                            <img src="{{ asset('assets/images/branding/logo-fpk.webp') }}" alt="" class="h-full w-full object-contain" width="44" height="44" loading="lazy" decoding="async">
+                            <img src="{{ asset('assets/images/branding/logo-fpk-48.webp') }}"
+                                 srcset="{{ asset('assets/images/branding/logo-fpk-48.webp') }} 1x, {{ asset('assets/images/branding/logo-fpk-96.webp') }} 2x"
+                                 alt="" class="h-full w-full object-contain" width="44" height="44" loading="lazy" decoding="async">
                         </span>
                     @endif
                     <span class="font-display text-lg font-bold text-cream-50">{{ $site->abbreviation ?: $site->site_name }}</span>

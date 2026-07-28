@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 #[Fillable([
     'site_name',
@@ -23,6 +24,7 @@ use Illuminate\Database\Eloquent\Model;
     'background_music_default_playing',
     'background_music_volume',
     'background_music_preference_version',
+    'singleton_key',
 ])]
 class SiteSetting extends Model
 {
@@ -47,14 +49,26 @@ class SiteSetting extends Model
 
     public static function resolveCurrent(): self
     {
-        return static::query()->first() ?? new self([
+        $attributes = Cache::remember('fpk.site_setting', 300, fn (): array => static::query()
+            ->where('singleton_key', 1)
+            ->first()
+            ?->attributesToArray() ?? []);
+
+        return new self($attributes ?: [
             'site_name' => config('app.name'),
             'organization_name' => 'Forum Pembauran Kebangsaan Kota Malang',
             'abbreviation' => 'FPK Kota Malang',
             'background_music_visible' => true,
-            'background_music_default_playing' => true,
+            'background_music_default_playing' => false,
             'background_music_volume' => 50,
             'background_music_preference_version' => 1,
+            'singleton_key' => 1,
         ]);
+    }
+
+    protected static function booted(): void
+    {
+        static::saved(fn () => Cache::forget('fpk.site_setting'));
+        static::deleted(fn () => Cache::forget('fpk.site_setting'));
     }
 }

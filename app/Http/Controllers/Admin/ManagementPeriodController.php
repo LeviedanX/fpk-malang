@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ManagementPeriodRequest;
 use App\Models\ManagementPeriod;
-use App\Support\ImageStorage;
+use App\Support\MediaTransaction;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -33,12 +33,13 @@ class ManagementPeriodController extends Controller
     public function store(ManagementPeriodRequest $request): RedirectResponse
     {
         $data = $request->safe()->except('group_photo');
+        $media = new MediaTransaction;
 
         if ($request->hasFile('group_photo')) {
-            $data['group_photo_path'] = ImageStorage::store($request->file('group_photo'), 'management');
+            $data['group_photo_path'] = $media->storeImage($request->file('group_photo'), 'management');
         }
 
-        $this->persist(new ManagementPeriod, $data);
+        $media->commit(fn () => $this->persist(new ManagementPeriod, $data));
 
         return redirect()
             ->route('admin.periods.index')
@@ -55,16 +56,17 @@ class ManagementPeriodController extends Controller
     public function update(ManagementPeriodRequest $request, ManagementPeriod $period): RedirectResponse
     {
         $data = $request->safe()->except('group_photo');
+        $media = new MediaTransaction;
 
         if ($request->hasFile('group_photo')) {
-            $data['group_photo_path'] = ImageStorage::replace(
+            $data['group_photo_path'] = $media->replaceImage(
                 $request->file('group_photo'),
                 $period->group_photo_path,
                 'management'
             );
         }
 
-        $this->persist($period, $data);
+        $media->commit(fn () => $this->persist($period, $data));
 
         return redirect()
             ->route('admin.periods.index')
@@ -86,13 +88,15 @@ class ManagementPeriodController extends Controller
             ],
         ], [], ['group_photo' => 'foto bersama']);
 
-        $period->update([
-            'group_photo_path' => ImageStorage::replace(
-                $request->file('group_photo'),
-                $period->group_photo_path,
-                'management'
-            ),
-        ]);
+        $media = new MediaTransaction;
+        $groupPhotoPath = $media->replaceImage(
+            $request->file('group_photo'),
+            $period->group_photo_path,
+            'management'
+        );
+        $media->commit(fn () => $period->update([
+            'group_photo_path' => $groupPhotoPath,
+        ]));
 
         return redirect()
             ->route('admin.members.index', ['period' => $period->id])
@@ -104,8 +108,9 @@ class ManagementPeriodController extends Controller
      */
     public function destroyGroupPhoto(ManagementPeriod $period): RedirectResponse
     {
-        ImageStorage::delete($period->group_photo_path);
-        $period->update(['group_photo_path' => null]);
+        $media = new MediaTransaction;
+        $media->deleteAfterCommit($period->group_photo_path);
+        $media->commit(fn () => $period->update(['group_photo_path' => null]));
 
         return redirect()
             ->route('admin.members.index', ['period' => $period->id])
@@ -118,10 +123,10 @@ class ManagementPeriodController extends Controller
             ->whereNotNull('portrait_path')
             ->pluck('portrait_path');
 
-        $period->delete();
-
-        ImageStorage::delete($period->group_photo_path);
-        $portraitPaths->each(fn (string $path) => ImageStorage::delete($path));
+        $media = new MediaTransaction;
+        $media->deleteAfterCommit($period->group_photo_path);
+        $portraitPaths->each(fn (string $path) => $media->deleteAfterCommit($path));
+        $media->commit(fn () => $period->delete());
 
         return redirect()
             ->route('admin.periods.index')

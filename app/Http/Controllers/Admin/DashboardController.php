@@ -17,18 +17,21 @@ class DashboardController extends Controller
             'articlesTotal' => Article::query()->count(),
             'articlesPublished' => Article::query()->published()->count(),
             'articlesDraft' => Article::query()->where('status', PublicationStatus::Draft)->count(),
-            'agendasTotal' => Agenda::query()->count(),
-            'agendasDraft' => Agenda::query()->where('publication_status', PublicationStatus::Draft)->count(),
+            'agendasActive' => Agenda::query()->currentOrUpcoming()->count(),
+            'agendasDraft' => Agenda::query()
+                ->currentOrUpcoming()
+                ->where('publication_status', PublicationStatus::Draft)
+                ->count(),
             'membersTotal' => ManagementMember::query()->count(),
             'latestArticles' => Article::query()
                 ->orderByDesc('created_at')
                 ->limit(5)
                 ->get(['id', 'title', 'slug', 'status', 'published_at', 'created_at']),
             'nearestAgendas' => Agenda::query()
-                ->visibleOnPublic()
+                ->currentOrUpcoming()
                 ->orderBy('starts_at')
                 ->limit(5)
-                ->get(['id', 'title', 'slug', 'starts_at', 'event_status']),
+                ->get(['id', 'title', 'slug', 'starts_at', 'event_status', 'publication_status', 'published_at']),
         ]);
     }
 }

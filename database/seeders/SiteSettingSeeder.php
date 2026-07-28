@@ -9,7 +9,7 @@ class SiteSettingSeeder extends Seeder
 {
     public function run(): void
     {
-        if (SiteSetting::query()->exists()) {
+        if (SiteSetting::query()->where('singleton_key', 1)->exists()) {
             return;
         }
 
@@ -30,9 +30,10 @@ class SiteSettingSeeder extends Seeder
             'admin_login_background_path' => null,
             'background_music_path' => null,
             'background_music_visible' => true,
-            'background_music_default_playing' => true,
+            'background_music_default_playing' => false,
             'background_music_volume' => 50,
             'background_music_preference_version' => 1,
+            'singleton_key' => 1,
         ]);
     }
 }

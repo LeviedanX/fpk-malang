@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 #[Fillable([
     'hero_eyebrow',
@@ -24,6 +25,7 @@ use Illuminate\Database\Eloquent\Model;
     'objectives',
     'core_tasks',
     'legal_basis',
+    'singleton_key',
 ])]
 class FpkProfile extends Model
 {
@@ -32,7 +34,17 @@ class FpkProfile extends Model
      */
     public static function current(): self
     {
-        return static::query()->first() ?? new self([
+        return app('fpk.profile');
+    }
+
+    public static function resolveCurrent(): self
+    {
+        $attributes = Cache::remember('fpk.profile', 300, fn (): array => static::query()
+            ->where('singleton_key', 1)
+            ->first()
+            ?->attributesToArray() ?? []);
+
+        return new self($attributes ?: [
             'hero_eyebrow' => 'Forum Pembauran Kebangsaan Kota Malang',
             'hero_title' => 'Forum Pembauran Kebangsaan Kota Malang',
             'hero_primary_cta_label' => 'Tentang FPK',
@@ -40,6 +52,13 @@ class FpkProfile extends Model
             'hero_legal_basis_label' => 'Dasar Hukum',
             'hero_foundation_label' => 'Landasan',
             'hero_period_label' => 'Masa Bakti',
+            'singleton_key' => 1,
         ]);
+    }
+
+    protected static function booted(): void
+    {
+        static::saved(fn () => Cache::forget('fpk.profile'));
+        static::deleted(fn () => Cache::forget('fpk.profile'));
     }
 }

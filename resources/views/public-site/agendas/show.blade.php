@@ -68,7 +68,9 @@
         <h1 class="reveal mt-3 font-display text-3xl font-extrabold leading-tight text-cream-50 sm:text-4xl" style="--reveal-delay: 70ms">{{ $agenda->title }}</h1>
 
         @if ($agenda->poster_path)
-            <img src="{{ \Illuminate\Support\Facades\Storage::url($agenda->poster_path) }}" alt="Poster {{ $agenda->title }}" fetchpriority="high" decoding="async" class="reveal reveal-scale mt-8 w-full rounded-xl object-cover shadow-sm">
+            <img src="{{ \Illuminate\Support\Facades\Storage::url($agenda->poster_path) }}" alt="Poster {{ $agenda->title }}"
+                 width="1200" height="675" fetchpriority="high" decoding="async"
+                 class="reveal reveal-scale mt-8 aspect-video w-full rounded-xl object-cover shadow-sm">
         @endif
 
         <dl class="reveal surface mt-8 grid gap-5 p-6 sm:grid-cols-2">

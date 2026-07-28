@@ -11,6 +11,7 @@ return [
         'articles_public' => 9,
         'articles_admin' => 15,
         'agendas_admin' => 15,
+        'chat_admin' => 20,
     ],
 
     /*
@@ -37,6 +38,7 @@ return [
             'profile' => 1920,
             'articles' => 1200,
             'agendas' => 1200,
+            'chat' => 1280,
         ],
         'directories' => [
             'branding' => 'branding',
@@ -47,9 +49,28 @@ return [
             'agendas' => 'agendas',
             'management' => 'management',
             'audio' => 'audio',
+            'chat' => 'chat',
         ],
         'audio_mimes' => ['mp3', 'wav', 'ogg', 'm4a'],
         'audio_max_size' => 10240, // 10 MB
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Chat tamu
+    |--------------------------------------------------------------------------
+    |
+    | Widget chat publik berjalan tanpa sesi: identitas tamu adalah token acak
+    | di localStorage. Batas di bawah menjaga tabel tetap ramping dan membatasi
+    | biaya polling.
+    |
+    */
+    'chat' => [
+        // Percakapan selesai yang tidak tersentuh selama sekian hari dibuang
+        // oleh perintah `chat:prune`. 0 menonaktifkan pembersihan.
+        'prune_closed_after_days' => 90,
+        // Percakapan yang tidak pernah dibalas admin dan sudah lama basi.
+        'prune_stale_after_days' => 180,
     ],
 
     /*
@@ -59,6 +80,5 @@ return [
     */
     'home' => [
         'latest_articles' => 3,
-        'past_agendas' => 6,
     ],
 ];

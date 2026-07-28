@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AdminAccountController extends Controller
 {
@@ -136,6 +137,41 @@ class AdminAccountController extends Controller
         return redirect()
             ->route('admin.account.edit')
             ->with('status', 'Seluruh histori aktivitas admin berhasil dihapus.');
+    }
+
+    public function exportActivityLogs(): StreamedResponse
+    {
+        return response()->streamDownload(function (): void {
+            $output = fopen('php://output', 'wb');
+            fputcsv($output, [
+                'waktu', 'administrator', 'event', 'deskripsi', 'method',
+                'path', 'ip', 'device_key', 'status',
+            ]);
+
+            AdminActivityLog::query()
+                ->with('user:id,name')
+                ->oldest()
+                ->chunkById(500, function ($logs) use ($output): void {
+                    foreach ($logs as $log) {
+                        fputcsv($output, [
+                            $log->created_at?->toIso8601String(),
+                            $log->user?->name,
+                            $log->event,
+                            $log->description,
+                            $log->method,
+                            $log->path,
+                            $log->ip_address,
+                            $log->device_key,
+                            $log->status_code,
+                        ]);
+                    }
+                });
+
+            fclose($output);
+        }, 'aktivitas-admin-'.now()->format('Ymd-His').'.csv', [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Cache-Control' => 'no-store, private',
+        ]);
     }
 
     public function update(

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\PublicSite;
 use App\Http\Controllers\Controller;
 use App\Models\Article;
 use App\Models\FpkProfile;
+use App\Support\SearchTerm;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -12,7 +13,8 @@ class ArticleController extends Controller
 {
     public function index(Request $request): View
     {
-        $search = trim((string) $request->query('q', ''));
+        $search = SearchTerm::fromRequest($request);
+        $pattern = SearchTerm::likePattern($search);
 
         // Spotlight a featured article only on the unfiltered first page, and keep
         // it out of the paginated list so it is never shown twice.
@@ -25,10 +27,10 @@ class ArticleController extends Controller
             ])
             ->latestPublished()
             ->when($featured, fn ($query) => $query->whereKeyNot($featured->getKey()))
-            ->when($search !== '', function ($query) use ($search) {
-                $query->where(function ($inner) use ($search) {
-                    $inner->where('title', 'like', "%{$search}%")
-                        ->orWhere('excerpt', 'like', "%{$search}%");
+            ->when($search !== '', function ($query) use ($pattern) {
+                $query->where(function ($inner) use ($pattern) {
+                    $inner->where('title', 'like', $pattern)
+                        ->orWhere('excerpt', 'like', $pattern);
                 });
             })
             ->paginate(config('fpk.pagination.articles_public'))

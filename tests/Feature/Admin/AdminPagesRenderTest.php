@@ -89,7 +89,7 @@ class AdminPagesRenderTest extends TestCase
         $this->actingAs($this->admin())
             ->get(route('admin.dashboard'))
             ->assertOk()
-            ->assertSee('Total Agenda')
+            ->assertSee('Agenda Aktif')
             ->assertSee('Agenda Terdekat')
             ->assertSee('Status publikasi')
             ->assertSee('Lihat semua')

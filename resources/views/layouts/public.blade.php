@@ -117,5 +117,9 @@
     </main>
 
     @include('public-site.partials.footer')
+
+    @include('public-site.partials.back-to-top')
+
+    @include('public-site.partials.chat-widget')
 </body>
 </html>

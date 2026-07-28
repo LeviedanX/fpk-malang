@@ -55,12 +55,21 @@
             <input type="hidden" name="settings_section" :value="section">
 
             <section x-show="section === 'identitas'" x-cloak aria-labelledby="settings-identitas-title">
-                <x-admin.card title="Identitas dan Branding" description="Satu sumber untuk identitas yang tampil pada navbar, footer, panel admin, dan metadata.">
+                <x-admin.card title="Identitas dan Branding" description="Identitas dasar website. Navbar dan footer menampilkan Singkatan bila diisi, sedangkan Nama Situs dipakai sebagai identitas teknis dan nilai cadangan.">
                     <div class="space-y-6">
+                        <div class="rounded-xl border border-slate-200 bg-slate-50/70 p-4 text-sm leading-relaxed text-slate-600">
+                            <p class="font-semibold text-slate-700">Cara ketiga kolom nama ini bekerja</p>
+                            <ul class="mt-2 list-disc space-y-1 pl-5">
+                                <li><span class="font-medium text-slate-700">Nama Situs</span> — identitas teknis website: judul panel admin, judul halaman login, <code>og:site_name</code>, dan structured data. Dipakai juga sebagai cadangan bila Judul SEO Default atau Singkatan kosong. Karena itu perubahannya tidak selalu terlihat langsung di navbar dan footer.</li>
+                                <li><span class="font-medium text-slate-700">Singkatan</span> — yang tampil di navbar dan footer selama kolom ini terisi. Kosongkan bila ingin navbar dan footer memakai Nama Situs.</li>
+                                <li><span class="font-medium text-slate-700">Judul SEO Default</span> — judul untuk mesin pencari dan pratinjau tautan, diatur terpisah di tab <span class="font-medium text-slate-700">SEO</span>.</li>
+                            </ul>
+                        </div>
+
                         <div class="grid gap-4 sm:grid-cols-2">
-                            <x-form.input name="site_name" label="Nama Situs" :value="$settings->site_name" maxlength="60" required hint="Maksimal 60 karakter." />
+                            <x-form.input name="site_name" label="Nama Situs" :value="$settings->site_name" maxlength="60" required hint="Identitas teknis dan nilai cadangan. Maksimal 60 karakter." />
                             <x-form.input name="organization_name" label="Nama Organisasi" :value="$settings->organization_name" maxlength="100" required hint="Maksimal 100 karakter." />
-                            <x-form.input name="abbreviation" label="Singkatan" :value="$settings->abbreviation" maxlength="20" hint="Maksimal 20 karakter." />
+                            <x-form.input name="abbreviation" label="Singkatan" :value="$settings->abbreviation" maxlength="20" hint="Tampil di navbar dan footer bila diisi. Maksimal 20 karakter." />
                             <x-form.input name="tagline" label="Tagline" :value="$settings->tagline" maxlength="120" hint="Maksimal 120 karakter." />
                         </div>
 
@@ -165,26 +174,11 @@
                                 </label>
                             </div>
 
-                            <fieldset class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                                <legend class="px-1 text-sm font-semibold text-slate-700">Status awal musik</legend>
-                                <div class="mt-2 flex flex-wrap gap-4">
-                                    @foreach (['1' => 'On', '0' => 'Off'] as $value => $label)
-                                        <label class="inline-flex items-center gap-2 text-sm font-medium text-slate-700">
-                                            <input
-                                                type="radio"
-                                                name="background_music_default_playing"
-                                                value="{{ $value }}"
-                                                @checked((int) old('background_music_default_playing', (int) ($settings->background_music_default_playing ?? true)) === $value)
-                                                class="border-slate-300 text-maroon-700 focus:ring-maroon-600"
-                                                required
-                                            >
-                                            {{ $label }}
-                                        </label>
-                                    @endforeach
-                                </div>
-                                <p class="mt-2 text-xs text-slate-500">Default baru adalah On. Saat konfigurasi musik diubah dan disimpan, preferensi lama pengunjung direset mengikuti pilihan admin.</p>
-                                <p class="mt-1 text-xs text-amber-700">Browser dapat menunda suara sampai klik/tap pertama, tetapi status musik tetap On.</p>
-                            </fieldset>
+                            <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+                                <input type="hidden" name="background_music_default_playing" value="0">
+                                <p class="text-sm font-semibold text-emerald-800">Musik selalu dimulai oleh pengunjung</p>
+                                <p class="mt-1 text-xs leading-relaxed text-emerald-700">Audio tidak diputar otomatis. Pengunjung harus menekan tombol musik agar navigasi, scroll, atau sentuhan biasa tidak memunculkan suara.</p>
+                            </div>
                         </div>
 
                         <div class="max-w-xl rounded-xl border border-slate-200 bg-slate-50 p-4">

@@ -23,7 +23,7 @@
                 <x-form.select name="publication_status" label="Status Publikasi" :options="\App\Enums\PublicationStatus::options()" :selected="$agenda->publication_status?->value ?? 'published'" required hint="'Terbit' tampil di situs publik; 'Draf' disembunyikan." />
                 <x-form.input name="published_at" label="Waktu Terbit" type="datetime-local"
                     :value="old('published_at', optional($agenda->published_at)->format('Y-m-d\TH:i'))"
-                    hint="Kosongkan untuk memakai waktu saat ini ketika diterbitkan." />
+                    hint="Kosongkan untuk memakai waktu saat ini. Jika dijadwalkan, waktu terbit harus sebelum acara selesai." />
             </div>
         </x-admin.card>
 
@@ -31,7 +31,8 @@
             <x-form.image-field name="poster" label="Poster Agenda" :current="$agenda->poster_path" />
         </x-admin.card>
 
-        <div class="reveal flex flex-col gap-2">
+        {{-- Tanpa class reveal: tombol aksi harus tampil sejak render. --}}
+        <div class="flex flex-col gap-2">
             <button type="submit" class="admin-button admin-button-primary">{{ $submitLabel }}</button>
             <a href="{{ route('admin.agendas.index') }}" class="admin-button admin-button-secondary">Batal</a>
         </div>

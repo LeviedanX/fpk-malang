@@ -67,12 +67,12 @@ class PublicPagesTest extends TestCase
             ->assertDontSee('dark:', false);
     }
 
-    public function test_music_player_uses_admin_default_and_volume_when_visible(): void
+    public function test_music_player_is_opt_in_and_uses_admin_volume_when_visible(): void
     {
         SiteSetting::query()->first()->update([
             'background_music_path' => 'audio/lagu-uji.mp3',
             'background_music_visible' => true,
-            'background_music_default_playing' => true,
+            'background_music_default_playing' => false,
             'background_music_volume' => 37,
             'background_music_preference_version' => 8,
         ]);
@@ -80,13 +80,13 @@ class PublicPagesTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee('data-site-music-player', false)
-            ->assertSee('data-music-default-playing="on"', false)
+            ->assertSee('data-music-default-playing="off"', false)
             ->assertSee('data-music-volume="37"', false)
             ->assertSee('data-music-preference-version="8"', false)
             ->assertSee('data-music-playback-state', false)
             ->assertSee('data-site-music-toggle', false)
-            ->assertSee('Putar musik latar', false)
-            ->assertSee('Scroll, klik, sentuh, atau tekan tombol untuk memulai musik', false)
+            ->assertSee('Nyalakan musik latar', false)
+            ->assertDontSee('Scroll, klik, sentuh, atau tekan tombol untuk memulai musik', false)
             ->assertSee('audio/lagu-uji.mp3', false);
     }
 
@@ -244,6 +244,10 @@ class PublicPagesTest extends TestCase
     public function test_home_renders_all_admin_managed_hero_elements(): void
     {
         Agenda::factory()->create();
+        ManagementPeriod::factory()->active()->create([
+            'start_year' => 2031,
+            'end_year' => 2034,
+        ]);
 
         FpkProfile::query()->first()->update([
             'hero_eyebrow' => 'Pembuka Hero Uji',
@@ -481,6 +485,23 @@ class PublicPagesTest extends TestCase
             ->assertOk()
             ->assertSee('Pembauran Kebangsaan Malang')
             ->assertDontSee('Topik Tidak Terkait');
+    }
+
+    public function test_article_search_escapes_wildcards_and_limits_query_length(): void
+    {
+        Article::factory()->create(['title' => 'Capaian 100% Persatuan']);
+        Article::factory()->create(['title' => 'Capaian 100X Persatuan']);
+
+        $response = $this->get(route('articles.index', ['q' => '%']))
+            ->assertOk()
+            ->assertSee('Capaian 100% Persatuan')
+            ->assertDontSee('Capaian 100X Persatuan');
+
+        $longSearch = str_repeat('a', 150);
+        $this->get(route('articles.index', ['q' => $longSearch]))
+            ->assertOk()
+            ->assertSee('value="'.str_repeat('a', 100).'"', false)
+            ->assertDontSee('value="'.$longSearch.'"', false);
     }
 
     public function test_home_spotlights_a_featured_article_without_duplicating_it(): void

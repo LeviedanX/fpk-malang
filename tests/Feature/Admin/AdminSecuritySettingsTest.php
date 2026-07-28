@@ -142,6 +142,12 @@ class AdminSecuritySettingsTest extends TestCase
 
         $this->actingAs($user)
             ->withSession($this->unlockedSession())
+            ->get(route('admin.account.logs.export'))
+            ->assertOk()
+            ->assertDownload();
+
+        $this->actingAs($user)
+            ->withSession($this->unlockedSession())
             ->delete(route('admin.account.logs.clear'))
             ->assertRedirect(route('admin.account.edit'));
 
@@ -149,6 +155,30 @@ class AdminSecuritySettingsTest extends TestCase
         $this->assertDatabaseHas('admin_activity_logs', [
             'event' => 'admin.account.logs.clear',
         ]);
+    }
+
+    public function test_activity_log_retention_command_prunes_only_expired_records(): void
+    {
+        $expired = AdminActivityLog::create([
+            'event' => 'test.expired',
+            'description' => 'Log kedaluwarsa',
+            'method' => 'GET',
+            'path' => '/admin/expired',
+        ]);
+        $expired->forceFill(['created_at' => now()->subDays(181)])->saveQuietly();
+
+        AdminActivityLog::create([
+            'event' => 'test.current',
+            'description' => 'Log aktif',
+            'method' => 'GET',
+            'path' => '/admin/current',
+        ]);
+
+        $this->artisan('admin:prune-activity-logs', ['--days' => 180])
+            ->assertSuccessful();
+
+        $this->assertDatabaseMissing('admin_activity_logs', ['event' => 'test.expired']);
+        $this->assertDatabaseHas('admin_activity_logs', ['event' => 'test.current']);
     }
 
     /** @return array<string, int> */

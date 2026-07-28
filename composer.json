@@ -1,9 +1,9 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "fpk-malang/website",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "description": "Website resmi Forum Pembauran Kebangsaan Kota Malang.",
+    "keywords": ["fpk", "malang", "laravel"],
     "license": "MIT",
     "require": {
         "php": "^8.3",
@@ -34,15 +34,15 @@
     "scripts": {
         "setup": [
             "composer install",
-            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
+            "@php -r \"if (!file_exists('.env')) { fwrite(STDERR, 'Tidak ada .env di root proyek. Proyek ini tidak lagi menyertakan templat .env.example -- salin .env dari mesin lain yang sudah punya, atau lihat README.md untuk daftar variabel yang wajib diisi.'.PHP_EOL); exit(1); }\"",
             "@php artisan key:generate",
-            "@php artisan migrate --seed --force",
+            "@php artisan migrate --seed",
             "npm install --ignore-scripts",
             "npm run build"
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1 --timeout=0\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite --kill-others"
+            "@php scripts/dev.php"
         ],
         "test": [
             "@php artisan config:clear --ansi @no_additional_args",

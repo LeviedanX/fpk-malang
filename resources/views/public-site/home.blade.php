@@ -58,7 +58,9 @@
 </section>
 
 {{-- ============================ TENTANG ============================ --}}
-<section id="tentang" class="home-scene scroll-mt-24">
+{{-- Offset anchor ditangani terpusat lewat scroll-padding-top pada <html>.
+     Section tidak lagi memakai scroll-mt agar kedua nilai tidak saling menumpuk. --}}
+<section id="tentang" class="home-scene home-scene--compact">
     <div class="container-x">
         <div class="p-6 sm:p-8 lg:p-12">
         <div class="reveal reveal-scale mx-auto max-w-2xl text-center">
@@ -72,13 +74,23 @@
         <div class="mt-12 grid gap-8 md:grid-cols-2 xl:grid-cols-[repeat(2,33rem)] xl:justify-center">
             <article class="about-feature-card reveal reveal-scale grid min-w-0 overflow-hidden md:col-span-2 lg:grid-cols-2 lg:items-stretch">
                 <figure class="about-feature-card__media group relative h-full min-w-0 overflow-hidden">
-                    <img src="{{ $profile->about_image_path
-                        ? \Illuminate\Support\Facades\Storage::url($profile->about_image_path)
-                        : asset('assets/images/about/about-fpk-vector.webp') }}"
+                    @if ($profile->about_image_path)
+                    <img src="{{ \Illuminate\Support\Facades\Storage::url($profile->about_image_path) }}"
                          alt="Ilustrasi Tugu Malang dan Balai Kota Malang sebagai identitas {{ $site->organization_name }}"
                          width="1400" height="1050"
                          loading="lazy" decoding="async" fetchpriority="low"
                          class="aspect-4/3 h-full w-full object-cover transition duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.025] lg:aspect-auto">
+                    @else
+                    <img src="{{ asset('assets/images/about/about-fpk-vector-960.webp') }}"
+                         srcset="{{ asset('assets/images/about/about-fpk-vector-480.webp') }} 480w,
+                                 {{ asset('assets/images/about/about-fpk-vector-960.webp') }} 960w,
+                                 {{ asset('assets/images/about/about-fpk-vector.webp') }} 1400w"
+                         sizes="(min-width: 1024px) 50vw, 100vw"
+                         alt="Ilustrasi Tugu Malang dan Balai Kota Malang sebagai identitas {{ $site->organization_name }}"
+                         width="1400" height="1050"
+                         loading="lazy" decoding="async" fetchpriority="low"
+                         class="aspect-4/3 h-full w-full object-cover transition duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.025] lg:aspect-auto">
+                    @endif
                 </figure>
 
                 @if ($profile->definition)
@@ -126,7 +138,7 @@
 
 {{-- ============================ AGENDA ============================ --}}
 @if ($upcomingAgendas->isNotEmpty())
-<section id="agenda" class="home-scene scroll-mt-24">
+<section id="agenda" class="home-scene">
     <div class="container-x">
         <div class="mx-auto max-w-4xl p-6 sm:p-8 lg:p-12">
         <div class="reveal reveal-scale text-center">
@@ -154,7 +166,7 @@
 
 {{-- ============================ GALERI ============================ --}}
 @if ($galleryImages->isNotEmpty())
-<section id="galeri" class="home-scene scroll-mt-24" data-public-gallery>
+<section id="galeri" class="home-scene home-scene--compact" data-public-gallery>
     <div class="container-x">
         <div class="p-6 sm:p-8 lg:p-12">
             <div class="reveal reveal-scale text-center">
@@ -195,7 +207,7 @@
 
 {{-- ============================ ARTIKEL ============================ --}}
 @if ($featuredArticle)
-<section id="artikel" class="home-scene scroll-mt-24">
+<section id="artikel" class="home-scene home-scene--compact">
     <div class="container-x">
         <div class="p-6 sm:p-8 lg:p-12">
         <div class="reveal reveal-left flex flex-wrap items-end justify-between gap-4">
@@ -279,7 +291,7 @@
 
 {{-- ============================ PENGURUS ============================ --}}
 @if ($activePeriod && ($activePeriod->group_photo_path || $activePeriod->activeMembers->isNotEmpty()))
-<section id="pengurus" class="home-scene scroll-mt-24">
+<section id="pengurus" class="home-scene">
     <div class="container-x">
         <div class="p-6 sm:p-8 lg:p-12">
         <div class="reveal reveal-scale text-center">
@@ -352,7 +364,7 @@
 
 {{-- ============================ KONTAK ============================ --}}
 @if ($publicContentVisibility['contact'])
-<section id="kontak" class="home-scene scroll-mt-24 text-cream-50">
+<section id="kontak" class="home-scene text-cream-50">
     <div class="container-x">
         <div class="home-scene-panel home-scene-panel--dark p-6 sm:p-8 lg:p-12">
         <div class="reveal reveal-scale text-center">

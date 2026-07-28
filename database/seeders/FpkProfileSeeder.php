@@ -8,17 +8,19 @@ use Illuminate\Database\Seeder;
 /**
  * Draft profile text retained from the source material used during initial setup.
  * Wording is safe to display, but the legal basis and period MUST be verified
- * against official documents before production (see TODO.md).
+ * against official documents before production. See the content approval gate
+ * in README.md ("Gerbang sebelum live").
  */
 class FpkProfileSeeder extends Seeder
 {
     public function run(): void
     {
-        if (FpkProfile::query()->exists()) {
+        if (FpkProfile::query()->where('singleton_key', 1)->exists()) {
             return;
         }
 
         FpkProfile::create([
+            'singleton_key' => 1,
             'hero_eyebrow' => 'Forum Pembauran Kebangsaan Kota Malang',
             'hero_title' => 'Forum Pembauran Kebangsaan Kota Malang',
             'hero_subtitle' => 'Merawat kebhinnekaan, memperkuat persatuan warga Kota Malang.',

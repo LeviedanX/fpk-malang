@@ -13,10 +13,17 @@ class ImageStorageTest extends TestCase
     {
         Storage::fake('public');
 
+        // PNG 4x4 yang benar-benar dapat didekode GD. Fixture sebelumnya berupa
+        // PNG 2x2 yang ditolak imagecreatefromstring(), sehingga optimisasi
+        // selalu gagal diam-diam dan cabang WebP di bawah tidak pernah teruji.
         $temporaryPath = tempnam(sys_get_temp_dir(), 'fpk-image-');
         file_put_contents(
             $temporaryPath,
-            base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFUlEQVR42mNkYGD4z8DAwMgABYwMDAAANwUBAO6f4iQAAAAASUVORK5CYII='),
+            base64_decode(
+                'iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAACXBIWXMAAA7E'
+                .'AAAOxAGVKw4bAAAAFUlEQVQImWOs0db/z4AEmBjQAGEBAHiNAd3cL7/7AAAA'
+                .'AElFTkSuQmCC'
+            ),
         );
 
         $upload = new UploadedFile($temporaryPath, 'gambar-uji.png', 'image/png', null, true);

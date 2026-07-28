@@ -44,7 +44,7 @@
         @php($stats = [
             ['Total Artikel', $articlesTotal, route('admin.articles.index'), 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h7l2 2h5a2 2 0 012 2v10a2 2 0 01-2 2zM7 10h10M7 14h7'],
             ['Artikel Terbit', $articlesPublished, route('admin.articles.index', ['status' => 'published']), 'M5 13l4 4L19 7'],
-            ['Total Agenda', $agendasTotal, route('admin.agendas.index'), 'M8 7V3m8 4V3M5 11h14M5 5h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z'],
+            ['Agenda Aktif', $agendasActive, route('admin.agendas.index'), 'M8 7V3m8 4V3M5 11h14M5 5h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z'],
             ['Anggota Pengurus', $membersTotal, route('admin.members.index'), 'M17 20h5v-2a4 4 0 00-4-4h-1M9 20H2v-2a4 4 0 014-4h3m4-7a4 4 0 11-8 0 4 4 0 018 0z'],
         ])
         @foreach ($stats as [$label, $value, $link, $icon])

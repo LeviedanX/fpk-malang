@@ -15,6 +15,16 @@
     <link rel="icon" href="{{ $faviconUrl }}">
     <link rel="apple-touch-icon" href="{{ $faviconUrl }}">
     <script nonce="{{ request()->attributes->get('csp_nonce') }}">
+        /* iPad mode desktop mengirim user agent "Macintosh" tanpa client hint,
+           jadi gerbang server melihatnya sebagai desktop. Pembedanya hanya
+           kombinasi Mac + layar sentuh, dan itu cuma terbaca di sini.
+           Apple tidak membuat Mac berlayar sentuh, sehingga kombinasi ini
+           praktis selalu berarti iPad. Dijalankan sebelum paint agar panel
+           tidak sempat terlihat. */
+        if (/Macintosh|Mac OS X/.test(navigator.userAgent)
+            && (navigator.maxTouchPoints > 0 || 'ontouchstart' in window)) {
+            window.location.replace('{{ route('desktop-only') }}');
+        }
         document.documentElement.classList.add('js');
         /* Pulihkan status sidebar sebelum paint pertama agar tidak berkedip. */
         try {
@@ -25,7 +35,10 @@
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="admin-shell min-h-screen font-sans text-slate-800 antialiased">
+<body
+    class="admin-shell min-h-screen font-sans text-slate-800 antialiased"
+    data-chat-unread-url="{{ route('admin.chat.unread') }}"
+>
     <div class="admin-desktop-content min-h-screen" data-admin-desktop-content>
         <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
 
@@ -43,6 +56,7 @@
                     request()->routeIs('admin.articles.*') => 'Konten / Artikel',
                     request()->routeIs('admin.agendas.*') => 'Konten / Agenda',
                     request()->routeIs('admin.galleries.*') => 'Konten / Galeri',
+                    request()->routeIs('admin.chat.*') => 'Komunikasi / Chat Tamu',
                     request()->routeIs('admin.periods.*', 'admin.members.*') => 'Organisasi / Pengurus',
                     request()->routeIs('admin.settings.*', 'admin.profile.*', 'admin.contact.*') => 'Konfigurasi Website',
                     request()->routeIs('admin.account.*') => 'Keamanan / Administrator',
@@ -72,6 +86,9 @@
                         ['admin.galleries.index', 'Galeri', ['admin.galleries.*'], 'M3 16.5 8.25 11.25a2.25 2.25 0 013.182 0L16.5 16.318m-1.5-1.5 1.068-1.068a2.25 2.25 0 013.182 0L21 15.5M5.25 4.5h13.5A2.25 2.25 0 0121 6.75v10.5a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 17.25V6.75A2.25 2.25 0 015.25 4.5z'],
                         ['admin.periods.index', 'Susunan Pengurus', ['admin.periods.*', 'admin.members.*'], 'M17 20h5v-2a4 4 0 00-4-4h-1M9 20H2v-2a4 4 0 014-4h3m4-7a4 4 0 11-8 0 4 4 0 018 0zm8 3a3 3 0 10-2.83-4'],
                     ],
+                    'Komunikasi' => [
+                        ['admin.chat.index', 'Chat Tamu', ['admin.chat.*'], 'M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z', 'chat'],
+                    ],
                     'Pengaturan' => [
                         ['admin.settings.edit', 'Pengaturan Website', ['admin.settings.*', 'admin.profile.*', 'admin.contact.*'], 'M12 15.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7zM19.4 15a1.7 1.7 0 00.34 1.88l.06.06-2.12 2.12-.06-.06a1.7 1.7 0 00-1.88-.34 1.7 1.7 0 00-1.03 1.56V20h-3v-.08a1.7 1.7 0 00-1.03-1.56 1.7 1.7 0 00-1.88.34l-.06.06-2.12-2.12.06-.06A1.7 1.7 0 007 15.4 1.7 1.7 0 005.44 14H5v-3h.44A1.7 1.7 0 007 9.6a1.7 1.7 0 00-.34-1.88l-.06-.06 2.12-2.12.06.06A1.7 1.7 0 0010.66 6 1.7 1.7 0 0011.7 4.44V4h3v.44A1.7 1.7 0 0015.74 6a1.7 1.7 0 001.88-.34l.06-.06 2.12 2.12-.06.06A1.7 1.7 0 0019.4 9.6 1.7 1.7 0 0020.96 11H21v3h-.04A1.7 1.7 0 0019.4 15z'],
                         ['admin.account.edit', 'Pengaturan Admin', ['admin.account.*'], 'M5.121 17.804A9 9 0 1118.88 17.8M15 11a3 3 0 11-6 0 3 3 0 016 0z'],
@@ -81,7 +98,8 @@
                     <div class="admin-nav-group">
                         <p class="admin-nav-group-label">{{ $groupLabel }}</p>
                         <ul class="space-y-1">
-                            @foreach ($items as [$route, $label, $patterns, $icon])
+                            @foreach ($items as $item)
+                                @php([$route, $label, $patterns, $icon] = $item)
                                 <li>
                                     <a
                                         href="{{ route($route) }}"
@@ -94,6 +112,15 @@
                                     >
                                         <svg class="h-5 w-5 flex-none text-gold-400/80" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $icon }}"/></svg>
                                         <span>{{ $label }}</span>
+                                        @if (($item[4] ?? null) === 'chat')
+                                            {{-- Nilai awal dari server, lalu disegarkan berkala oleh
+                                                 adminChatBadge tanpa memuat ulang halaman. --}}
+                                            <span
+                                                class="admin-nav-badge"
+                                                data-chat-unread-badge
+                                                @if (($chatUnreadTotal ?? 0) < 1) hidden @endif
+                                            >{{ ($chatUnreadTotal ?? 0) > 9 ? '9+' : ($chatUnreadTotal ?? 0) }}</span>
+                                        @endif
                                     </a>
                                 </li>
                             @endforeach

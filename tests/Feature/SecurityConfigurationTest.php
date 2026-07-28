@@ -6,21 +6,17 @@ use Tests\TestCase;
 
 class SecurityConfigurationTest extends TestCase
 {
-    public function test_production_environment_template_has_secure_session_defaults_without_secrets(): void
-    {
-        $template = file_get_contents(base_path('.env.production.example'));
-
-        $this->assertIsString($template);
-        $this->assertStringContainsString('APP_ENV=production', $template);
-        $this->assertStringContainsString('APP_DEBUG=false', $template);
-        $this->assertStringContainsString('SESSION_ENCRYPT=true', $template);
-        $this->assertStringContainsString('SESSION_SECURE_COOKIE=true', $template);
-        $this->assertStringContainsString('SESSION_HTTP_ONLY=true', $template);
-        $this->assertStringContainsString('SESSION_SAME_SITE=strict', $template);
-        $this->assertMatchesRegularExpression('/^APP_KEY=\\R/m', $template);
-        $this->assertMatchesRegularExpression('/^DB_PASSWORD=\\R/m', $template);
-    }
-
+    /**
+     * There is no longer a hand-maintained .env.production.example checked
+     * into the repo — that was the file that kept drifting out of sync with
+     * the real .env. scripts/build-release.ps1 now derives a secret-free,
+     * production-forced template from the working .env on every release
+     * build, and scripts/audit-release.ps1 asserts these exact guarantees
+     * (APP_ENV=production, APP_DEBUG=false, secure/encrypted session, blank
+     * APP_KEY/DB_PASSWORD/ADMIN_PASSWORD) against that generated artifact
+     * before a release is considered shippable. See README.md § "Artefak
+     * handoff (paket rilis)".
+     */
     public function test_public_upload_directory_blocks_executable_php_extensions(): void
     {
         $rules = file_get_contents(storage_path('app/public/.htaccess'));

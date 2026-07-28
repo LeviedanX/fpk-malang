@@ -47,31 +47,35 @@ class Agenda extends Model
         return 'slug';
     }
 
-    public function scopePublished(Builder $query): Builder
+    public function scopePublished(Builder $query, ?DateTimeInterface $at = null): Builder
     {
+        $at = $at ? Carbon::parse($at) : now();
+
         return $query
             ->where('publication_status', PublicationStatus::Published)
             ->whereNotNull('published_at')
-            ->where('published_at', '<=', now());
+            ->where('published_at', '<=', $at);
     }
 
-    public function scopeUpcoming(Builder $query): Builder
+    public function scopeCurrentOrUpcoming(Builder $query, ?DateTimeInterface $at = null): Builder
     {
-        return $query->published()
-            ->where(function (Builder $query): void {
+        $at = $at ? Carbon::parse($at) : now();
+
+        return $query
+            ->where(function (Builder $query) use ($at): void {
                 $query
-                    ->where(function (Builder $query): void {
+                    ->where(function (Builder $query) use ($at): void {
                         $query
-                            ->where('starts_at', '>=', now())
+                            ->where('starts_at', '>', $at)
                             ->where('event_status', '!=', AgendaStatus::Cancelled);
                     })
-                    ->orWhere(function (Builder $query): void {
+                    ->orWhere(function (Builder $query) use ($at): void {
                         $query
-                            ->where('starts_at', '<', now())
+                            ->where('starts_at', '<=', $at)
                             ->where('event_status', '!=', AgendaStatus::Cancelled)
-                            ->where(function (Builder $query): void {
+                            ->where(function (Builder $query) use ($at): void {
                                 $query
-                                    ->where('ends_at', '>=', now())
+                                    ->where('ends_at', '>=', $at)
                                     ->orWhere(function (Builder $query): void {
                                         $query
                                             ->whereNull('ends_at')
@@ -79,44 +83,61 @@ class Agenda extends Model
                                     });
                             });
                     });
-            })
+            });
+    }
+
+    public function scopeHistorical(Builder $query, ?DateTimeInterface $at = null): Builder
+    {
+        $at = $at ? Carbon::parse($at) : now();
+
+        return $query
+            ->where(function (Builder $query) use ($at): void {
+                $query
+                    ->whereNotNull('deleted_at')
+                    ->orWhere('event_status', AgendaStatus::Cancelled)
+                    ->orWhere('ends_at', '<', $at)
+                    ->orWhere(function (Builder $query) use ($at): void {
+                        $query
+                            ->where('starts_at', '<=', $at)
+                            ->whereNull('ends_at')
+                            ->where('event_status', AgendaStatus::Completed);
+                    });
+            });
+    }
+
+    public function scopeUpcoming(Builder $query, ?DateTimeInterface $at = null): Builder
+    {
+        return $query
+            ->published($at)
+            ->currentOrUpcoming($at)
             ->orderBy('starts_at');
     }
 
-    public function scopePast(Builder $query): Builder
+    public function scopePast(Builder $query, ?DateTimeInterface $at = null): Builder
     {
-        return $query->published()
-            ->where(function (Builder $query): void {
-                $query
-                    ->where('ends_at', '<', now())
-                    ->orWhere(function (Builder $query): void {
-                        $query
-                            ->where('starts_at', '<', now())
-                            ->whereNull('ends_at')
-                            ->whereIn('event_status', [
-                                AgendaStatus::Completed,
-                                AgendaStatus::Cancelled,
-                            ]);
-                    });
-            })
+        return $query
+            ->published($at)
+            ->historical($at)
             ->orderByDesc('starts_at');
     }
 
-    public function scopeVisibleOnPublic(Builder $query): Builder
+    public function scopeVisibleOnPublic(Builder $query, ?DateTimeInterface $at = null): Builder
     {
-        return $query->upcoming();
+        return $query->upcoming($at);
     }
 
-    public function isPublished(): bool
+    public function isPublished(?DateTimeInterface $at = null): bool
     {
+        $at = $at ? Carbon::parse($at) : now();
+
         return $this->publication_status === PublicationStatus::Published
             && $this->published_at !== null
-            && $this->published_at->lte(now());
+            && $this->published_at->lte($at);
     }
 
     public function isVisibleOnPublic(?DateTimeInterface $at = null): bool
     {
-        if (! $this->isPublished()) {
+        if (! $this->isPublished($at)) {
             return false;
         }
 

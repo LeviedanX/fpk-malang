@@ -6,7 +6,7 @@
 @section('content')
     <div class="admin-toolbar">
         <form method="GET" action="{{ route('admin.agendas.history') }}" class="admin-filter">
-            <input type="search" name="q" value="{{ $search }}" placeholder="Cari judul riwayat..." class="form-control text-sm sm:min-w-56">
+            <input type="search" name="q" value="{{ $search }}" placeholder="Cari judul riwayat..." maxlength="100" class="form-control text-sm sm:min-w-56">
             <button type="submit" class="admin-button admin-button-dark">Cari</button>
         </form>
 

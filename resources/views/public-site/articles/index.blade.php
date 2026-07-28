@@ -35,7 +35,7 @@
     <div class="container-x">
         <form method="GET" action="{{ route('articles.index') }}" class="reveal reveal-scale mx-auto mb-10 flex max-w-xl gap-2">
             <label for="q" class="sr-only">Cari artikel</label>
-            <input type="search" name="q" id="q" value="{{ $search }}" placeholder="Cari artikel..."
+            <input type="search" name="q" id="q" value="{{ $search }}" placeholder="Cari artikel..." maxlength="100"
                 class="block w-full rounded-lg border-ink-200 bg-white shadow-sm focus:border-maroon-600 focus:ring-maroon-600">
             <button type="submit" class="btn-primary">Cari</button>
         </form>

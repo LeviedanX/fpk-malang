@@ -23,11 +23,6 @@ class AgendaLog extends Model
         ];
     }
 
-    public function agenda(): BelongsTo
-    {
-        return $this->belongsTo(Agenda::class);
-    }
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

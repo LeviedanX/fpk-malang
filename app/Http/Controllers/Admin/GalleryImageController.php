@@ -7,7 +7,9 @@ use App\Http\Requests\Admin\GalleryStoreRequest;
 use App\Http\Requests\Admin\GalleryUpdateRequest;
 use App\Models\GalleryImage;
 use App\Support\ImageStorage;
+use App\Support\MediaTransaction;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Throwable;
@@ -71,6 +73,12 @@ class GalleryImageController extends Controller
             }
         });
 
+        // Update lewat query builder tidak memicu event `saved`, sehingga cache
+        // visibilitas yang dipasang di AppServiceProvider tidak ikut dibersihkan.
+        // Tanpa ini navbar masih menautkan section Galeri setelah seluruh foto
+        // disembunyikan.
+        Cache::forget('fpk.public_content_visibility');
+
         return redirect()
             ->route('admin.galleries.index')
             ->with('status', 'Urutan dan status galeri berhasil disimpan.');
@@ -78,10 +86,9 @@ class GalleryImageController extends Controller
 
     public function destroy(GalleryImage $galleryImage): RedirectResponse
     {
-        $imagePath = $galleryImage->image_path;
-
-        $galleryImage->delete();
-        ImageStorage::delete($imagePath);
+        $media = new MediaTransaction;
+        $media->deleteAfterCommit($galleryImage->image_path);
+        $media->commit(fn () => $galleryImage->delete());
 
         return redirect()
             ->route('admin.galleries.index')

@@ -17,7 +17,8 @@ class GalleryUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'items' => ['required', 'array'],
+            'items' => ['required', 'array', 'max:100'],
+            'items.*' => ['required', 'array:display_order,is_visible'],
             'items.*.display_order' => ['required', 'integer', 'between:0,100000'],
             'items.*.is_visible' => ['required', 'boolean'],
         ];

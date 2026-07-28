@@ -79,6 +79,10 @@
         <x-admin.card title="Histori Aktivitas Admin" description="Rekaman akses dan perubahan pada seluruh fitur administrator.">
             <div class="mb-5 flex flex-col gap-3 border-b border-slate-100 pb-5 sm:flex-row sm:items-center sm:justify-between">
                 <p class="text-sm text-slate-500">Menampilkan aktivitas terbaru beserta waktu, IP, perangkat, dan status respons.</p>
+                <div class="flex flex-col gap-2 sm:flex-row">
+                    <a href="{{ route('admin.account.logs.export') }}" class="admin-button admin-button-secondary justify-center">
+                        Export CSV
+                    </a>
                 <form
                     method="POST"
                     action="{{ route('admin.account.logs.clear') }}"
@@ -92,6 +96,7 @@
                         Hapus Seluruh Histori
                     </button>
                 </form>
+                </div>
             </div>
 
             <div class="admin-table-wrap shadow-none!">

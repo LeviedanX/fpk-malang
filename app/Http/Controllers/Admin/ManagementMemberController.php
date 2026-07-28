@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ManagementMemberRequest;
 use App\Models\ManagementMember;
 use App\Models\ManagementPeriod;
-use App\Support\ImageStorage;
+use App\Support\MediaTransaction;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -56,12 +56,13 @@ class ManagementMemberController extends Controller
     public function store(ManagementMemberRequest $request): RedirectResponse
     {
         $data = $request->safe()->except('portrait');
+        $media = new MediaTransaction;
 
         if ($request->hasFile('portrait')) {
-            $data['portrait_path'] = ImageStorage::store($request->file('portrait'), 'management');
+            $data['portrait_path'] = $media->storeImage($request->file('portrait'), 'management');
         }
 
-        ManagementMember::create($data);
+        $media->commit(fn () => ManagementMember::create($data));
 
         return redirect()
             ->route('admin.members.index', ['period' => $data['management_period_id']])
@@ -79,16 +80,17 @@ class ManagementMemberController extends Controller
     public function update(ManagementMemberRequest $request, ManagementMember $member): RedirectResponse
     {
         $data = $request->safe()->except('portrait');
+        $media = new MediaTransaction;
 
         if ($request->hasFile('portrait')) {
-            $data['portrait_path'] = ImageStorage::replace(
+            $data['portrait_path'] = $media->replaceImage(
                 $request->file('portrait'),
                 $member->portrait_path,
                 'management'
             );
         }
 
-        $member->update($data);
+        $media->commit(fn () => $member->update($data));
 
         return redirect()
             ->route('admin.members.index', ['period' => $member->management_period_id])
@@ -99,8 +101,9 @@ class ManagementMemberController extends Controller
     {
         $periodId = $member->management_period_id;
 
-        ImageStorage::delete($member->portrait_path);
-        $member->delete();
+        $media = new MediaTransaction;
+        $media->deleteAfterCommit($member->portrait_path);
+        $media->commit(fn () => $member->delete());
 
         return redirect()
             ->route('admin.members.index', ['period' => $periodId])

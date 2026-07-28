@@ -4,7 +4,9 @@
 
 @section('content')
     <div class="mt-3 text-center">
-        <h2 class="font-display text-[1.4rem] font-bold leading-tight text-maroon-800">Autentikasi Administrator</h2>
+        {{-- h1, bukan h2: ini judul utama halaman. Tanpa h1 pembaca layar tidak
+             menemukan tingkat teratas saat menelusuri heading. --}}
+        <h1 class="font-display text-[1.4rem] font-bold leading-tight text-maroon-800">Autentikasi Administrator</h1>
         <span class="mx-auto mt-2.5 block h-1 w-10 rounded-full bg-gold-500"></span>
     </div>
 

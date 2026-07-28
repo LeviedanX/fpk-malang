@@ -20,6 +20,15 @@ class SecurityHeaders
             $response->headers->set($name, $value);
         }
 
+        if (app()->environment('production')
+            && $request->isSecure()
+            && Str::startsWith((string) config('app.url'), 'https://')) {
+            $response->headers->set(
+                'Strict-Transport-Security',
+                'max-age=31536000; includeSubDomains'
+            );
+        }
+
         if ($request->is('admin', 'admin/*')) {
             $response->headers->set('Cache-Control', 'no-store, private, max-age=0, must-revalidate');
             $response->headers->set('Pragma', 'no-cache');
@@ -49,6 +58,7 @@ class SecurityHeaders
     {
         $devHttpSources = [];
         $devWebSocketSources = [];
+        $localConnectSources = [];
         $localAssetSources = [];
 
         if (app()->environment('local')) {
@@ -62,6 +72,9 @@ class SecurityHeaders
                 'ws://127.0.0.1:5173',
                 'ws://*:5173',
             ];
+            // Opera GX loads its built-in FidelityFX shader through a data URL.
+            // Keep this compatibility exception local-only; production remains strict.
+            $localConnectSources = ['data:'];
             $localAssetSources = [
                 'http://localhost:8000',
                 'http://127.0.0.1:8000',
@@ -82,7 +95,12 @@ class SecurityHeaders
             $this->directive('img-src', ["'self'", 'data:', 'blob:', ...$localAssetSources]),
             "font-src 'self' data:",
             $this->directive('media-src', ["'self'", 'blob:', ...$localAssetSources]),
-            $this->directive('connect-src', ["'self'", ...$devHttpSources, ...$devWebSocketSources]),
+            $this->directive('connect-src', [
+                "'self'",
+                ...$localConnectSources,
+                ...$devHttpSources,
+                ...$devWebSocketSources,
+            ]),
             'frame-src https://www.google.com https://maps.google.com',
             "frame-ancestors 'none'",
             "object-src 'none'",

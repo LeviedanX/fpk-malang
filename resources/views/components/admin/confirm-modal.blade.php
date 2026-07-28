@@ -10,21 +10,44 @@
         message: 'Yakin ingin menghapus data ini?',
         actionLabel: 'Hapus',
         pendingForm: null,
+        previousFocus: null,
         openFor(form) {
+            this.previousFocus = document.activeElement;
             this.pendingForm = form;
             this.message = form.getAttribute('data-confirm') || 'Yakin ingin menghapus data ini?';
             this.title = form.getAttribute('data-confirm-title') || 'Konfirmasi Hapus';
             this.actionLabel = form.getAttribute('data-confirm-action') || 'Hapus';
             this.show = true;
+            document.querySelector('.admin-desktop-content')?.setAttribute('inert', '');
             this.$nextTick(() => { this.$refs.confirmBtn && this.$refs.confirmBtn.focus(); });
         },
         accept() {
             const form = this.pendingForm;
             this.show = false;
             this.pendingForm = null;
+            document.querySelector('.admin-desktop-content')?.removeAttribute('inert');
             if (form) { form.submit(); }
         },
-        cancel() { this.show = false; this.pendingForm = null; },
+        cancel() {
+            this.show = false;
+            this.pendingForm = null;
+            document.querySelector('.admin-desktop-content')?.removeAttribute('inert');
+            this.$nextTick(() => this.previousFocus?.focus());
+        },
+        trapFocus(event) {
+            const focusable = [...this.$refs.dialog.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex=&quot;-1&quot;])')]
+                .filter((element) => !element.disabled);
+            if (!focusable.length) return;
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        },
     }"
     x-effect="document.body.classList.toggle('overflow-hidden', show)"
     x-on:submit.capture.window="
@@ -36,7 +59,9 @@
     x-on:keydown.escape.window="show && cancel()"
 >
     <template x-teleport="body">
-        <div x-show="show" x-cloak class="fixed inset-0 z-[80] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="admin-confirm-title">
+        <div x-show="show" x-cloak x-ref="dialog" @keydown.tab="trapFocus($event)"
+             class="fixed inset-0 z-[80] flex items-center justify-center p-4"
+             role="dialog" aria-modal="true" aria-labelledby="admin-confirm-title">
             {{-- Backdrop --}}
             <div x-show="show"
                  x-transition:enter="transition duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)]" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"

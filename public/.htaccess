@@ -13,6 +13,15 @@
     RewriteCond %{HTTP:x-xsrf-token} .
     RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
 
+    # Direktori unggahan tidak pernah melayani berkas yang bisa dieksekusi.
+    #
+    # storage/app/public/.htaccess sudah melepas handler PHP di direktorinya
+    # sendiri, tetapi berkas itu hanya terbaca bila AllowOverride aktif untuk
+    # path tersebut — pada banyak hosting, override hanya diizinkan di docroot.
+    # Aturan berikut berjalan dari docroot, sehingga tetap berlaku walau
+    # .htaccess di dalam direktori unggahan diabaikan server.
+    RewriteRule ^storage/.*\.(?:php|phar|phtml|pht|php[0-9]|cgi|pl|py|rb|sh|asp|aspx|jsp|htaccess|htpasswd)$ - [F,L,NC]
+
     # Redirect Trailing Slashes If Not A Folder...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$

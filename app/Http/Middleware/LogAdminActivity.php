@@ -37,6 +37,16 @@ class LogAdminActivity
 
     private function write(Request $request, int $statusCode): void
     {
+        if ($request->isMethodSafe()
+            && $statusCode < 400
+            && ! $request->routeIs(
+                'admin.dashboard',
+                'admin.account.edit',
+                'admin.account.logs.export',
+            )) {
+            return;
+        }
+
         $user = $request->user();
         $routeName = (string) $request->route()?->getName();
 

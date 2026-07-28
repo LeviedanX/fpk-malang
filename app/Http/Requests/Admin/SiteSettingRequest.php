@@ -16,6 +16,13 @@ class SiteSettingRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        // Audio publik selalu opt-in. Nilai ini tidak boleh diaktifkan kembali
+        // melalui request yang dibuat manual.
+        $this->merge(['background_music_default_playing' => false]);
+    }
+
     /**
      * @return array<string, mixed>
      */

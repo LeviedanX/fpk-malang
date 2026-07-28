@@ -6,7 +6,7 @@
 @section('content')
     <div class="admin-toolbar">
         <form method="GET" action="{{ route('admin.articles.index') }}" class="admin-filter">
-            <input type="search" name="q" value="{{ $search }}" placeholder="Cari judul..." class="form-control text-sm sm:min-w-56">
+            <input type="search" name="q" value="{{ $search }}" placeholder="Cari judul..." maxlength="100" class="form-control text-sm sm:min-w-56">
             <select name="status" class="form-control text-sm sm:w-auto">
                 <option value="">Semua status</option>
                 <option value="published" @selected($status === 'published')>Terbit</option>
